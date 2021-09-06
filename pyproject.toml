@@ -1,0 +1,90 @@
+[build-system]
+requires = ["setuptools>=40.9.0", "wheel"]
+build-backend = "setuptools.build_meta:__legacy__"
+
+[tool.coverage.run]
+branch = true
+command_line = "-m pytest"
+data_file = "caches/pytest/coverage.sqlite3"
+source_pkgs = ["lockup"]
+[tool.coverage.report]
+precision = 2
+[tool.coverage.html]
+directory = "artifacts/coverage-pytest"
+
+[tool.pylint.MASTER]
+ignore = []
+# Warning: Parallelizing causes diagnostic output to be interleaved
+#          and also messes with similarities detection and dependency grouping.
+jobs = 1
+[tool.pylint.'MESSAGES CONTROL']
+disable = [
+  "consider-using-f-string",
+  "fixme",
+  "f-string-without-interpolation",
+  "import-outside-toplevel",
+  "misplaced-comparison-constant",
+  "multiple-statements",
+  "reimported",
+  "too-few-public-methods",
+  "ungrouped-imports",
+  "wrong-import-order",
+  "wrong-import-position",
+]
+[tool.pylint.REPORTS]
+output-format = "colorized"
+reports = true
+msg-template = "{path} {line:3d},{column:2d} [{symbol}] {msg}"
+[tool.pylint.TYPECHECK]
+ignore-mixin-members = false
+[tool.pylint.BASIC]
+good-names = [ "_", "__" ]
+include-naming-hint = true
+const-rgx = '([A-Za-z_][A-Za-z0-9_]{2,30}|(__.*__))$'
+const-name-hint = '([A-Za-z_][A-Za-z0-9_]{2,30}|(__.*__))$'
+[tool.pylint.FORMAT]
+max-line-length = 79
+ignore-long-lines = '^\s*(#\s*)?<?https?://\S+>?$'
+[tool.pylint.VARIABLES]
+dummy-variables-rgx = '_$'
+callbacks = []
+[tool.pylint.DESIGN]
+max-statements = 30
+max-parents = 3
+min-public-methods = 1
+[tool.pylint.CLASSES]
+defining-attr-methods = ["__init__", "__new__"]
+valid-classmethod-first-arg = ["kind", "class_"]
+valid-metaclass-classmethod-first-arg = ["maker", "factory"]
+exclude-protected = []
+[tool.pylint.EXCEPTIONS]
+overgeneral-exceptions = ["BaseException", "Exception"]
+[tool.pylint.SIMILARITIES]
+min-similarity-lines = 5
+ignore-imports = true
+
+[tool.pytest.ini_options]
+minversion = "6.1"
+addopts = "--exitfirst -rA --doctest-modules --doctest-glob='*.rst'"
+testpaths = ["tests/python3", "sources/sphinx"]
+python_files = ["*.py"]
+python_functions = ["test_[0-9][0-9][0-9]_*"]
+cache_dir = "caches/pytest"
+
+[tool.tox]
+# https://tox.readthedocs.io/en/latest/config.html
+legacy_tox_ini = """
+[tox]
+minversion = 3.20
+toxworkdir = caches/tox
+envlist = py36, py37, py38, py39, py310
+
+[testenv]
+deps = pipenv
+setenv =
+    PIPENV_VERBOSITY=-1
+passenv = HYPOTHESIS_STORAGE_DIRECTORY
+commands =
+    pipenv install --skip-lock --dev
+    pipenv run coverage run --parallel-mode
+"""
