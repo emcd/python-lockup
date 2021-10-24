@@ -318,7 +318,7 @@ class Version:
             if 'a' == stage: return Version_( 'a', major, minor, timestamp )
             if stage in 'cf': return Version_( stage, major, minor, patch + 1 )
         if 'major' == piece:
-            return Version_( 'a', major + 1, minor, timestamp )
+            return Version_( 'a', major + 1, 0, timestamp )
         if 'minor' == piece:
             return Version_( 'a', major, minor + 1, timestamp )
         raise Exit( f"Unknown kind of piece: {piece}" )
