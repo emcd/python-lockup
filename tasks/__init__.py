@@ -144,7 +144,13 @@ def freshen_pipenv( context ):
 
 @task( pre = ( clean_pycaches, clean_tool_caches, clean_pipenv, ) )
 def clean( context ): # pylint: disable=unused-argument
-    """ Cleans all caches and freshens the development virtual environment. """
+    """ Cleans all caches. """
+
+
+@task
+def lint_bandit( context ):
+    """ Security checks the source code with Bandit. """
+    context.run( f"bandit --recursive --verbose {python3_sources_path}" )
 
 
 @task( iterable = ( 'packages', 'modules', 'files', ) )
@@ -182,10 +188,11 @@ def lint_pylint( context, targets, checks ):
         f"pylint {reports_str} {checks_str} {targets_str}", pty = True )
 
 
-# TODO: Also run 'semgrep' and 'bandit'.
+# TODO: Also run 'semgrep'.
 @task( pre = (
     call( lint_pylint, targets = ( ), checks = ( ) ),
     call( lint_mypy, packages = ( ), modules = ( ), files = ( ) ),
+    call( lint_bandit ),
 ) )
 def lint( context ): # pylint: disable=unused-argument
     """ Lints the source code. """
