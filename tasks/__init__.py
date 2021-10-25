@@ -377,14 +377,15 @@ def push( context ):
     """ Pushes commits on current branch, plus all tags. """
     _ensure_clean_workspace( context )
     true_branch = context.run(
-        f"git branch --show-current", pty = True ).stdout.strip( )
+        f"git branch --show-current",
+        hide = 'stdout', pty = True ).stdout.strip( )
     this_version = Version.from_string( package_version )
     new_version = Version( 'f', this_version.major, this_version.minor, 0 )
     target_branch = f"release-{new_version}"
     if true_branch == target_branch:
         remote = context.run(
             f"git config --local branch.master.remote",
-            pty = True ).stdout.strip( )
+            hide = 'stdout', pty = True ).stdout.strip( )
         context.run(
             f"git push --set-upstream {remote} {true_branch}", pty = True )
     context.run( f"git push --tags", pty = True )
