@@ -33,7 +33,7 @@ class __( metaclass = NamespaceFactory ):
 
     from inspect import ismodule as is_module
     from sys import modules
-    from types import ModuleType as Module
+    from types import ModuleType as Module # type: ignore
 
     from .base import (
         InaccessibleAttribute,
@@ -113,6 +113,6 @@ def reclassify_module( module ):
     module.__class__ = Module
 
 
-reclassify_module( base )   # pylint: disable=undefined-variable
+reclassify_module( base ) # type: ignore # pylint: disable=undefined-variable
 reclassify_module( exceptions )
 reclassify_module( __name__ )

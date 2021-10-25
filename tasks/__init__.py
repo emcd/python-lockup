@@ -185,7 +185,7 @@ def lint_pylint( context, targets, checks ):
 # TODO: Also run 'semgrep' and 'bandit'.
 @task( pre = (
     call( lint_pylint, targets = ( ), checks = ( ) ),
-    #call( lint_mypy, packages = ( ), modules = ( ), files = ( ) ),
+    call( lint_mypy, packages = ( ), modules = ( ), files = ( ) ),
 ) )
 def lint( context ): # pylint: disable=unused-argument
     """ Lints the source code. """
