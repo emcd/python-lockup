@@ -44,17 +44,17 @@ from invoke import Exit, task, call
 
 
 top_path = Path( __file__ ).parent.parent
-sources_path = top_path / "sources"
-tests_path = top_path / "tests"
-caches_path = top_path / "caches"
-artifacts_path = top_path / "artifacts"
+sources_path = top_path / 'sources'
+tests_path = top_path / 'tests'
+caches_path = top_path / 'caches'
+artifacts_path = top_path / 'artifacts'
 project = top_path.name
 
-python3_sources_path = sources_path / "python3"
-python3_tests_path = tests_path / "python3"
+python3_sources_path = sources_path / 'python3'
+python3_tests_path = tests_path / 'python3'
 
-sphinx_sources_path = sources_path / "sphinx"
-sphinx_cache_path = caches_path / "sphinx"
+sphinx_sources_path = sources_path / 'sphinx'
+sphinx_cache_path = caches_path / 'sphinx'
 # https://www.sphinx-doc.org/en/master/man/sphinx-build.html
 sphinx_options = f"-j auto -d {sphinx_cache_path} -n -T"
 
@@ -130,7 +130,13 @@ def clean_pipenv( context ):
     context.run( 'pipenv clean', pty = True )
 
 
-@task( post = ( clean_pipenv, ) )
+@task
+def check_pipenv_security( context ):
+    """ Checks for security issues in utilized packages and tools. """
+    context.run( 'pipenv check', pty = True )
+
+
+@task( post = ( clean_pipenv, check_pipenv_security, ) )
 def freshen_pipenv( context ):
     """ Updates packages in the Python development virtualenv. """
     context.run( 'pipenv update --dev', pty = True )
@@ -176,9 +182,7 @@ def lint_pylint( context, targets, checks ):
         f"pylint {reports_str} {checks_str} {targets_str}", pty = True )
 
 
-# TODO: Create task for 'pipenv check'.
-
-
+# TODO: Also run 'semgrep' and 'bandit'.
 @task( pre = (
     call( lint_pylint, targets = ( ), checks = ( ) ),
     #call( lint_mypy, packages = ( ), modules = ( ), files = ( ) ),
@@ -191,18 +195,18 @@ def lint( context ): # pylint: disable=unused-argument
 def test( context ):
     """ Runs the test suite with the current Python version. """
     context.run(
-        "coverage run", pty = True,
+        'coverage run', pty = True,
         env = dict(
             HYPOTHESIS_STORAGE_DIRECTORY = caches_path / 'hypothesis', ) )
-    context.run( "coverage report", pty = True )
-    context.run( "coverage html", pty = True )
+    context.run( 'coverage report', pty = True )
+    context.run( 'coverage html', pty = True )
 
 
 @task( pre = ( lint, ) )
 def test_all_versions( context ):
     """ Runs the test suite across multiple, isolated Python versions. """
     context.run(
-        "tox --asdf-no-fallback --asdf-install", pty = True,
+        'tox --asdf-no-fallback --asdf-install', pty = True,
         env = dict(
             HYPOTHESIS_STORAGE_DIRECTORY = caches_path / 'hypothesis', ) )
 
@@ -210,15 +214,15 @@ def test_all_versions( context ):
 @task( pre = ( test_all_versions, ) )
 def cover_all_versions( context ):
     """ Reports on code coverage across multiple, isolated Python versions. """
-    context.run( "coverage combine", pty = True )
-    context.run( "coverage report", pty = True )
-    context.run( "coverage html", pty = True )
+    context.run( 'coverage combine', pty = True )
+    context.run( 'coverage report', pty = True )
+    context.run( 'coverage html', pty = True )
 
 
 @task
 def check_urls( context ):
     """ Checks the HTTP URLs in the documentation for liveness. """
-    output_path = artifacts_path / "sphinx-linkcheck"
+    output_path = artifacts_path / 'sphinx-linkcheck'
     context.run(
         f"sphinx-build -b linkcheck {sphinx_options} "
         f"{sphinx_sources_path} {output_path}" )
@@ -230,6 +234,7 @@ def make_sdist( context ):
     context.run( 'python3 setup.py sdist' )
 
 
+# TODO: Pluralize across target platforms.
 @task( pre = ( make_sdist, ) )
 def make_wheel( context ):
     """ Packages a Python wheel for release. """
@@ -313,7 +318,7 @@ class Version:
         if 'stage' == piece:
             if 'a' == stage: return Version_( 'c', major, minor, 1 )
             if 'c' == stage: return Version_( 'f', major, minor, 0 )
-            raise Exit( f"Cannot bump last stage." )
+            raise Exit( 'Cannot bump last stage.' )
         if 'patch' == piece:
             if 'a' == stage: return Version_( 'a', major, minor, timestamp )
             if stage in 'cf': return Version_( stage, major, minor, patch + 1 )
@@ -326,7 +331,7 @@ class Version:
 
 def _ensure_clean_workspace( context ):
     """ Error if version control reports any dirty or untracked files. """
-    result = context.run( f"git status --short", pty = True )
+    result = context.run( 'git status --short', pty = True )
     if result.stdout or result.stderr:
         raise Exit( 'Dirty workspace. Please stash or commit changes.' )
 
@@ -377,18 +382,18 @@ def push( context ):
     """ Pushes commits on current branch, plus all tags. """
     _ensure_clean_workspace( context )
     true_branch = context.run(
-        f"git branch --show-current",
+        'git branch --show-current',
         hide = 'stdout', pty = True ).stdout.strip( )
     this_version = Version.from_string( package_version )
     new_version = Version( 'f', this_version.major, this_version.minor, 0 )
     target_branch = f"release-{new_version}"
     if true_branch == target_branch:
         remote = context.run(
-            f"git config --local branch.master.remote",
+            'git config --local branch.master.remote',
             hide = 'stdout', pty = True ).stdout.strip( )
         context.run(
             f"git push --set-upstream {remote} {true_branch}", pty = True )
-    context.run( f"git push --tags", pty = True )
+    context.run( 'git push --tags', pty = True )
 
 
 @task( pre = ( clean, make, push, ) )
