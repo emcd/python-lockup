@@ -1,6 +1,10 @@
+# https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html
+# TODO: Add PEP 621 'metadata' tables once decent support exists.
+#       The 'ppsetuptools' wrapper is one possibility.
+#       The 'whey' build backend as a replacement for 'setuptools' is another.
+
 [build-system]
 requires = ["setuptools>=40.9.0", "wheel"]
-build-backend = "setuptools.build_meta:__legacy__"
 
 [tool.coverage.run]
 branch = true
