@@ -22,32 +22,42 @@
 
 .. TODO: Add row of status icons.
 
-Enables the creation of safer modules and namespaces with cleaner programming
-interfaces.
+Enables the creation of classes, modules, and namespaces on which all
+attributes are **immutable** and for which only public attributes are presented
+as an API (**visibility restriction**). Immutability increases code safety by
+discouraging monkey-patching and preventing accidental or deliberate changes to
+state. Visibility restriction means that functions, like ``dir``, can report a
+subset of attributes that are intended for programmers to use without exposing
+internals.
 
 Contents of this package are:
 
-* A module class which enforces **immutability** and **visibility restriction**
-  upon module attributes, thereby allowing module authors to guarantee state
-  and discourage the use of internal machinery by consumers. The module class
-  can *replace* the standard Python module class *with a single line of code*
-  in a module definition.
+* A module class, which enforces immutability and visibility restriction upon
+  module attributes. This module class can *replace* the standard Python module
+  class *with a single line of code* in a module definition.
 
-* A factory (metaclass) that creates **immutable** classes. (Just the classes
-  themsleves are immutable and not the instances of the classes.)
+* A factory (metaclass) that creates classes, enforcing immutability and
+  visibility restriction upon their attributes. (Just attributes on the
+  classes, themsleves, are immutable and visibility-restricted and not
+  attributes on the instances of the classes.)
 
-* A factory that creates **immutable** namespaces, which also provide **inert
+* A factory that creates namespaces, enforcing immutability and visibility
+  restriction upon their attributes. These namespaces also provide **inert
   access** to their attributes, meaning that no descriptor protocol, such as
-  method binding, intercepts attribute accesses.
+  method binding, intercepts attribute accesses on them.
 
 .. TODO: Provide link to online documentation.
 
 Quick Tour
 ===============================================================================
 
-Module immutability prevents tampering with critical module state:
+Module
+-------------------------------------------------------------------------------
 
-	>>> import lockup
+Let us consider the mutable `os <https://docs.python.org/3/library/os.html>`_
+module from the Python standard library and how we can alter "constants" that
+may be used in many places:
+
 	>>> import os
 	>>> os.EX_OK
 	0
@@ -59,6 +69,11 @@ Module immutability prevents tampering with critical module state:
 	>>> os.EX_OK = 0
 	>>> type( os )
 	<class 'module'>
+
+Now, let us see what protection it gains from becoming immutable:
+
+	>>> import os
+	>>> import lockup
 	>>> lockup.reclassify_module( os )
 	>>> del os.EX_OK
 	Traceback (most recent call last):
@@ -71,7 +86,10 @@ Module immutability prevents tampering with critical module state:
 	>>> type( os )
 	<class 'lockup.Module'>
 
-Immutable classes provide resistance to monkey-patching:
+Class Factory
+-------------------------------------------------------------------------------
+
+Let us monkey-patch a mutable class:
 
 	>>> import lockup
 	>>> class A:
@@ -87,12 +105,19 @@ Immutable classes provide resistance to monkey-patching:
 	>>> a = A( )
 	>>> a.expected_functionality( )
 	'I selfishly change behavior upon which other consumers depend.'
+
+Now, let us try to monkey-patch an immutable class:
+
+	>>> import lockup
 	>>> class B( metaclass = lockup.PrimalClassFactory ):
 	...     def expected_functionality( self ): return 42
 	...
 	>>> b = B( )
 	>>> b.expected_functionality( )
 	42
+	>>> def monkey_patch( self ):
+	...     return 'I selfishly change behavior upon which other consumers depend.'
+	...
 	>>> B.expected_functionality = monkey_patch
 	Traceback (most recent call last):
 	...
@@ -103,17 +128,16 @@ Immutable classes provide resistance to monkey-patching:
 	Traceback (most recent call last):
 	...
 	lockup.exceptions.ImpermissibleAttributeOperation: Attempt to delete indelible attribute '__setattr__' on class 'lockup.PrimalClassFactory'.
-	>>> type( type( B ) )
-	<class 'lockup.PrimalClassFactory'>
 	>>> issubclass( type( B ), type )
 	True
 
+Namespace Factory
+-------------------------------------------------------------------------------
+
 An alternative to `types.SimpleNamespace
 <https://docs.python.org/3/library/types.html#types.SimpleNamespace>`_ is
-available. This alternative is immutable and restricts visibility to public
-attributes:
+provided. First, let us observe the behaviors on a standard namespace:
 
-	>>> import lockup
 	>>> import types
 	>>> sn = types.SimpleNamespace( run = lambda: 42 )
 	>>> sn
@@ -135,6 +159,10 @@ attributes:
 	Traceback (most recent call last):
 	...
 	TypeError: 'types.SimpleNamespace' object is not callable
+
+Now, let us compare those behaviors to an immutable namespace:
+
+	>>> import lockup
 	>>> class NS( metaclass = lockup.NamespaceFactory ):
 	...     def run( ): return 42
 	...
@@ -161,12 +189,15 @@ attributes:
 	...
 	lockup.exceptions.ImpermissibleOperation: Impermissible instantiation of class ...
 
+Exceptions
+-------------------------------------------------------------------------------
+
 Exceptions can be intercepted with appropriate builtin exception classes or
 with package exception classes:
 
+	>>> import os
 	>>> import lockup
 	>>> from lockup.exceptions import InvalidOperation
-	>>> import os
 	>>> os.O_RDONLY
 	0
 	>>> lockup.reclassify_module( os )
