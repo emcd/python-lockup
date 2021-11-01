@@ -336,7 +336,7 @@ class Version:
         if 'patch' == piece:
             if 'dev' == stage:
                 return Version_( 'dev', major, minor, timestamp )
-            else: return Version_( stage, major, minor, patch + 1 )
+            return Version_( stage, major, minor, patch + 1 )
         if 'major' == piece:
             return Version_( 'dev', major + 1, 0, timestamp )
         if 'minor' == piece:
