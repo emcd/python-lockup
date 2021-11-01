@@ -20,7 +20,7 @@
                                     lockup
 *******************************************************************************
 
-.. todo:: Add row of status icons.
+.. TODO: Add row of status icons.
 
 Enables the creation of safer modules and namespaces with cleaner programming
 interfaces.
@@ -40,7 +40,7 @@ Contents of this package are:
   access** to their attributes, meaning that no descriptor protocol, such as
   method binding, intercepts attribute accesses.
 
-.. todo:: Provide link to online documentation.
+.. TODO: Provide link to online documentation.
 
 Quick Tour
 ===============================================================================
@@ -108,8 +108,10 @@ Immutable classes provide resistance to monkey-patching:
 	>>> issubclass( type( B ), type )
 	True
 
-An alternative to :py:class:`types.SimpleNamespace` is available.
-This alternative is immutable and restricts visibility to public attributes:
+An alternative to `types.SimpleNamespace
+<https://docs.python.org/3/library/types.html#types.SimpleNamespace>`_ is
+available. This alternative is immutable and restricts visibility to public
+attributes:
 
 	>>> import lockup
 	>>> import types

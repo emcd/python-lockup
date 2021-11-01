@@ -235,13 +235,20 @@ def check_urls( context ):
         f"{sphinx_sources_path} {output_path}" )
 
 
-@task( pre = ( cover_all_versions, check_urls, ) )
+@task
+def check_readme( context ):
+    """ Checks that the README will render correctly on PyPI. """
+    sdist_name = f"{package_name}-{package_version}.tar.gz"
+    sdist_path = artifacts_path / 'sdists' / sdist_name
+    context.run( f"twine check {sdist_path}" )
+
+
+@task( pre = ( cover_all_versions, check_urls, ), post = ( check_readme, ) )
 def make_sdist( context ):
     """ Packages the Python sources for release. """
     context.run( 'python3 setup.py sdist' )
 
 
-# TODO: Pluralize across target platforms.
 @task( pre = ( make_sdist, ) )
 def make_wheel( context ):
     """ Packages a Python wheel for release. """
@@ -284,20 +291,21 @@ class Version:
         from re import match
         matched = match(
             r"(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)"
-            r"(?:(?P<stage>[ac])(?:"
-            r"(?:(?<=a)(?P<ts>\d{12}))|(?:(?<=c)(?P<rc>\d+))"
+            r"(?:(?P<stage>dev|rc)(?:"
+            r"(?:(?<=dev)(?P<ts>\d{12}))|(?:(?<=rc)(?P<rc>\d+))"
             r"))?", version )
         stage = matched.group( 'stage' ) or 'f'
         patch = (
-            matched.group( 'ts' ) if 'a' == stage
+            matched.group( 'ts' ) if 'dev' == stage
             else (
-                matched.group( 'rc' ) if 'c' == stage
+                matched.group( 'rc' ) if 'rc' == stage
                 else matched.group( 'patch' ) ) )
         return kind(
             stage, matched.group( 'major' ), matched.group( 'minor' ), patch )
 
     def __init__( self, stage, major, minor, patch ):
-        if stage not in 'acf': raise Exit( f"Bad stage: {stage}" )
+        if stage not in ( 'dev', 'rc', 'f' ):
+            raise Exit( f"Bad stage: {stage}" )
         self.stage = stage
         self.major = int( major )
         self.minor = int( minor )
@@ -310,8 +318,7 @@ class Version:
         return ''.join( filter( None, (
             f"{self.major}", f".{self.minor}",
             f".{patch}" if 'f' == stage else '.0',
-            stage if stage in 'ac' else '',
-            f"{patch}" if stage in 'ac' else '' ) ) )
+            f"{stage}{patch}" if stage in ( 'dev', 'rc' ) else '' ) ) )
 
     def as_bumped( self, piece ):
         """ Returns a derivative of the version,
@@ -321,18 +328,19 @@ class Version:
         Version_ = type( self )
         stage, major, minor, patch = (
             self.stage, self.major, self.minor, self.patch )
-        timestamp = DateTime.utcnow( ).strftime( '%Y%m%d%H%M' )
         if 'stage' == piece:
-            if 'a' == stage: return Version_( 'c', major, minor, 1 )
-            if 'c' == stage: return Version_( 'f', major, minor, 0 )
+            if 'dev' == stage: return Version_( 'rc', major, minor, 1 )
+            if 'rc' == stage: return Version_( 'f', major, minor, 0 )
             raise Exit( 'Cannot bump last stage.' )
+        timestamp = DateTime.utcnow( ).strftime( '%Y%m%d%H%M' )
         if 'patch' == piece:
-            if 'a' == stage: return Version_( 'a', major, minor, timestamp )
-            if stage in 'cf': return Version_( stage, major, minor, patch + 1 )
+            if 'dev' == stage:
+                return Version_( 'dev', major, minor, timestamp )
+            else: return Version_( stage, major, minor, patch + 1 )
         if 'major' == piece:
-            return Version_( 'a', major + 1, 0, timestamp )
+            return Version_( 'dev', major + 1, 0, timestamp )
         if 'minor' == piece:
-            return Version_( 'a', major, minor + 1, timestamp )
+            return Version_( 'dev', major, minor + 1, timestamp )
         raise Exit( f"Unknown kind of piece: {piece}" )
 
 

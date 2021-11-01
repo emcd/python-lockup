@@ -34,10 +34,8 @@ del required_version, version, error_message, version_info
 
 
 from sys import stderr
-from pathlib import Path
-from os import environ as env
-top_path = Path( __file__ ).parent
-#env[ 'DISTUTILS_DEBUG' ] = 'True'
+from os import environ as psenv
+#psenv[ 'DISTUTILS_DEBUG' ] = 'True'
 
 
 # Sanity check tools.
@@ -51,15 +49,5 @@ except ImportError as exc:
 # TODO: Check 'setuptools' version.
 
 
-# Load long description from README file.
-readme_path = top_path / 'README.rst'
-with readme_path.open( ) as readme_file:
-    long_description = readme_file.read( )
-
-
-# https://packaging.python.org/guides/distributing-packages-using-setuptools/#setup-args
 # https://docs.python.org/3/distutils/setupscript.html#writing-the-setup-script
-configuration = { }
-configuration[ 'long_description' ] = long_description
-configuration[ 'long_description_content_type' ] = 'text/x-rst'
-setup( **configuration )
+setup( )
