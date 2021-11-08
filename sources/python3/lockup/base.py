@@ -117,12 +117,6 @@ def create_attribute_nonexistence_exception( name, context ):
     return InaccessibleAttribute(
         f"Attempt to access nonexistent {label}." )
 
-def create_attribute_concealment_exception( name, context ):
-    ''' Creates error with context about attribute concealment. '''
-    label = calculate_label( context, f"attribute '{name}'" )
-    return InaccessibleAttribute(
-        f"Attempt to violate concealment of {label}." )
-
 def create_attribute_immutability_exception(
     name, context, action = 'assign'
 ):
@@ -343,12 +337,13 @@ def select_public_attributes(
 #============================ Primal Class Factory ===========================#
 
 
-class PrimalClassFactory( type ):
-    ''' Produces classes with immutable attributes.
+class Class( type ):
+    ''' Produces classes which have immutable attributes.
 
-        Also, conceals private attributes from :py:func:`dir`. '''
+        Non-public attributes of each class are concealed from :py:func:`dir`.
+    '''
 
-    __module__ = f"{base_package_name}"
+    __module__ = base_package_name
 
     __slots__ = ( )
 
@@ -394,7 +389,7 @@ if python_implementation in ( 'CPython', ): # pragma: no branch
         f_struct = PyObject.from_address( f_pointer )
         f_struct.ob_type = c_void_p( f_pointer )
 
-    _make_god_unto_itself( PrimalClassFactory )
+    _make_god_unto_itself( Class )
 
 
 #================================= Exceptions ================================#
@@ -408,7 +403,7 @@ if python_implementation in ( 'CPython', ): # pragma: no branch
 # pylint: disable=too-many-ancestors
 
 
-class Exception0( BaseException, metaclass = PrimalClassFactory ):
+class Exception0( BaseException, metaclass = Class ):
     ''' Base for all exceptions in the package. '''
 
     __module__ = f"{base_package_name}.exceptions"
@@ -503,27 +498,51 @@ class FugitiveException( InvalidState, RuntimeError ):
 #============================ Additional Factories ===========================#
 
 
-class NamespaceFactory( PrimalClassFactory, metaclass = PrimalClassFactory ):
-    ''' Produces immutable namespaces with inert access to their attributes.
-
-        Also, conceals private attributes on each namespace
-        from :py:func:`dir`.
+class NamespaceClass( Class, metaclass = Class ):
+    ''' Produces namespace classes which have immutable attributes.
 
         Each produced namespace is a unique class, which cannot be
-        instantiated. Descriptors will not be invoked on a class,
-        which means that attribute accesses will be inert. (I.e.,
-        each attribute will be presented as it was assigned without
-        any logic, such as method binding, to intercept its presentation.) '''
+        instantiated.
 
-    __module__ = f"{base_package_name}"
+        Non-public attributes of each class are concealed from :py:func:`dir`.
+
+        .. warning::
+           Although most descriptor attributes will be inert on a class,
+           :py:func:`types.DynamicClassAttribute` and similar, may trigger
+           attribute errors when accessed. However, these are a fairly rare
+           case and are probably not needed on namespaces, in general. '''
+
+    __module__ = base_package_name
 
     @intercept
     def __new__( factory, name, bases, namespace ):
-        # Prevent instantiation.
-        if '__new__' in namespace:
+        for aname in namespace:
+            if aname in ( '__doc__', '__module__', '__qualname__', ): continue
+            if is_public_name( aname ): continue
             raise create_class_attribute_rejection_exception(
-                '__new__', namespace )
-        def __new__( kind, *givens_list, **givens_mapping ): # pylint: disable=unused-argument
+                aname, namespace )
+        def __new__( kind, *posargs, **nomargs ): # pylint: disable=unused-argument
             raise create_impermissible_instantiation_exception( kind )
         namespace[ '__new__' ] = __new__
         return super( ).__new__( factory, name, bases, namespace )
+
+    @intercept
+    def __repr__( kind ):
+        namespace = {
+            '__module__': kind.__module__, '__qualname__': kind.__qualname__ }
+        namespace.update( kind.__dict__ )
+        return "{kind}( {name!r}, {bases!r}, {{ {namespace} }} )".format(
+            kind = type( kind ).__qualname__,
+            name = kind.__name__,
+            bases = tuple( ( base.__qualname__ for base in kind.__bases__ ) ),
+            namespace = ", ".join( (
+                f"{aname!r}: {avalue!r}" for aname, avalue
+                in namespace.items( ) ) ) )
+
+
+def create_namespace( **nomargs ):
+    ''' Creates immutable namespaces from nominative arguments. '''
+    namespace = {
+        '__module__': base_package_name, '__qualname__': 'Namespace' }
+    namespace.update( nomargs )
+    return NamespaceClass( 'Namespace', ( ), namespace )

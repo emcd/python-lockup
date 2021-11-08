@@ -26,10 +26,10 @@ __version__ = '1.0.0rc1'
 
 
 from . import exceptions
-from .base import NamespaceFactory, PrimalClassFactory
+from .base import Class, NamespaceClass, create_namespace
 
 
-class __( metaclass = NamespaceFactory ):
+class __( metaclass = NamespaceClass ):
 
     from inspect import ismodule as is_module
     from sys import modules
@@ -39,7 +39,6 @@ class __( metaclass = NamespaceFactory ):
         InaccessibleAttribute,
         base_package_name,
         create_argument_validation_exception,
-        create_attribute_concealment_exception,
         create_attribute_immutability_exception,
         create_attribute_indelibility_exception,
         create_attribute_nonexistence_exception,
@@ -49,33 +48,26 @@ class __( metaclass = NamespaceFactory ):
         validate_attribute_name, )
 
 
-class Module( __.Module, metaclass = PrimalClassFactory ):
-    ''' Module whose attributes cannot be mutated outside of its definition.
+class Module( __.Module, metaclass = Class ):
+    ''' Module whose attributes are immutable except during module definition.
 
-        Also:
+        Can replace the ``__class__`` attribute on an existing module.
 
-        * Conceals private attributes from :py:func:`dir`.
-        * Denies direct access to private attributes
-          outside of its definition. '''
+        Non-public attributes of the module are concealed from :py:func:`dir`.
+        Also, a copy of the module dictionary is returned when the ``__dict__``
+        attribute is accessed; this is done to remove a backdoor by which
+        attributes could be mutated.
+
+        .. note::
+           Copies of the module dictionary are mutable so as to not violate the
+           internal expectations of Python as well as important packages,
+           such as :py:mod:`doctest`. Ideally, these would be immutable,
+           but cannot be as of this writing. '''
 
     @__.intercept
     def __getattribute__( self, name ):
-        # Note: Ideally, we would return a 'DictionaryProxy' here,
-        #       but that breaks various expectations for a true 'dict'.
         if '__dict__' == name: return dict( super( ).__getattribute__( name ) )
-        # Short-circuit lookup for auxiliary functions we want to use here.
-        if '__' == name: return super( ).__getattribute__( name )
-        try:
-            # Operational attributes are fine.
-            if __.is_operational_name( name ):
-                return super( ).__getattribute__( name )
-            # Concealed attributes should be... concealed.
-            if name.startswith( '_' ):
-                raise __.create_attribute_concealment_exception( name, self )
-            return super( ).__getattribute__( name )
-        # Explicitly forward 'InaccessibleAttribute'
-        # to prevent infinite recursion on 'AttributeError'.
-        except __.InaccessibleAttribute: raise
+        try: return super( ).__getattribute__( name )
         except AttributeError as exc:
             raise __.create_attribute_nonexistence_exception(
                 name, self ) from exc

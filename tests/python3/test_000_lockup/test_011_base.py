@@ -23,10 +23,10 @@
 
 from pytest import mark, raises
 
-from lockup import NamespaceFactory
+from lockup import NamespaceClass
 
 
-class __( metaclass = NamespaceFactory ):
+class __( metaclass = NamespaceClass ):
 
     import types
 
@@ -38,17 +38,21 @@ class __( metaclass = NamespaceFactory ):
         calculate_invocable_label,
         calculate_module_label,
         create_argument_validation_exception,
+        create_namespace,
         intercept,
+        is_operational_name,
         is_public_or_operational_name,
         module_qualify_class_name,
         select_public_attributes,
         validate_argument_invocability,
+        validate_attribute_existence,
         select_public_attributes,
+        Class,
         FugitiveException,
+        InaccessibleAttribute,
         IncorrectData,
         InvalidOperation,
         InvalidState,
-        PrimalClassFactory,
     )
 
 
@@ -97,8 +101,21 @@ _invocables = (
 )
 
 class _A: red = 1
-class _B( metaclass = NamespaceFactory ): blue = 2
+class _B( metaclass = NamespaceClass ): blue = 2
 class _C: __slots__ = ( 'blue', 'red', )
+
+
+def test_006_is_operational_name( ):
+    ''' Verify valid operational Python identifier. '''
+    assert __.is_operational_name( '__dict__' )
+
+
+@mark.parametrize(
+    'name', ( 'public', '_non_public', '__', '__nope', 'if', '123', )
+)
+def test_007_is_not_operational_name( name ):
+    ''' Verify invalid operational Python identifier. '''
+    assert not __.is_operational_name( name )
 
 
 @mark.parametrize( 'name', ( 'public', '__dict__', ) )
@@ -136,8 +153,8 @@ def test_017_module_qualify_invalid_class_name( class_ ):
     'class_, object_, includes, excludes, expectation',
     ( ( type, _A, ( ), ( ), [ 'mro', 'red' ] ),
       ( _A, _A( ), ( ), ( ), [ 'red' ] ),
-      ( __.PrimalClassFactory, NamespaceFactory, ( ), ( ), [ 'mro' ] ),
-      ( NamespaceFactory, _B, ( ), ( ), [ 'blue' ] ),
+      ( __.Class, NamespaceClass, ( ), ( ), [ 'mro' ] ),
+      ( NamespaceClass, _B, ( ), ( ), [ 'blue' ] ),
       ( _C, _C( ), ( ), ( ), [ 'blue', 'red' ] ),
       ( _C, _C( ), ( '__str__', ), ( 'red', ), [ '__str__', 'blue' ] ) ) )
 def test_021_select_public_attributes(
@@ -271,6 +288,19 @@ def test_082_validate_noninvocable_argument( argument ):
     def tester( argument ): return argument
     with raises( __.IncorrectData ):
         __.validate_argument_invocability( argument, 'argument', tester )
+
+
+def test_091_validate_attribute_existence( ):
+    ''' Names of valid attributes are returned without alteration. '''
+    assert 'a_method' == __.validate_attribute_existence(
+        'a_method', _invocable_object )
+
+
+def test_092_validate_attribute_nonexistence( ):
+    ''' Nonexistent attributes cause exceptions. '''
+    aname = 'ph00b4r' * 5
+    with raises( __.InaccessibleAttribute ):
+        __.validate_attribute_existence( aname, _invocable_object )
 
 
 @mark.parametrize( 'value',
