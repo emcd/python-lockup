@@ -23,29 +23,28 @@
 
 from pytest import mark, raises
 
-from lockup import NamespaceFactory
+from lockup import NamespaceClass
 
 
-class __( metaclass = NamespaceFactory ):
+class __( metaclass = NamespaceClass ):
 
     from lockup import exceptions
     from lockup import (
         reclassify_module,
         Module,
-        NamespaceFactory,
-        PrimalClassFactory,
+        NamespaceClass,
     )
 
 
 def test_211_produce_namespace( ):
     ''' Normal production of namespace. '''
 
-    class Namespace( metaclass = __.NamespaceFactory ):
+    class Namespace( metaclass = __.NamespaceClass ):
         ''' Test namespace. '''
 
         answer = 42
 
-    assert isinstance( Namespace, __.NamespaceFactory )
+    assert isinstance( Namespace, __.NamespaceClass )
 
 
 def test_212_fail_to_produce_instantiable_namespace( ):
@@ -53,11 +52,11 @@ def test_212_fail_to_produce_instantiable_namespace( ):
 
     with raises( __.exceptions.InvalidOperation ):
 
-        class Namespace( metaclass = __.NamespaceFactory ):
+        class Namespace( metaclass = __.NamespaceClass ):
             ''' Test namespace. '''
 
             def __new__( class_, *pos_arguments, **nom_arguments ):
-                return super( class_, __.NamespaceFactory ).__new__(
+                return super( class_, __.NamespaceClass ).__new__(
                     *pos_arguments, **nom_arguments )
 
         del Namespace

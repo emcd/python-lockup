@@ -23,8 +23,8 @@
 .. TODO: Add row of status icons.
 
 Enables the creation of classes, modules, and namespaces on which all
-attributes are **immutable** and for which only public attributes are presented
-as an API (**visibility restriction**). Immutability increases code safety by
+attributes are **immutable** and for which non-public attributes are concealed
+(**visibility restriction**).  Immutability increases code safety by
 discouraging monkey-patching and preventing accidental or deliberate changes to
 state. Visibility restriction means that functions, like ``dir``, can report a
 subset of attributes that are intended for programmers to use without exposing
@@ -42,9 +42,7 @@ Contents of this package are:
   attributes on the instances of the classes.)
 
 * A factory that creates namespaces, enforcing immutability and visibility
-  restriction upon their attributes. These namespaces also provide **inert
-  access** to their attributes, meaning that no descriptor protocol, such as
-  method binding, intercepts attribute accesses on them.
+  restriction upon their attributes.
 
 .. TODO: Provide link to online documentation.
 
@@ -109,7 +107,7 @@ Let us monkey-patch a mutable class:
 Now, let us try to monkey-patch an immutable class:
 
 	>>> import lockup
-	>>> class B( metaclass = lockup.PrimalClassFactory ):
+	>>> class B( metaclass = lockup.Class ):
 	...     def expected_functionality( self ): return 42
 	...
 	>>> b = B( )
@@ -123,11 +121,11 @@ Now, let us try to monkey-patch an immutable class:
 	...
 	lockup.exceptions.ImpermissibleAttributeOperation: Attempt to assign immutable attribute 'expected_functionality' on class ...
 	>>> type( B )
-	<class 'lockup.PrimalClassFactory'>
+	<class 'lockup.Class'>
 	>>> del type( B ).__setattr__
 	Traceback (most recent call last):
 	...
-	lockup.exceptions.ImpermissibleAttributeOperation: Attempt to delete indelible attribute '__setattr__' on class 'lockup.PrimalClassFactory'.
+	lockup.exceptions.ImpermissibleAttributeOperation: Attempt to delete indelible attribute '__setattr__' on class 'lockup.Class'.
 	>>> issubclass( type( B ), type )
 	True
 
@@ -162,32 +160,42 @@ provided. First, let us observe the behaviors on a standard namespace:
 
 Now, let us compare those behaviors to an immutable namespace:
 
-	>>> import lockup
-	>>> class NS( metaclass = lockup.NamespaceFactory ):
-	...     def run( ): return 42
-	...
-	>>> NS.run( )
-	42
-	>>> type( NS )
-	<class 'lockup.NamespaceFactory'>
-	>>> dir( NS )
-	['run']
-	>>> NS.__dict__
-	mappingproxy(...)
-	>>> type( NS.run )
-	<class 'function'>
-	>>> NS.run = lambda: 666
-	Traceback (most recent call last):
-	...
-	lockup.exceptions.ImpermissibleAttributeOperation: Attempt to assign immutable attribute 'run' on class ...
-	>>> NS.__dict__[ 'run' ] = lambda: 666
-	Traceback (most recent call last):
-	...
-	TypeError: 'mappingproxy' object does not support item assignment
-	>>> NS( )
-	Traceback (most recent call last):
-	...
-	lockup.exceptions.ImpermissibleOperation: Impermissible instantiation of class ...
+    >>> import lockup
+    >>> ns = lockup.create_namespace( run = lambda: 42 )
+    >>> ns
+    NamespaceClass( 'Namespace', ('object',), { ... } )
+    >>> ns.run( )
+    42
+    >>> type( ns )
+    <class 'lockup.NamespaceClass'>
+    >>> ns.__dict__
+    mappingproxy({...})
+    >>> type( ns.run )
+    <class 'function'>
+    >>> ns.run = lambda: 666
+    Traceback (most recent call last):
+    ...
+    lockup.exceptions.ImpermissibleAttributeOperation: Attempt to assign immutable attribute 'run' on class 'lockup.Namespace'.
+    >>> ns.__dict__[ 'run' ] = lambda: 666
+    Traceback (most recent call last):
+    ...
+    TypeError: 'mappingproxy' object does not support item assignment
+    >>> ns( )
+    Traceback (most recent call last):
+    ...
+    lockup.exceptions.ImpermissibleOperation: Impermissible instantiation of class 'lockup.Namespace'.
+
+Also of note is that we can define namespace classes directly, allowing us to
+capture imports for internal use in a module without publicly exposing them as
+part of the module API, for example:
+
+    >>> class __( metaclass = lockup.NamespaceClass ):
+    ...     from os import O_RDONLY, O_RDWR
+    ...
+    >>> __.O_RDONLY
+    0
+
+The above technique is used internally within this package itself.
 
 Exceptions
 -------------------------------------------------------------------------------
