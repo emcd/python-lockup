@@ -392,6 +392,17 @@ def branch_release( context ):
     context.run( f"git checkout -b release-{new_version}", pty = True )
 
 
+@task( optional = ( 'write_changes', ) )
+def check_code_style( context, write_changes = False ):
+    """ Checks code style of new changes. """
+    yapf_options = [ ]
+    if write_changes: yapf_options.append( '--in-place --verbose' )
+    yapf_options_string = ' '.join( yapf_options )
+    context.run(
+        f"git diff -U0 --no-color -- {python3_sources_path} "
+        f"| yapf-diff {yapf_options_string}" )
+
+
 @task
 def push( context ):
     """ Pushes commits on current branch, plus all tags. """
