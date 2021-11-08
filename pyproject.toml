@@ -92,3 +92,29 @@ commands =
     pipenv install --skip-lock --dev
     pipenv run coverage run --parallel-mode
 """
+
+[tool.yapf]
+# https://github.com/google/yapf
+allow_multiline_dictionary_keys = true
+allow_multiline_lambdas = true
+blank_lines_between_top_level_imports_and_variables = 2
+blank_line_before_module_docstring = true
+blank_line_before_nested_class_or_def = true
+coalesce_brackets = true
+#continuation_align_style = 'SPACE'
+dedent_closing_brackets = true
+disable_ending_comma_heuristic = true
+each_dict_entry_on_separate_line = false
+indent_dictionary_value = true
+spaces_around_default_or_named_assign = true
+spaces_around_dict_delimiters = true
+spaces_around_list_delimiters = true
+spaces_around_power_operator = true
+spaces_around_subscript_colon = true
+spaces_around_tuple_delimiters = true
+space_inside_brackets = true
+split_arguments_when_comma_terminated = true
+split_before_arithmetic_operator = true
+split_before_dot = false
+split_before_expression_after_opening_paren = true
+#split_before_named_assigns = true
