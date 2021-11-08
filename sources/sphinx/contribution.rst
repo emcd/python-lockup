@@ -181,7 +181,7 @@ would be used to automate such tasks.
 However, in to provide maximum portability
 and to reduce the number of languages that a developer needs to remember,
 we use a Python-native solution:
-`invoke <http://www.pyinvoke.org/>`_.
+`invoke <https://www.pyinvoke.org/>`_.
 The :command:`invoke` is available as part of the virtual environment
 maintained by Pipenv for this project.
 
