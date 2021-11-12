@@ -48,7 +48,7 @@ const-rgx = '([A-Za-z_][A-Za-z0-9_]{2,30}|(__.*__))$'
 const-name-hint = '([A-Za-z_][A-Za-z0-9_]{2,30}|(__.*__))$'
 [tool.pylint.FORMAT]
 max-line-length = 79
-ignore-long-lines = '^\s*(#\s*)?<?https?://\S+>?$'
+ignore-long-lines = '^(\s*(#\s*)?<?https?://\S+>?|.*\s+#\s*.*)$'
 [tool.pylint.VARIABLES]
 dummy-variables-rgx = '_$'
 callbacks = []
