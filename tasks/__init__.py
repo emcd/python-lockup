@@ -44,10 +44,11 @@ from invoke import Exit, task, call
 
 
 top_path = Path( __file__ ).parent.parent
+artifacts_path = top_path / 'artifacts'
+caches_path = top_path / 'caches'
+scm_modules_path = top_path / 'scm-modules'
 sources_path = top_path / 'sources'
 tests_path = top_path / 'tests'
-caches_path = top_path / 'caches'
-artifacts_path = top_path / 'artifacts'
 project = top_path.name
 
 python3_sources_path = sources_path / 'python3'
@@ -130,21 +131,42 @@ def clean_pipenv( context ):
     context.run( 'pipenv clean', pty = True )
 
 
+@task( pre = ( clean_pycaches, clean_tool_caches, clean_pipenv, ) )
+def clean( context ): # pylint: disable=unused-argument
+    """ Cleans all caches. """
+
+
 @task
 def check_pipenv_security( context ):
-    """ Checks for security issues in utilized packages and tools. """
+    """ Checks for security issues in utilized packages and tools.
+
+        This task requires Internet access and may take some time. """
     context.run( 'pipenv check', pty = True )
 
 
 @task( post = ( clean_pipenv, check_pipenv_security, ) )
 def freshen_pipenv( context ):
-    """ Updates packages in the Python development virtualenv. """
+    """ Updates packages for the Python development virtualenv.
+
+        This task requires Internet access and may take some time. """
     context.run( 'pipenv update --dev', pty = True )
 
 
-@task( pre = ( clean_pycaches, clean_tool_caches, clean_pipenv, ) )
-def clean( context ): # pylint: disable=unused-argument
-    """ Cleans all caches. """
+@task
+def freshen_scm_modules( context ):
+    """ Performs recursive update of all SCM modules.
+
+        Initializes SCM modules as needed.
+        This task requires Internet access and may take some time. """
+    context.run(
+        'git submodule update --init --recursive --remote', pty = True )
+
+
+@task( pre = ( clean, freshen_pipenv, freshen_scm_modules, ) )
+def freshen( context ): # pylint: disable=unused-argument
+    """ Performs the various freshening tasks, cleaning first.
+
+        This task requires Internet access and may take some time. """
 
 
 @task
@@ -188,9 +210,20 @@ def lint_pylint( context, targets, checks ):
         f"pylint {reports_str} {checks_str} {targets_str}", pty = True )
 
 
-# TODO: Also run 'semgrep'.
+@task
+def lint_semgrep( context ):
+    """ Lints the source code with Semgrep. """
+    sgconfig_path = (
+        scm_modules_path / 'semgrep-rules' / 'python' / 'lang' )
+    # TODO: Remove error interception once Semgrep core does not crash.
+    context.run(
+        f"semgrep --config {sgconfig_path} --use-git-ignore "
+        f"{python3_sources_path}", hide = 'stderr', warn = True )
+
+
 @task( pre = (
     call( lint_pylint, targets = ( ), checks = ( ) ),
+    call( lint_semgrep ),
     call( lint_mypy, packages = ( ), modules = ( ), files = ( ) ),
     call( lint_bandit ),
 ) )
@@ -265,7 +298,7 @@ def make_html( context ):
         f"{sphinx_sources_path} {output_path}" )
 
 
-@task( pre = ( freshen_pipenv, make_wheel, make_html, ) )
+@task( pre = ( freshen, make_wheel, make_html, ) )
 def make( context ): # pylint: disable=unused-argument
     """ Generates all of the artifacts. """
 
