@@ -53,7 +53,7 @@ class __:
     from sys import modules
 
 
-def intercept( invocation ): # nosemgrep: scm-modules.semgrep-rules.python.lang.maintainability.useless-inner-function
+def intercept( invocation ):
     ''' Decorator to intercept fugitive exceptions.
 
         Fugitive exceptions are ones which are not expected
@@ -514,7 +514,7 @@ class NamespaceClass( Class, metaclass = Class ):
 
     __module__ = base_package_name
 
-    @intercept # nosemgrep: scm-modules.semgrep-rules.python.lang.maintainability.useless-inner-function
+    @intercept
     def __new__( factory, name, bases, namespace ):
         for aname in namespace:
             if aname in ( '__doc__', '__module__', '__qualname__', ): continue
