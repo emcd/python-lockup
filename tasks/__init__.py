@@ -39,8 +39,10 @@
 """
 
 
+from itertools import chain
 from pathlib import Path
-from invoke import Exit, task, call
+
+from invoke import Context, Exit, call, task
 
 
 top_path = Path( __file__ ).parent.parent
@@ -68,7 +70,7 @@ def _parse_project_information( ):
         config.read( path )
         metadata = config[ 'metadata' ]
         return path, metadata[ 'name' ], metadata[ 'version' ]
-    # TODO: Look in 'pyproject.toml' if PEP 621 is implemented.
+    # TODO: Look in 'pyproject.toml' if PEP 621 is implemented for setuptools.
     #       https://www.python.org/dev/peps/pep-0621/
     raise Exception( 'Cannot find suitable source of project metadata.' )
 
@@ -93,9 +95,17 @@ def _unlink_recursively( path ):
 
 
 @task
+def install_git_hooks( context ):
+    """ Installs hooks to check goodness of code changes before commit. """
+    my_cfg_path = sources_path / 'pre-commit.yaml'
+    context.run(
+        f"pre-commit install --config {my_cfg_path} --install-hooks",
+        pty = True )
+
+
+@task
 def clean_pycaches( context ): # pylint: disable=unused-argument
     """ Removes all caches of compiled CPython bytecode. """
-    from itertools import chain
     anchors = ( python3_sources_path, python3_tests_path, )
     for path in chain.from_iterable( map(
         lambda anchor: anchor.rglob( '__pycache__/*' ), anchors
@@ -108,7 +118,6 @@ def clean_pycaches( context ): # pylint: disable=unused-argument
 @task
 def clean_tool_caches( context ): # pylint: disable=unused-argument
     """ Clears the caches used by code generation and testing utilities. """
-    from itertools import chain
     anchors = caches_path.glob( '*' )
     gitignore_paths = set( caches_path.glob( '*/.gitignore' ) )
     dirs_stack = [ ]
@@ -153,8 +162,8 @@ def freshen_pipenv( context ):
 
 
 @task
-def freshen_scm_modules( context ):
-    """ Performs recursive update of all SCM modules.
+def freshen_git_modules( context ):
+    """ Performs recursive update of all Git modules.
 
         Initializes SCM modules as needed.
         This task requires Internet access and may take some time. """
@@ -162,7 +171,7 @@ def freshen_scm_modules( context ):
         'git submodule update --init --recursive --remote', pty = True )
 
 
-@task( pre = ( clean, freshen_pipenv, freshen_scm_modules, ) )
+@task( pre = ( clean, freshen_pipenv, freshen_git_modules, ) )
 def freshen( context ): # pylint: disable=unused-argument
     """ Performs the various freshening tasks, cleaning first.
 
@@ -424,18 +433,18 @@ def branch_release( context ):
     context.run( f"git checkout -b release-{new_version}", pty = True )
 
 
-@task( optional = ( 'write_changes', ) )
+@task
 def check_code_style( context, write_changes = False ):
     """ Checks code style of new changes. """
     yapf_options = [ ]
     if write_changes: yapf_options.append( '--in-place --verbose' )
     yapf_options_string = ' '.join( yapf_options )
     context.run(
-        f"git diff -U0 --no-color -- {python3_sources_path} "
+        f"git diff --unified=0 --no-color -- {python3_sources_path} "
         f"| yapf-diff {yapf_options_string}" )
 
 
-@task
+@task( pre = ( test, ) )
 def push( context ):
     """ Pushes commits on current branch, plus all tags. """
     _ensure_clean_workspace( context )
