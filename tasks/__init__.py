@@ -215,10 +215,9 @@ def lint_semgrep( context ):
     """ Lints the source code with Semgrep. """
     sgconfig_path = (
         scm_modules_path / 'semgrep-rules' / 'python' / 'lang' )
-    # TODO: Remove error interception once Semgrep core does not crash.
     context.run(
         f"semgrep --config {sgconfig_path} --use-git-ignore "
-        f"{python3_sources_path}", hide = 'stderr', warn = True )
+        f"{python3_sources_path}", pty = True )
 
 
 @task( pre = (
