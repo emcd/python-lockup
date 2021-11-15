@@ -98,7 +98,7 @@ some packages with your OS package manager first:
 
     .. code-block:: sh
 
-        sudo apt-get update && sudo apt-get install libbz2-dev libffi-dev libsqlite3-dev libssl-dev libreadline-dev zlib1g-dev
+        sudo apt update && sudo apt install libbz2-dev libffi-dev libsqlite3-dev libssl-dev libreadline-dev zlib1g-dev
 
 If you have installed asdf_, then you can execute the following commands to
 ensure that the necessary Python environments are available:
@@ -159,7 +159,16 @@ you clone the project and have installed pipenv_, just run::
 
     pipenv sync --dev
 
-to prepare a virtual environment for development. Simple!
+to prepare a virtual environment for development.
+
+To use certain development tools that we support, you may need to install
+some packages with your OS package manager first:
+
+.. tab:: apt
+
+    .. code-block:: sh
+
+        sudo apt update && sudo apt install libenchant-2-2
 
 `EditorConfig <https://editorconfig.org>`_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

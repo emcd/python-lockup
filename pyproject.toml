@@ -41,6 +41,9 @@ reports = true
 msg-template = "{path} {line:3d},{column:2d} [{symbol}] {msg}"
 [tool.pylint.TYPECHECK]
 ignore-mixin-members = false
+[toll.pylint.SPELLING]
+spelling-dict = 'en_US'
+spelling-ignore-comment-directives = [ 'mypy:', 'pylint:' ]
 [tool.pylint.BASIC]
 good-names = [ "_", "__" ]
 include-naming-hint = true
