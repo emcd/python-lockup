@@ -473,6 +473,7 @@ def push( context ):
             hide = 'stdout', pty = True ).stdout.strip( )
         context.run(
             f"git push --set-upstream {remote} {true_branch}", pty = True )
+    else: context.run( 'git push', pty = True )
     context.run( 'git push --tags', pty = True )
 
 
