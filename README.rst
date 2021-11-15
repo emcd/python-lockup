@@ -44,7 +44,7 @@ Contents of this package are:
 * A factory that creates namespaces, enforcing immutability and visibility
   restriction upon their attributes.
 
-.. TODO: Provide link to online documentation.
+Full Documentation: https://emcd.github.io/python-lockup/
 
 Quick Tour
 ===============================================================================
