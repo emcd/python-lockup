@@ -290,21 +290,34 @@ def check_urls( context ):
 @task
 def check_readme( context ):
     """ Checks that the README will render correctly on PyPI. """
-    sdist_name = f"{package_name}-{package_version}.tar.gz"
-    sdist_path = artifacts_path / 'sdists' / sdist_name
-    context.run( f"twine check {sdist_path}" )
+    path = _get_sdist_path( )
+    context.run( f"twine check {path}" )
 
 
 @task( pre = ( cover_all_versions, check_urls, ), post = ( check_readme, ) )
 def make_sdist( context ):
     """ Packages the Python sources for release. """
+    path = _get_sdist_path( )
     context.run( 'python3 setup.py sdist' )
+    context.run( f"gpg --detach-sign --armor {path}", pty = True )
+
+
+def _get_sdist_path( ):
+    name = f"{package_name}-{package_version}.tar.gz"
+    return artifacts_path / 'sdists' / name
 
 
 @task( pre = ( make_sdist, ) )
 def make_wheel( context ):
     """ Packages a Python wheel for release. """
+    path = _get_wheel_path( )
     context.run( 'python3 setup.py bdist_wheel' )
+    context.run( f"gpg --detach-sign --armor {path}", pty = True )
+
+
+def _get_wheel_path( ):
+    name = f"{package_name}-{package_version}-py3-none-any.whl"
+    return artifacts_path / 'wheels' / name
 
 
 @task( pre = ( check_urls, ) )
@@ -475,6 +488,22 @@ def push( context ):
             f"git push --set-upstream {remote} {true_branch}", pty = True )
     else: context.run( 'git push', pty = True )
     context.run( 'git push --tags', pty = True )
+
+
+#@task( pre = ( clean, make, push, ) )
+@task
+def upload_test_pypi( context ):
+    """ Publishes current sdist and wheels to Test PyPI. """
+    artifacts = _get_pypi_artifacts( )
+    context.run(
+        'twine upload --skip-existing --verbose --repository testpypi '
+        f"{artifacts}", pty = True )
+
+
+def _get_pypi_artifacts( ):
+    return ' '.join( map(
+        lambda p: f"{p}.asc",
+        ( _get_sdist_path( ), _get_wheel_path( ), ) ) )
 
 
 @task( pre = ( clean, make, push, ) )
