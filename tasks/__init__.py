@@ -299,6 +299,7 @@ def make_sdist( context ):
     """ Packages the Python sources for release. """
     path = _get_sdist_path( )
     context.run( 'python3 setup.py sdist' )
+    # TODO: Ensure that 'GPG_TTY' is set.
     context.run( f"gpg --detach-sign --armor {path}", pty = True )
 
 
@@ -312,6 +313,7 @@ def make_wheel( context ):
     """ Packages a Python wheel for release. """
     path = _get_wheel_path( )
     context.run( 'python3 setup.py bdist_wheel' )
+    # TODO: Ensure that 'GPG_TTY' is set.
     context.run( f"gpg --detach-sign --armor {path}", pty = True )
 
 
@@ -490,8 +492,7 @@ def push( context ):
     context.run( 'git push --tags', pty = True )
 
 
-#@task( pre = ( clean, make, push, ) )
-@task
+@task( pre = ( clean, make, push, ) )
 def upload_test_pypi( context ):
     """ Publishes current sdist and wheels to Test PyPI. """
     artifacts = _get_pypi_artifacts( )
@@ -500,18 +501,24 @@ def upload_test_pypi( context ):
         f"{artifacts}", pty = True )
 
 
-def _get_pypi_artifacts( ):
-    return ' '.join( map(
-        lambda p: f"{p}.asc",
-        ( _get_sdist_path( ), _get_wheel_path( ), ) ) )
-
-
 @task( pre = ( clean, make, push, ) )
-def upload( context ):
+def upload_pypi( context ):
+    """ Publishes current sdist and wheels to PyPI. """
+    artifacts = _get_pypi_artifacts( )
+    context.run(
+        f"twine upload --skip-existing --verbose {artifacts}", pty = True )
+
+
+def _get_pypi_artifacts( ):
+    stems = ( _get_sdist_path( ), _get_wheel_path( ), )
+    return ' '.join( chain(
+        map( str, stems ), map( lambda p: f"{p}.asc", stems ) ) )
+
+
+# TODO: Publish to Github pages, etc....
+@task( pre = ( upload_pypi, ) )
+def upload( context ): # pylint: disable=unused-argument
     """ Publishes all relevant artifacts to their intended destinations. """
-    # TODO: Call 'twine'.
-    # TODO: Publish to Github pages, etc....
-    context.run( 'echo "TODO: Implement the upload task."' )
 
 
 @task( pre = ( clean, bump_patch, upload, ) )
