@@ -1,3 +1,4 @@
 [submodule "scm-modules/semgrep-rules"]
 	path = scm-modules/semgrep-rules
 	url = https://github.com/returntocorp/semgrep-rules.git
+	branch = develop

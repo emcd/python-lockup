@@ -171,7 +171,18 @@ def freshen_git_modules( context ):
         'git submodule update --init --recursive --remote', pty = True )
 
 
-@task( pre = ( clean, freshen_pipenv, freshen_git_modules, ) )
+@task
+def freshen_git_hooks( context ):
+    """ Updates Git hooks to latest tagged release.
+
+        This task requires Internet access and may take some time. """
+    my_cfg_path = sources_path / 'pre-commit.yaml'
+    context.run( f"pre-commit autoupdate --config {my_cfg_path}", pty = True )
+
+
+@task(
+    pre = ( clean, freshen_pipenv, freshen_git_modules, freshen_git_hooks, )
+)
 def freshen( context ): # pylint: disable=unused-argument
     """ Performs the various freshening tasks, cleaning first.
 
