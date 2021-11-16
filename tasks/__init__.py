@@ -477,8 +477,7 @@ def push( context ):
     """ Pushes commits on current branch, plus all tags. """
     _ensure_clean_workspace( context )
     true_branch = context.run(
-        'git branch --show-current',
-        hide = 'stdout', pty = True ).stdout.strip( )
+        'git branch --show-current', hide = 'stdout' ).stdout.strip( )
     this_version = Version.from_string( package_version )
     new_version = Version( 'f', this_version.major, this_version.minor, 0 )
     target_branch = f"release-{new_version}"
@@ -492,7 +491,7 @@ def push( context ):
     context.run( 'git push --tags', pty = True )
 
 
-@task( pre = ( clean, make, push, ) )
+@task( pre = ( make, push, ) )
 def upload_test_pypi( context ):
     """ Publishes current sdist and wheels to Test PyPI. """
     artifacts = _get_pypi_artifacts( )
@@ -501,7 +500,7 @@ def upload_test_pypi( context ):
         f"{artifacts}", pty = True )
 
 
-@task( pre = ( clean, make, push, ) )
+@task( pre = ( make, push, ) )
 def upload_pypi( context ):
     """ Publishes current sdist and wheels to PyPI. """
     artifacts = _get_pypi_artifacts( )
@@ -515,8 +514,33 @@ def _get_pypi_artifacts( ):
         map( str, stems ), map( lambda p: f"{p}.asc", stems ) ) )
 
 
-# TODO: Publish to Github pages, etc....
-@task( pre = ( upload_pypi, ) )
+# Inspiration: https://stackoverflow.com/a/58993849/14833542
+@task( pre = ( make, push ) )
+def upload_github_pages( context ):
+    """ Publishes Sphinx HTML output to Github Pages for project. """
+    # TODO: Ensure that work is from project root,
+    #       since 'git subtree' apparently requires relative paths.
+    html_path = Path( 'artifacts' ) / 'html' / 'sphinx'
+    nojekyll_path = html_path / '.nojekyll'
+    saved_branch = context.run(
+        'git branch --show-current', hide = 'stdout' ).stdout.strip( )
+    context.run( 'git branch -D local-documentation', warn = True )
+    # TODO: Error handler for cleanup.
+    context.run( 'git checkout -b local-documentation', pty = True )
+    nojekyll_path.touch( exist_ok = True )
+    # Override .gitignore to pickup artifacts.
+    context.run( f"git add --force {html_path}", pty = True )
+    context.run( 'git commit -m "Update documentation."', pty = True )
+    subtree_id = context.run(
+        f"git subtree split --prefix {html_path}",
+        hide = 'stdout' ).stdout.strip( )
+    context.run(
+        f"git push --force origin {subtree_id}:refs/heads/documentation",
+        pty = True )
+    context.run( f"git checkout {saved_branch}", pty = True )
+
+
+@task( pre = ( upload_pypi, upload_github_pages, ) )
 def upload( context ): # pylint: disable=unused-argument
     """ Publishes all relevant artifacts to their intended destinations. """
 
