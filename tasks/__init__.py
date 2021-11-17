@@ -332,7 +332,7 @@ def make_html( context ):
         f"{sphinx_sources_path} {output_path}" )
 
 
-@task( pre = ( freshen, make_wheel, make_html, ) )
+@task( pre = ( clean, make_wheel, make_html, ) )
 def make( context ): # pylint: disable=unused-argument
     """ Generates all of the artifacts. """
 
@@ -491,7 +491,7 @@ def push( context ):
     context.run( 'git push --tags', pty = True )
 
 
-@task( pre = ( make, push, ) )
+@task( pre = ( make, ) )
 def upload_test_pypi( context ):
     """ Publishes current sdist and wheels to Test PyPI. """
     artifacts = _get_pypi_artifacts( )
@@ -500,7 +500,7 @@ def upload_test_pypi( context ):
         f"{artifacts}", pty = True )
 
 
-@task( pre = ( make, push, ) )
+@task( pre = ( make, ) )
 def upload_pypi( context ):
     """ Publishes current sdist and wheels to PyPI. """
     artifacts = _get_pypi_artifacts( )
@@ -515,7 +515,7 @@ def _get_pypi_artifacts( ):
 
 
 # Inspiration: https://stackoverflow.com/a/58993849/14833542
-@task( pre = ( make, push ) )
+@task( pre = ( make, ) )
 def upload_github_pages( context ):
     """ Publishes Sphinx HTML output to Github Pages for project. """
     # TODO: Ensure that work is from project root,
@@ -545,11 +545,11 @@ def upload( context ): # pylint: disable=unused-argument
     """ Publishes all relevant artifacts to their intended destinations. """
 
 
-@task( pre = ( clean, bump_patch, upload, ) )
+@task( pre = ( bump_patch, push, upload, ) )
 def release_new_patch( context ): # pylint: disable=unused-argument
     """ Unleashes a new patch upon the world. """
 
 
-@task( pre = ( clean, bump_stage, upload, ) )
+@task( pre = ( bump_stage, push, upload, ) )
 def release_new_stage( context ): # pylint: disable=unused-argument
     """ Unleashes a new stage upon the world. """
