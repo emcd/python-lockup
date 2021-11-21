@@ -1,0 +1,24 @@
+name: Test
+on: [pull_request, push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Note: MyPy is broken on Python 3.10 as of 2021-11-21.
+        python-version: ['3.6', '3.7', '3.8', '3.9']
+    steps:
+      - name: Clone Repository Code
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Procure Baseline Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Pipenv
+        run: sudo pip3 install pipenv
+      - name: Create Virtual Environment
+        run: pipenv sync --dev --python ${{ matrix.python-version }}
+      - name: Test
+        run: pipenv run invoke test

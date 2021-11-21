@@ -42,6 +42,7 @@
 from contextlib import ExitStack as CMStack
 from itertools import chain
 from pathlib import Path
+from sys import stderr
 
 from invoke import Context, Exit, call, task
 
@@ -245,7 +246,7 @@ def lint_semgrep( context ):
         scm_modules_path / 'semgrep-rules' / 'python' / 'lang' )
     context.run(
         f"semgrep --config {sgconfig_path} --use-git-ignore "
-        f"{python3_sources_path}", pty = True )
+        f"{python3_sources_path}", pty = stderr.isatty( ) )
 
 
 @task( pre = (
