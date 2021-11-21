@@ -39,6 +39,7 @@
 """
 
 
+from contextlib import ExitStack as CMStack
 from itertools import chain
 from pathlib import Path
 
@@ -62,20 +63,27 @@ sphinx_cache_path = caches_path / 'sphinx'
 sphinx_options = f"-j auto -d {sphinx_cache_path} -n -T"
 
 
-def _parse_project_information( ):
+def parse_project_name( ):
+    """ Returns project name, as parsed from configuration. """
+    return parse_project_information( )[ 'name' ]
+
+def parse_project_version( ):
+    """ Returns project version, as parsed from configuration. """
+    return parse_project_information( )[ 'version' ]
+
+def parse_project_information( ):
+    """ Returns project information, as parsed from configuration. """
     path = top_path / 'setup.cfg'
     if path.is_file( ):
         from configparser import ConfigParser
         config = ConfigParser( )
         config.read( path )
-        metadata = config[ 'metadata' ]
-        return path, metadata[ 'name' ], metadata[ 'version' ]
+        return config[ 'metadata' ]
     # TODO: Look in 'pyproject.toml' if PEP 621 is implemented for setuptools.
     #       https://www.python.org/dev/peps/pep-0621/
     raise Exception( 'Cannot find suitable source of project metadata.' )
 
-configuration_path, package_name, package_version = (
-    _parse_project_information( ) )
+project_name = parse_project_name( )
 
 
 def _unlink_recursively( path ):
@@ -200,7 +208,7 @@ def lint_mypy( context, packages, modules, files ):
     """ Lints the source code with Mypy. """
     environment_str = f"MYPYPATH={top_path}:{python3_sources_path}"
     configuration_str = "--config-file {}".format( sources_path / 'mypy.ini' )
-    if not packages and not modules and not files: packages = ( package_name, )
+    if not packages and not modules and not files: packages = ( project_name, )
     packages_str = ' '.join( map(
         lambda package: f"--package {package}", packages ) )
     modules_str = ' '.join( map(
@@ -218,7 +226,7 @@ def lint_pylint( context, targets, checks ):
     reports_str = '--reports=no --score=no' if targets or checks else ''
     if not targets:
         targets = (
-            package_name,
+            project_name,
             *python3_tests_path.rglob( '*.py' ),
             sphinx_sources_path / 'conf.py',
             __package__, )
@@ -304,7 +312,8 @@ def make_sdist( context ):
 
 
 def _get_sdist_path( ):
-    name = f"{package_name}-{package_version}.tar.gz"
+    project_version = parse_project_version( )
+    name = f"{project_name}-{project_version}.tar.gz"
     return artifacts_path / 'sdists' / name
 
 
@@ -318,14 +327,15 @@ def make_wheel( context ):
 
 
 def _get_wheel_path( ):
-    name = f"{package_name}-{package_version}-py3-none-any.whl"
+    project_version = parse_project_version( )
+    name = f"{project_name}-{project_version}-py3-none-any.whl"
     return artifacts_path / 'wheels' / name
 
 
 @task( pre = ( check_urls, ) )
 def make_html( context ):
     """ Generates documentation as HTML artifacts. """
-    output_path = artifacts_path / "html" / "sphinx"
+    output_path = artifacts_path / 'html' / 'sphinx'
     _unlink_recursively( output_path )
     context.run(
         f"sphinx-build -b html {sphinx_options} "
@@ -424,7 +434,8 @@ def _ensure_clean_workspace( context ):
 def bump( context, piece ):
     """ Bumps a piece of the current version. """
     _ensure_clean_workspace( context )
-    current_version = Version.from_string( package_version )
+    project_version = parse_project_version( )
+    current_version = Version.from_string( project_version )
     new_version = current_version.as_bumped( piece )
     if 'stage' == piece: part = 'release_class'
     elif 'patch' == piece:
@@ -453,8 +464,9 @@ def bump_stage( context ): # pylint: disable=unused-argument
 def branch_release( context ):
     """ Makes a new branch for development torwards a release. """
     _ensure_clean_workspace( context )
+    project_version = parse_project_version( )
     # TODO: Assert mainline branch.
-    this_version = Version.from_string( package_version )
+    this_version = Version.from_string( project_version )
     stage = this_version.stage
     if 'a' != stage: raise Exit( f"Cannot create branch at stage: {stage}" )
     new_version = Version( 'f', this_version.major, this_version.minor, 0 )
@@ -476,9 +488,10 @@ def check_code_style( context, write_changes = False ):
 def push( context ):
     """ Pushes commits on current branch, plus all tags. """
     _ensure_clean_workspace( context )
+    project_version = parse_project_version( )
     true_branch = context.run(
         'git branch --show-current', hide = 'stdout' ).stdout.strip( )
-    this_version = Version.from_string( package_version )
+    this_version = Version.from_string( project_version )
     new_version = Version( 'f', this_version.major, this_version.minor, 0 )
     target_branch = f"release-{new_version}"
     if true_branch == target_branch:
@@ -518,26 +531,30 @@ def _get_pypi_artifacts( ):
 @task( pre = ( make, ) )
 def upload_github_pages( context ):
     """ Publishes Sphinx HTML output to Github Pages for project. """
-    # TODO: Ensure that work is from project root,
-    #       since 'git subtree' apparently requires relative paths.
-    html_path = Path( 'artifacts' ) / 'html' / 'sphinx'
+    # Use relative path, since 'git subtree' needs it.
+    html_path = artifacts_path.relative_to( top_path ) / 'html' / 'sphinx'
     nojekyll_path = html_path / '.nojekyll'
-    saved_branch = context.run(
-        'git branch --show-current', hide = 'stdout' ).stdout.strip( )
-    context.run( 'git branch -D local-documentation', warn = True )
-    # TODO: Error handler for cleanup.
-    context.run( 'git checkout -b local-documentation', pty = True )
-    nojekyll_path.touch( exist_ok = True )
-    # Override .gitignore to pickup artifacts.
-    context.run( f"git add --force {html_path}", pty = True )
-    context.run( 'git commit -m "Update documentation."', pty = True )
-    subtree_id = context.run(
-        f"git subtree split --prefix {html_path}",
-        hide = 'stdout' ).stdout.strip( )
-    context.run(
-        f"git push --force origin {subtree_id}:refs/heads/documentation",
-        pty = True )
-    context.run( f"git checkout {saved_branch}", pty = True )
+    target_branch = 'documentation'
+    with CMStack( ) as cm_stack:
+        # Work from project root, since 'git subtree' requires relative paths.
+        cm_stack.enter_context( context.cd( top_path ) )
+        saved_branch = context.run(
+            'git branch --show-current', hide = 'stdout' ).stdout.strip( )
+        context.run( f"git branch -D local-{target_branch}", warn = True )
+        context.run( f"git checkout -b local-{target_branch}", pty = True )
+        def restore( *exc_info ): # pylint: disable=unused-argument
+            context.run( f"git checkout {saved_branch}", pty = True )
+        cm_stack.push( restore )
+        nojekyll_path.touch( exist_ok = True )
+        # Override .gitignore to pickup artifacts.
+        context.run( f"git add --force {html_path}", pty = True )
+        context.run( 'git commit -m "Update documentation."', pty = True )
+        subtree_id = context.run(
+            f"git subtree split --prefix {html_path}",
+            hide = 'stdout' ).stdout.strip( )
+        context.run(
+            f"git push --force origin {subtree_id}:refs/heads/{target_branch}",
+            pty = True )
 
 
 @task( pre = ( upload_pypi, upload_github_pages, ) )
