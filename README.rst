@@ -27,7 +27,7 @@
    :alt: Project Version
    :target: https://pypi.org/project/lockup/
 
-.. image:: https://github.com/emcd/python-lockup/actions/workflows/test.yaml/badge.svg
+.. image:: https://github.com/emcd/python-lockup/actions/workflows/test.yaml/badge.svg?branch=master&event=push
    :alt: Tests Status
    :target: https://github.com/emcd/python-lockup/actions/workflows/test.yaml
 

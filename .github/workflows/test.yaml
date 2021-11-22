@@ -22,3 +22,34 @@ jobs:
         run: pipenv sync --dev --python ${{ matrix.python-version }}
       - name: Test
         run: pipenv run invoke test
+      - name: Preserve Coverage Results
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-results-${{ matrix.python-version }}
+          path: caches/pytest/coverage.sqlite3.*
+  report-coverage:
+    needs: test
+    runs-on: ubuntu-latest
+    if: "${{ 'push' == github.event_name && 'refs/heads/master' == github.ref }}"
+    steps:
+      - name: Clone Repository Code
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Procure Baseline Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.6
+      - name: Install Pipenv
+        run: sudo pip3 install pipenv
+      - name: Create Virtual Environment
+        run: pipenv sync --dev
+      - name: Restore Coverage Results
+        uses: actions/download-artifact@v2
+        with:
+          path: caches/pytest
+      - name: Relocate Coverage Results
+        run: mv caches/pytest/coverage-results-*/coverage.sqlite3.* caches/pytest
+      - name: Report Coverage
+        run: pipenv run invoke report-coverage
+      # TODO: Add codecov step here.
