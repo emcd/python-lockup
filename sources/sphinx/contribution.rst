@@ -25,8 +25,9 @@ Contribution
 Contribution to this project is welcome!
 Here are some ways that you can help:
 
-* Filing Issues_ for bug reports and feature requests.
-* Helping out with the Development_ of the source code and documentation.
+* Filing `issues <https://github.com/emcd/python-lockup/issues>`_
+  for bug reports, feature requests, and other relevant discussion.
+* Helping out with the development_ of the source code and documentation.
 
 Please do note that all interactions about this project
 on media under its control are subject to its `Code of Conduct`_.
@@ -47,15 +48,15 @@ Please take a look at:
 as well as note the following bullet points from the `Rust Code of Conduct
 <https://www.rust-lang.org/policies/code-of-conduct>`_:
 
-* Respect that people have differences of opinion and that every design or
-  implementation choice carries a trade-off and numerous costs. There is seldom
-  a right answer.
+  |bull| Respect that people have differences of opinion and that every design
+  or implementation choice carries a trade-off and numerous costs. There is
+  seldom a right answer.
 
-* Please keep unstructured critique to a minimum. If you have solid ideas you
-  want to experiment with, make a fork and see how it works.
+  |bull| Please keep unstructured critique to a minimum. If you have solid
+  ideas you want to experiment with, make a fork and see how it works.
 
-* Likewise any spamming, trolling, flaming, baiting or other attention-stealing
-  behavior is not welcome.
+  |bull| Likewise any spamming, trolling, flaming, baiting or other
+  attention-stealing behavior is not welcome.
 
 .. note:: Please do not contact the authors of the above documents
           for anything related to this project.
@@ -68,10 +69,6 @@ Also, no need to create noise with "+1" or "me too" comments in issue
 tracker threads. Please only add substantive comments that will further advance
 the understanding of an issue. If you wish to upvote a comment, then please use
 an appropriate reacji on that comment.
-
-Issues
-===============================================================================
-.. todo:: Describe location of issue tracker and kinds of issues.
 
 Development
 ===============================================================================
