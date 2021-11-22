@@ -268,7 +268,7 @@ def report_coverage( context ):
     context.run( 'coverage xml', pty = True )
 
 
-@task( pre = ( lint, ), post = ( report_coverage, ) )
+@task( pre = ( lint, ) )
 def test( context ):
     """ Runs the test suite with the current Python version. """
     context.run(
