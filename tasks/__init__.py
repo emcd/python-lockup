@@ -92,6 +92,13 @@ def parse_project_information( ):
 project_name = parse_project_name( )
 
 
+def _assert_gpg_tty( ):
+    if 'GPG_TTY' not in psenv:
+        raise Exit(
+            "ERROR: Environment variable 'GPG_TTY' is not set. "
+            "Task cannot prompt for GPG secret key passphrase." )
+
+
 def _unlink_recursively( path ):
     """ Pure Python implementation of ``rm -rf``, essentially. """
     if not path.exists( ): return
@@ -349,9 +356,9 @@ def check_readme( context ):
 def make_sdist( context ):
     """ Packages the Python sources for release. """
     eprint( _render_boxed_title( 'Artifact: Source Distribution' ) )
+    _assert_gpg_tty( )
     path = _get_sdist_path( )
     context.run( 'python3 setup.py sdist' )
-    # TODO: Ensure that 'GPG_TTY' is set.
     context.run( f"gpg --detach-sign --armor {path}", pty = True )
 
 
@@ -365,9 +372,9 @@ def _get_sdist_path( ):
 def make_wheel( context ):
     """ Packages a Python wheel for release. """
     eprint( _render_boxed_title( 'Artifact: Python Wheel' ) )
+    _assert_gpg_tty( )
     path = _get_wheel_path( )
     context.run( 'python3 setup.py bdist_wheel' )
-    # TODO: Ensure that 'GPG_TTY' is set.
     context.run( f"gpg --detach-sign --armor {path}", pty = True )
 
 
@@ -481,6 +488,7 @@ def bump( context, piece ):
     """ Bumps a piece of the current version. """
     eprint( _render_boxed_title( f"Version: Adjust" ) )
     _ensure_clean_workspace( context )
+    _assert_gpg_tty( )
     project_version = parse_project_version( )
     current_version = Version.from_string( project_version )
     new_version = current_version.as_bumped( piece )
