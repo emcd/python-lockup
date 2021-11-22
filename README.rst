@@ -20,29 +20,43 @@
                                     lockup
 *******************************************************************************
 
-.. TODO: Add row of status icons.
+.. image:: https://img.shields.io/pypi/pyversions/lockup
+   :alt: Python Versions
+
+.. image:: https://img.shields.io/pypi/v/lockup
+   :alt: Project Version
+   :target: https://pypi.org/project/lockup/
+
+.. image:: https://github.com/emcd/python-lockup/actions/workflows/test.yaml/badge.svg
+   :alt: Tests Status
+   :target: https://github.com/emcd/python-lockup/actions/workflows/test.yaml
+
+.. TODO: Add badge for code coverage.
+
+.. image:: https://img.shields.io/pypi/l/lockup
+   :alt: Project License
+   :target: https://github.com/emcd/python-lockup/blob/master/LICENSE.txt
 
 Enables the creation of classes, modules, and namespaces on which all
-attributes are **immutable** and for which non-public attributes are concealed
-(**visibility restriction**).  Immutability increases code safety by
-discouraging monkey-patching and preventing accidental or deliberate changes to
-state. Visibility restriction means that functions, like ``dir``, can report a
-subset of attributes that are intended for programmers to use without exposing
-internals.
+attributes are **immutable** and for which non-public attributes are
+**concealed**. Immutability increases code safety by discouraging
+monkey-patching and preventing accidental or deliberate changes to state.
+Concealment means that functions, like ``dir``, can report a subset of
+attributes that are intended for programmers to use without exposing internals.
 
 Contents of this package are:
 
-* A module class, which enforces immutability and visibility restriction upon
-  module attributes. This module class can *replace* the standard Python module
-  class *with a single line of code* in a module definition.
+* A module class, which enforces immutability and concealment upon module
+  attributes. This module class can *replace* the standard Python module class
+  *with a single line of code* in a module definition.
 
 * A factory (metaclass) that creates classes, enforcing immutability and
-  visibility restriction upon their attributes. (Just attributes on the
-  classes, themsleves, are immutable and visibility-restricted and not
-  attributes on the instances of the classes.)
+  concealment upon their attributes. (Just attributes on the classes,
+  themsleves, are immutable and concealed and not attributes on the instances
+  of the classes.)
 
-* A factory that creates namespaces, enforcing immutability and visibility
-  restriction upon their attributes.
+* A factory that creates namespaces, enforcing immutability and concealment
+  upon their attributes.
 
 Full Documentation: https://emcd.github.io/python-lockup/
 
