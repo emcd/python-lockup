@@ -10,11 +10,13 @@ requires = ["setuptools>=40.9.0", "wheel"]
 branch = true
 command_line = "-m pytest"
 data_file = "caches/pytest/coverage.sqlite3"
-source_pkgs = ["lockup"]
+parallel = true
 [tool.coverage.report]
 precision = 2
 [tool.coverage.html]
 directory = "artifacts/coverage-pytest"
+[tool.coverage.xml]
+output = "artifacts/coverage-pytest/coverage.xml"
 
 [tool.pylint.MASTER]
 ignore = []
@@ -90,10 +92,12 @@ envlist = py36, py37, py38, py39, py310
 deps = pipenv
 setenv =
     PIPENV_VERBOSITY=-1
-passenv = HYPOTHESIS_STORAGE_DIRECTORY
+passenv =
+    HYPOTHESIS_STORAGE_DIRECTORY
+    _PROJECT_NAME
 commands =
     pipenv install --skip-lock --dev
-    pipenv run coverage run --parallel-mode
+    pipenv run coverage run --source {env:_PROJECT_NAME}
 """
 
 [tool.yapf]
