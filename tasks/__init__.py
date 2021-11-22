@@ -259,32 +259,32 @@ def lint( context ): # pylint: disable=unused-argument
     """ Lints the source code. """
 
 
-@task( pre = ( lint, ) )
+@task
+def report_coverage( context ):
+    """ Combines multiple code coverage results into a single report. """
+    context.run( 'coverage combine', pty = True )
+    context.run( 'coverage report', pty = True )
+    context.run( 'coverage html', pty = True )
+    context.run( 'coverage xml', pty = True )
+
+
+@task( pre = ( lint, ), post = ( report_coverage, ) )
 def test( context ):
     """ Runs the test suite with the current Python version. """
     context.run(
-        'coverage run', pty = True,
+        f"coverage run --source {project_name}", pty = True,
         env = dict(
             HYPOTHESIS_STORAGE_DIRECTORY = caches_path / 'hypothesis', ) )
-    context.run( 'coverage report', pty = True )
-    context.run( 'coverage html', pty = True )
 
 
-@task( pre = ( lint, ) )
+@task( pre = ( lint, ), post = ( report_coverage, ) )
 def test_all_versions( context ):
     """ Runs the test suite across multiple, isolated Python versions. """
     context.run(
         'tox --asdf-no-fallback --asdf-install', pty = True,
         env = dict(
-            HYPOTHESIS_STORAGE_DIRECTORY = caches_path / 'hypothesis', ) )
-
-
-@task( pre = ( test_all_versions, ) )
-def cover_all_versions( context ):
-    """ Reports on code coverage across multiple, isolated Python versions. """
-    context.run( 'coverage combine', pty = True )
-    context.run( 'coverage report', pty = True )
-    context.run( 'coverage html', pty = True )
+            HYPOTHESIS_STORAGE_DIRECTORY = caches_path / 'hypothesis',
+            _PROJECT_NAME = f"{project_name}" ) )
 
 
 @task
@@ -303,7 +303,7 @@ def check_readme( context ):
     context.run( f"twine check {path}" )
 
 
-@task( pre = ( cover_all_versions, check_urls, ), post = ( check_readme, ) )
+@task( pre = ( test, check_urls, ), post = ( check_readme, ) )
 def make_sdist( context ):
     """ Packages the Python sources for release. """
     path = _get_sdist_path( )
@@ -514,7 +514,7 @@ def upload_test_pypi( context ):
         f"{artifacts}", pty = True )
 
 
-@task( pre = ( make, ) )
+@task( pre = ( make, test_all_versions, ) )
 def upload_pypi( context ):
     """ Publishes current sdist and wheels to PyPI. """
     artifacts = _get_pypi_artifacts( )
@@ -529,7 +529,7 @@ def _get_pypi_artifacts( ):
 
 
 # Inspiration: https://stackoverflow.com/a/58993849/14833542
-@task( pre = ( make, ) )
+@task( pre = ( test, make_html, ) )
 def upload_github_pages( context ):
     """ Publishes Sphinx HTML output to Github Pages for project. """
     # Use relative path, since 'git subtree' needs it.
