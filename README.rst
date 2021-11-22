@@ -31,7 +31,8 @@
    :alt: Tests Status
    :target: https://github.com/emcd/python-lockup/actions/workflows/test.yaml
 
-.. TODO: Add badge for code coverage.
+.. image:: https://codecov.io/gh/emcd/python-lockup/branch/master/graph/badge.svg?token=PA9QI9RL63
+   :target: https://codecov.io/gh/emcd/python-lockup
 
 .. image:: https://img.shields.io/pypi/l/lockup
    :alt: Project License
