@@ -40,11 +40,16 @@
 
 
 from contextlib import ExitStack as CMStack
+from functools import partial as partial_function
 from itertools import chain
+from os import environ as psenv
 from pathlib import Path
 from sys import stderr
 
 from invoke import Context, Exit, call, task
+
+
+eprint = partial_function( print, file = stderr )
 
 
 top_path = Path( __file__ ).parent.parent
@@ -103,6 +108,27 @@ def _unlink_recursively( path ):
     path.rmdir( )
 
 
+def _render_boxed_title( title ):
+    """ Renders box around title. """
+    columns_count = int( psenv.get( 'COLUMNS', 79 ) )
+    icolumns_count = columns_count - 2
+    content_template = (
+        '\N{BOX DRAWINGS DOUBLE VERTICAL}{fill}'
+        '\N{BOX DRAWINGS DOUBLE VERTICAL}' )
+    return '\n'.join( (
+        '',
+        '\N{BOX DRAWINGS DOUBLE DOWN AND RIGHT}{fill}'
+        '\N{BOX DRAWINGS DOUBLE DOWN AND LEFT}'.format(
+            fill = '\N{BOX DRAWINGS DOUBLE HORIZONTAL}' * icolumns_count ),
+        content_template.format( fill = ' ' * icolumns_count ),
+        content_template.format( fill = title.center( icolumns_count ) ),
+        content_template.format( fill = ' ' * icolumns_count ),
+        '\N{BOX DRAWINGS DOUBLE UP AND RIGHT}{fill}'
+        '\N{BOX DRAWINGS DOUBLE UP AND LEFT}'.format(
+            fill = '\N{BOX DRAWINGS DOUBLE HORIZONTAL}' * icolumns_count ),
+        '', ) )
+
+
 @task
 def install_git_hooks( context ):
     """ Installs hooks to check goodness of code changes before commit. """
@@ -115,6 +141,7 @@ def install_git_hooks( context ):
 @task
 def clean_pycaches( context ): # pylint: disable=unused-argument
     """ Removes all caches of compiled CPython bytecode. """
+    eprint( _render_boxed_title( 'Clean: Python Caches' ) )
     anchors = ( python3_sources_path, python3_tests_path, )
     for path in chain.from_iterable( map(
         lambda anchor: anchor.rglob( '__pycache__/*' ), anchors
@@ -127,6 +154,7 @@ def clean_pycaches( context ): # pylint: disable=unused-argument
 @task
 def clean_tool_caches( context ): # pylint: disable=unused-argument
     """ Clears the caches used by code generation and testing utilities. """
+    eprint( _render_boxed_title( 'Clean: Tool Caches' ) )
     anchors = caches_path.glob( '*' )
     gitignore_paths = set( caches_path.glob( '*/.gitignore' ) )
     dirs_stack = [ ]
@@ -146,6 +174,7 @@ def clean_tool_caches( context ): # pylint: disable=unused-argument
 @task
 def clean_pipenv( context ):
     """ Removes unused packages in the Python development virtualenv. """
+    eprint( _render_boxed_title( 'Clean: Orphan Packages' ) )
     context.run( 'pipenv clean', pty = True )
 
 
@@ -159,6 +188,7 @@ def check_pipenv_security( context ):
     """ Checks for security issues in utilized packages and tools.
 
         This task requires Internet access and may take some time. """
+    eprint( _render_boxed_title( 'Lint: Package Security' ) )
     context.run( 'pipenv check', pty = True )
 
 
@@ -167,6 +197,7 @@ def freshen_pipenv( context ):
     """ Updates packages for the Python development virtualenv.
 
         This task requires Internet access and may take some time. """
+    eprint( _render_boxed_title( 'Freshen: Development Dependencies' ) )
     context.run( 'pipenv update --dev', pty = True )
 
 
@@ -176,6 +207,7 @@ def freshen_git_modules( context ):
 
         Initializes SCM modules as needed.
         This task requires Internet access and may take some time. """
+    eprint( _render_boxed_title( 'Freshen: SCM Modules' ) )
     context.run(
         'git submodule update --init --recursive --remote', pty = True )
 
@@ -185,6 +217,7 @@ def freshen_git_hooks( context ):
     """ Updates Git hooks to latest tagged release.
 
         This task requires Internet access and may take some time. """
+    eprint( _render_boxed_title( 'Freshen: SCM Hooks' ) )
     my_cfg_path = sources_path / 'pre-commit.yaml'
     context.run( f"pre-commit autoupdate --config {my_cfg_path}", pty = True )
 
@@ -201,12 +234,14 @@ def freshen( context ): # pylint: disable=unused-argument
 @task
 def lint_bandit( context ):
     """ Security checks the source code with Bandit. """
+    eprint( _render_boxed_title( 'Lint: Bandit' ) )
     context.run( f"bandit --recursive --verbose {python3_sources_path}" )
 
 
 @task( iterable = ( 'packages', 'modules', 'files', ) )
 def lint_mypy( context, packages, modules, files ):
     """ Lints the source code with Mypy. """
+    eprint( _render_boxed_title( 'Lint: MyPy' ) )
     environment_str = f"MYPYPATH={top_path}:{python3_sources_path}"
     configuration_str = "--config-file {}".format( sources_path / 'mypy.ini' )
     if not packages and not modules and not files: packages = ( project_name, )
@@ -224,6 +259,7 @@ def lint_mypy( context, packages, modules, files ):
 @task( iterable = ( 'targets', 'checks', ) )
 def lint_pylint( context, targets, checks ):
     """ Lints the source code with Pylint. """
+    eprint( _render_boxed_title( 'Lint: Pylint' ) )
     reports_str = '--reports=no --score=no' if targets or checks else ''
     if not targets:
         targets = (
@@ -242,6 +278,7 @@ def lint_pylint( context, targets, checks ):
 @task
 def lint_semgrep( context ):
     """ Lints the source code with Semgrep. """
+    eprint( _render_boxed_title( 'Lint: Semgrep' ) )
     sgconfig_path = (
         scm_modules_path / 'semgrep-rules' / 'python' / 'lang' )
     context.run(
@@ -262,6 +299,7 @@ def lint( context ): # pylint: disable=unused-argument
 @task
 def report_coverage( context ):
     """ Combines multiple code coverage results into a single report. """
+    eprint( _render_boxed_title( 'Artifact: Code Coverage Report' ) )
     context.run( 'coverage combine', pty = True )
     context.run( 'coverage report', pty = True )
     context.run( 'coverage html', pty = True )
@@ -271,6 +309,7 @@ def report_coverage( context ):
 @task( pre = ( lint, ) )
 def test( context ):
     """ Runs the test suite with the current Python version. """
+    eprint( _render_boxed_title( 'Test: Unit + Code Coverage' ) )
     context.run(
         f"coverage run --source {project_name}", pty = True,
         env = dict(
@@ -280,6 +319,7 @@ def test( context ):
 @task( pre = ( lint, ), post = ( report_coverage, ) )
 def test_all_versions( context ):
     """ Runs the test suite across multiple, isolated Python versions. """
+    eprint( _render_boxed_title( 'Test: Unit + Code Coverage (all Pythons)' ) )
     context.run(
         'tox --asdf-no-fallback --asdf-install', pty = True,
         env = dict(
@@ -290,6 +330,7 @@ def test_all_versions( context ):
 @task
 def check_urls( context ):
     """ Checks the HTTP URLs in the documentation for liveness. """
+    eprint( _render_boxed_title( 'Test: Documentation URLs' ) )
     output_path = artifacts_path / 'sphinx-linkcheck'
     context.run(
         f"sphinx-build -b linkcheck {sphinx_options} "
@@ -299,6 +340,7 @@ def check_urls( context ):
 @task
 def check_readme( context ):
     """ Checks that the README will render correctly on PyPI. """
+    eprint( _render_boxed_title( 'Test: README Render' ) )
     path = _get_sdist_path( )
     context.run( f"twine check {path}" )
 
@@ -306,6 +348,7 @@ def check_readme( context ):
 @task( pre = ( test, check_urls, ), post = ( check_readme, ) )
 def make_sdist( context ):
     """ Packages the Python sources for release. """
+    eprint( _render_boxed_title( 'Artifact: Source Distribution' ) )
     path = _get_sdist_path( )
     context.run( 'python3 setup.py sdist' )
     # TODO: Ensure that 'GPG_TTY' is set.
@@ -321,6 +364,7 @@ def _get_sdist_path( ):
 @task( pre = ( make_sdist, ) )
 def make_wheel( context ):
     """ Packages a Python wheel for release. """
+    eprint( _render_boxed_title( 'Artifact: Python Wheel' ) )
     path = _get_wheel_path( )
     context.run( 'python3 setup.py bdist_wheel' )
     # TODO: Ensure that 'GPG_TTY' is set.
@@ -336,6 +380,7 @@ def _get_wheel_path( ):
 @task( pre = ( check_urls, ) )
 def make_html( context ):
     """ Generates documentation as HTML artifacts. """
+    eprint( _render_boxed_title( 'Artifact: Documentation' ) )
     output_path = artifacts_path / 'html' / 'sphinx'
     _unlink_recursively( output_path )
     context.run(
@@ -434,6 +479,7 @@ def _ensure_clean_workspace( context ):
 @task
 def bump( context, piece ):
     """ Bumps a piece of the current version. """
+    eprint( _render_boxed_title( f"Version: Adjust" ) )
     _ensure_clean_workspace( context )
     project_version = parse_project_version( )
     current_version = Version.from_string( project_version )
@@ -488,6 +534,7 @@ def check_code_style( context, write_changes = False ):
 @task( pre = ( test, ) )
 def push( context ):
     """ Pushes commits on current branch, plus all tags. """
+    eprint( _render_boxed_title( 'SCM: push' ) )
     _ensure_clean_workspace( context )
     project_version = parse_project_version( )
     true_branch = context.run(
@@ -508,6 +555,7 @@ def push( context ):
 @task( pre = ( make, ) )
 def upload_test_pypi( context ):
     """ Publishes current sdist and wheels to Test PyPI. """
+    eprint( _render_boxed_title( 'Publication: Test PyPI' ) )
     artifacts = _get_pypi_artifacts( )
     context.run(
         'twine upload --skip-existing --verbose --repository testpypi '
@@ -517,6 +565,7 @@ def upload_test_pypi( context ):
 @task( pre = ( make, test_all_versions, ) )
 def upload_pypi( context ):
     """ Publishes current sdist and wheels to PyPI. """
+    eprint( _render_boxed_title( 'Publication: PyPI' ) )
     artifacts = _get_pypi_artifacts( )
     context.run(
         f"twine upload --skip-existing --verbose {artifacts}", pty = True )
@@ -532,6 +581,7 @@ def _get_pypi_artifacts( ):
 @task( pre = ( test, make_html, ) )
 def upload_github_pages( context ):
     """ Publishes Sphinx HTML output to Github Pages for project. """
+    eprint( _render_boxed_title( 'Publication: Github Pages' ) )
     # Use relative path, since 'git subtree' needs it.
     html_path = artifacts_path.relative_to( top_path ) / 'html' / 'sphinx'
     nojekyll_path = html_path / '.nojekyll'
