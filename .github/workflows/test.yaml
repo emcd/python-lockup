@@ -52,4 +52,7 @@ jobs:
         run: mv caches/pytest/coverage-results-*/coverage.sqlite3.* caches/pytest
       - name: Report Coverage
         run: pipenv run invoke report-coverage
-      # TODO: Add codecov step here.
+      - name: Upload Coverage Report
+        uses: codecov/codecov-action@v2
+        with:
+          files: artifacts/coverage-pytest/coverage.xml
