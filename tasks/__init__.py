@@ -576,7 +576,7 @@ def check_code_style( context, write_changes = False ):
 @task( pre = ( test, ) )
 def push( context ):
     """ Pushes commits on current branch, plus all tags. """
-    eprint( _render_boxed_title( 'SCM: push' ) )
+    eprint( _render_boxed_title( 'SCM: Push Branch with Tags' ) )
     _ensure_clean_workspace( context )
     project_version = parse_project_version( )
     true_branch = context.run(
