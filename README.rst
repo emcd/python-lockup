@@ -38,14 +38,29 @@
    :alt: Project License
    :target: https://github.com/emcd/python-lockup/blob/master/LICENSE.txt
 
+.. TODO: Link to release API documentation.
+
+`API Documentation (current) <https://emcd.github.io/python-lockup/api.html>`_
+|
+`Code of Conduct
+<https://emcd.github.io/python-lockup/contribution.html#code-of-conduct>`_
+|
+`Contribution Guide <https://emcd.github.io/python-lockup/contribution.html>`_
+
+Overview
+===============================================================================
+
 Enables the creation of classes, modules, and namespaces on which all
 attributes are **immutable** and for which non-public attributes are
 **concealed**. Immutability increases code safety by discouraging
 monkey-patching and preventing accidental or deliberate changes to state.
-Concealment means that functions, like ``dir``, can report a subset of
-attributes that are intended for programmers to use without exposing internals.
+Concealment means that functions, such as `dir
+<https://docs.python.org/3/library/functions.html#dir>`_, can report a subset
+of attributes that are intended for programmers to use without exposing
+internals.
 
-Contents of this package are:
+Salient Features
+-------------------------------------------------------------------------------
 
 * A module class, which enforces immutability and concealment upon module
   attributes. This module class can *replace* the standard Python module class
@@ -58,8 +73,6 @@ Contents of this package are:
 
 * A factory that creates namespaces, enforcing immutability and concealment
   upon their attributes.
-
-Full Documentation: https://emcd.github.io/python-lockup/
 
 Quick Tour
 ===============================================================================
