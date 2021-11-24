@@ -44,12 +44,15 @@ from functools import partial as partial_function
 from itertools import chain
 from os import environ as psenv
 from pathlib import Path
+from pprint import pprint
 from sys import stderr
+import re
 
 from invoke import Context, Exit, call, task
 
 
 eprint = partial_function( print, file = stderr )
+epprint = partial_function( pprint, stream = stderr )
 
 
 top_path = Path( __file__ ).parent.parent
@@ -197,6 +200,39 @@ def check_pipenv_security( context ):
         This task requires Internet access and may take some time. """
     eprint( _render_boxed_title( 'Lint: Package Security' ) )
     context.run( 'pipenv check', pty = True )
+
+
+@task
+def freshen_asdf( context ):
+    """ Asks ASDF to update itself. """
+    eprint( _render_boxed_title( 'Freshen: Version Manager' ) )
+    context.run( 'asdf update', pty = True )
+    context.run( 'asdf plugin update python', pty = True )
+
+
+@task( pre = ( freshen_asdf, ) )
+def freshen_python( context ):
+    """ Updates each supported Python minor version to latest patch. """
+    eprint( _render_boxed_title( 'Freshen: Python Versions' ) )
+    python_regex = re.compile( r'''^python\s+(.*)$''', re.MULTILINE )
+    with ( top_path / '.tool-versions' ).open( ) as versions_file:
+        current_versions = python_regex.match(
+            versions_file.read( ) )[ 1 ].split( )
+    minors_regex = re.compile(
+        r'''^(?P<prefix>\w+-)?(?P<minor>\d+\.\d+)\..*$''' )
+    latest_versions = [ ]
+    for version in current_versions:
+        groups = minors_regex.match( version ).groupdict( )
+        minor_version = "{prefix}{minor}".format(
+            prefix = groups.get( 'prefix' ) or '',
+            minor = groups[ 'minor' ] )
+        latest_version = context.run(
+            f"asdf latest python {minor_version}",
+            hide = 'stdout' ).stdout.strip( )
+        latest_versions.append( latest_version )
+        context.run( f"asdf install python {latest_version}", pty = True )
+    context.run( "asdf local python {versions}".format(
+        versions = ' '.join( latest_versions ) ), pty = True )
 
 
 @task( post = ( clean_pipenv, check_pipenv_security, ) )
@@ -442,8 +478,6 @@ class Version:
         self.major = int( major )
         self.minor = int( minor )
         self.patch = int( patch )
-
-    # TODO: Make immutable with 'setattr'.
 
     def __str__( self ):
         stage, patch = self.stage, self.patch
