@@ -1,0 +1,4 @@
+# NOTE: This hack needed until we switch from Pipenv+Setuptools to Poetry or similar.
+furo
+sphinx-copybutton
+sphinx-inline-tabs==2021.3.28b7
