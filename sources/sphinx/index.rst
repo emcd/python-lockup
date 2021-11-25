@@ -29,6 +29,7 @@ Table of Contents
    api
    contribution
    license
+   CHANGELOG
 
 
 Indices

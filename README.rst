@@ -38,8 +38,9 @@
    :alt: Project License
    :target: https://github.com/emcd/python-lockup/blob/master/LICENSE.txt
 
-.. TODO: Link to release API documentation.
-
+`API Documentation (stable)
+<https://python-lockup.readthedocs.io/en/stable/api.html>`_
+|
 `API Documentation (current) <https://emcd.github.io/python-lockup/api.html>`_
 |
 `Code of Conduct
