@@ -341,7 +341,11 @@ class Class( type ):
     ''' Produces classes which have immutable attributes.
 
         Non-public attributes of each class are concealed from :py:func:`dir`.
-    '''
+
+        .. note::
+           Only class attributes are immutable. Instances of immutable classes
+           will have mutable attributes without additional intervention beyond
+           the scope of this package. '''
 
     __module__ = base_package_name
 
