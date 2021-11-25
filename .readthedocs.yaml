@@ -1,0 +1,9 @@
+# Read the Docs configuration file
+# See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
+
+version: 2
+
+# NOTE: This hack needed until we switch from Pipenv+Setuptools to Poetry or similar.
+python:
+  install:
+    - requirements: sources/sphinx/requirements.txt
