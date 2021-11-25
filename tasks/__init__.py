@@ -650,16 +650,11 @@ def upload_github_pages( context ):
             pty = True )
 
 
-@task( pre = ( upload_pypi, upload_github_pages, ) )
-def upload( context ): # pylint: disable=unused-argument
-    """ Publishes all relevant artifacts to their intended destinations. """
-
-
-@task( pre = ( bump_patch, push, upload, ) )
+@task( pre = ( bump_patch, push, upload_pypi, ) )
 def release_new_patch( context ): # pylint: disable=unused-argument
     """ Unleashes a new patch upon the world. """
 
 
-@task( pre = ( bump_stage, push, upload, ) )
+@task( pre = ( bump_stage, push, upload_pypi, ) )
 def release_new_stage( context ): # pylint: disable=unused-argument
     """ Unleashes a new stage upon the world. """

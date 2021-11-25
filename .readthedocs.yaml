@@ -3,7 +3,9 @@
 
 version: 2
 
-# NOTE: This hack needed until we switch from Pipenv+Setuptools to Poetry or similar.
 python:
   install:
+    # NOTE: This hack needed until we switch from Pipenv+Setuptools to Poetry or similar.
     - requirements: sources/sphinx/requirements.txt
+    - method: pip
+      path: .
