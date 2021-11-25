@@ -18,3 +18,15 @@
 
 Changelog
 ===============================================================================
+
+v1.0.1
+-------------------------------------------------------------------------------
+
+Documentation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Improve wording of introduction in README.
+* Add badges in README for supported Python versions, current release, code
+  coverage, and license.
+* Provide direct links in README to current API documentation, code of conduct,
+  and contribution guide.
