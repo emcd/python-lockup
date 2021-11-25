@@ -51,39 +51,62 @@
 Overview
 ===============================================================================
 
-Enables the creation of classes, modules, and namespaces on which all
-attributes are **immutable** and for which non-public attributes are
-**concealed**. Immutability increases code safety by discouraging
-monkey-patching and preventing accidental or deliberate changes to state.
-Concealment means that functions, such as `dir
-<https://docs.python.org/3/library/functions.html#dir>`_, can report a subset
-of attributes that are intended for programmers to use without exposing
-internals.
+Enables the creation of classes, modules, and namespaces on which the following
+properties are true:
 
-Salient Features
--------------------------------------------------------------------------------
+* All attributes are **immutable**. Immutability increases code safety by
+  discouraging monkey-patching and preventing accidental or deliberate changes
+  to state.
 
-* A module class, which enforces immutability and concealment upon module
-  attributes. This module class can *replace* the standard Python module class
-  *with a single line of code* in a module definition.
+  .. code-block:: python
 
-* A factory (metaclass) that creates classes, enforcing immutability and
-  concealment upon their attributes. (Just attributes on the classes,
-  themsleves, are immutable and concealed and not attributes on the instances
-  of the classes.)
+    >>> import sys
+    >>> import lockup
+    >>> lockup.reclassify_module( sys )  # doctest: +SKIP
+    >>> sys.stderr = sys.stdout          # doctest: +SKIP
+    Traceback (most recent call last):
+    ...
+    lockup.exceptions.ImpermissibleAttributeOperation: Attempt to assign immutable attribute 'stderr' on module 'sys'.
 
-* A factory that creates namespaces, enforcing immutability and concealment
-  upon their attributes.
+  .. code-block:: python
+
+    >>> import lockup
+    >>> ns = lockup.create_namespace( some_constant = 6 )
+    >>> ns.some_constant = 13
+    Traceback (most recent call last):
+    ...
+    lockup.exceptions.ImpermissibleAttributeOperation: Attempt to assign immutable attribute 'some_constant' on class 'lockup.Namespace'.
+
+* Non-public attributes are **concealed**. Concealment means that functions,
+  such as `dir <https://docs.python.org/3/library/functions.html#dir>`_, can
+  report a subset of attributes that are intended for programmers to use
+  (without directly exposing internals).
+
+  .. code-block:: python
+
+    >>> import lockup
+    >>> dir( lockup )
+    ['Class', 'Module', 'NamespaceClass', 'base', 'create_namespace', 'exceptions', 'reclassify_module']
+    >>> len( dir( lockup ) )
+    7
+    >>> len( lockup.__dict__ )  # doctest: +SKIP
+    18
 
 Quick Tour
 ===============================================================================
 
-Module
+.. _`Class Factory`: https://python-lockup.readthedocs.io/en/stable/api.html#lockup.Class
+.. _Module: https://python-lockup.readthedocs.io/en/stable/api.html#lockup.Module
+.. _`Namespace Factory`: https://python-lockup.readthedocs.io/en/stable/api.html#lockup.NamespaceClass
+
+Module_
 -------------------------------------------------------------------------------
 
 Let us consider the mutable `os <https://docs.python.org/3/library/os.html>`_
 module from the Python standard library and how we can alter "constants" that
 may be used in many places:
+
+.. code-block:: python
 
 	>>> import os
 	>>> os.EX_OK
@@ -99,6 +122,8 @@ may be used in many places:
 
 Now, let us see what protection it gains from becoming immutable:
 
+.. code-block:: python
+
 	>>> import os
 	>>> import lockup
 	>>> lockup.reclassify_module( os )
@@ -113,12 +138,13 @@ Now, let us see what protection it gains from becoming immutable:
 	>>> type( os )
 	<class 'lockup.Module'>
 
-Class Factory
+`Class Factory`_
 -------------------------------------------------------------------------------
 
 Let us monkey-patch a mutable class:
 
-	>>> import lockup
+.. code-block:: python
+
 	>>> class A:
 	...     def expected_functionality( self ): return 42
 	...
@@ -134,6 +160,8 @@ Let us monkey-patch a mutable class:
 	'I selfishly change behavior upon which other consumers depend.'
 
 Now, let us try to monkey-patch an immutable class:
+
+.. code-block:: python
 
 	>>> import lockup
 	>>> class B( metaclass = lockup.Class ):
@@ -158,12 +186,19 @@ Now, let us try to monkey-patch an immutable class:
 	>>> issubclass( type( B ), type )
 	True
 
-Namespace Factory
+.. note::
+   Only class attributes are immutable. Instances of immutable classes will
+   have mutable attributes without additional intervention beyond the scope of
+   this package.
+
+`Namespace Factory`_
 -------------------------------------------------------------------------------
 
 An alternative to `types.SimpleNamespace
 <https://docs.python.org/3/library/types.html#types.SimpleNamespace>`_ is
 provided. First, let us observe the behaviors on a standard namespace:
+
+.. code-block:: python
 
 	>>> import types
 	>>> sn = types.SimpleNamespace( run = lambda: 42 )
@@ -188,6 +223,8 @@ provided. First, let us observe the behaviors on a standard namespace:
 	TypeError: 'types.SimpleNamespace' object is not callable
 
 Now, let us compare those behaviors to an immutable namespace:
+
+.. code-block:: python
 
     >>> import lockup
     >>> ns = lockup.create_namespace( run = lambda: 42 )
@@ -218,6 +255,9 @@ Also of note is that we can define namespace classes directly, allowing us to
 capture imports for internal use in a module without publicly exposing them as
 part of the module API, for example:
 
+.. code-block:: python
+
+	>>> import lockup
     >>> class __( metaclass = lockup.NamespaceClass ):
     ...     from os import O_RDONLY, O_RDWR
     ...
@@ -231,6 +271,8 @@ Exceptions
 
 Exceptions can be intercepted with appropriate builtin exception classes or
 with package exception classes:
+
+.. code-block:: python
 
 	>>> import os
 	>>> import lockup
