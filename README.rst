@@ -60,13 +60,13 @@ properties are true:
 
   .. code-block:: python
 
-    >>> import sys
+    >>> import math
     >>> import lockup
-    >>> lockup.reclassify_module( sys )  # doctest: +SKIP
-    >>> sys.stderr = sys.stdout          # doctest: +SKIP
+    >>> lockup.reclassify_module( math )
+    >>> math.pi = math.e
     Traceback (most recent call last):
     ...
-    lockup.exceptions.ImpermissibleAttributeOperation: Attempt to assign immutable attribute 'stderr' on module 'sys'.
+    lockup.exceptions.ImpermissibleAttributeOperation: Attempt to assign immutable attribute 'pi' on module 'math'.
 
   .. code-block:: python
 
@@ -96,6 +96,7 @@ Quick Tour
 ===============================================================================
 
 .. _`Class Factory`: https://python-lockup.readthedocs.io/en/stable/api.html#lockup.Class
+.. _Exceptions: https://python-lockup.readthedocs.io/en/stable/api.html#module-lockup.exceptions
 .. _Module: https://python-lockup.readthedocs.io/en/stable/api.html#lockup.Module
 .. _`Namespace Factory`: https://python-lockup.readthedocs.io/en/stable/api.html#lockup.NamespaceClass
 
@@ -266,7 +267,7 @@ part of the module API, for example:
 
 The above technique is used internally within this package itself.
 
-Exceptions
+`Exceptions`_
 -------------------------------------------------------------------------------
 
 Exceptions can be intercepted with appropriate builtin exception classes or
