@@ -46,10 +46,11 @@ from os import environ as psenv
 from pathlib import Path
 from pprint import pprint
 from sys import stderr
+from time import sleep
 import re
 from venv import create as create_venv
 
-from invoke import Context, Exit, call, task
+from invoke import Context, Exit, Failure, call, task
 
 
 eprint = partial_function( print, file = stderr )
@@ -606,10 +607,15 @@ def check_pip_install( context, index_url = '' ):
         f"import {project_name}; "
         f"print( {project_name}.__version__ )" )
     project_version = parse_project_version( )
-    context.run(
-        f". {venv_path}/bin/activate "
-        f"&& pip install {index_url_option} {project_name}=={project_version} "
-        f"&& python -c '{python_import_command}'", pty = True )
+    for attempt_count in range( 3 ):
+        try:
+            context.run(
+                f". {venv_path}/bin/activate "
+                f"&& pip install {index_url_option} "
+                f"     {project_name}=={project_version} "
+                f"&& python -c '{python_import_command}'", pty = True )
+        except Failure: sleep( 2 ** attempt_count )
+        else: break
 
 
 @task(
