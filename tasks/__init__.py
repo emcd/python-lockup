@@ -636,7 +636,7 @@ def _upload_pypi( context, repository_name = '' ):
     repository_option = ''
     task_name_suffix = ''
     if repository_name:
-        repository_option = f"--repository {respository_name}"
+        repository_option = f"--repository {repository_name}"
         task_name_suffix = f" ({repository_name})"
     eprint( _render_boxed_title( f"Publication: PyPI{task_name_suffix}" ) )
     artifacts = _get_pypi_artifacts( )
@@ -656,7 +656,7 @@ def _get_pypi_credentials( repository_name ):
     from tomli import load as load_toml
     if '' == repository_name: repository_name = 'pypi'
     with open( top_path / 'credentials.toml', 'rb' ) as file:
-        table = load_toml( file )[ table_name ]
+        table = load_toml( file )[ repository_name ]
     return {
         'TWINE_USERNAME': table[ 'username' ],
         'TWINE_PASSWORD': table[ 'password' ], }
