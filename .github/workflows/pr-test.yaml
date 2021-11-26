@@ -1,0 +1,31 @@
+name: pr-tests
+on:
+  pull_request:
+    branches: ['*']
+jobs:
+  test:
+    uses: emcd/python-lockup/.github/workflows/reusable--test.yaml@test-gh-action
+  verify-caches:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Repository Code
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Procure Baseline Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.6
+      - name: Install Pipenv
+        run: sudo pip3 install pipenv
+      - name: Create Virtual Environment
+        run: pipenv sync --dev
+      - name: Restore Coverage Results
+        uses: actions/download-artifact@v2
+        with:
+          path: caches/pytest
+      - name: Relocate Coverage Results
+        run: mv caches/pytest/coverage-results-*/coverage.sqlite3.* caches/pytest
+      - name: Report Coverage
+        run: pipenv run invoke report-coverage
