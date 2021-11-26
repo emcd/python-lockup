@@ -111,7 +111,7 @@ def _unlink_recursively( path ):
         return
     dirs_stack = [ ]
     for child_path in path.rglob( '*' ):
-        if child_path.is_dir( ):
+        if child_path.is_dir( ) and not child_path.is_symlink( ):
             dirs_stack.append( child_path )
             continue
         child_path.unlink( )
@@ -173,7 +173,7 @@ def clean_tool_caches( context ): # pylint: disable=unused-argument
         lambda anchor: anchor.rglob( '*' ), anchors
     ) ):
         if path in gitignore_paths: continue
-        if path.is_dir( ):
+        if path.is_dir( ) and not path.is_symlink( ):
             dirs_stack.append( path )
             continue
         path.unlink( )
