@@ -1,0 +1,7 @@
+name: pr-tests
+on:
+  pull_request:
+    branches: ['*']
+jobs:
+  test:
+    uses: emcd/python-lockup/.github/workflows/reusable--test.yaml@master
