@@ -47,6 +47,7 @@ from pathlib import Path
 from pprint import pprint
 from sys import stderr
 import re
+from venv import create as create_venv
 
 from invoke import Context, Exit, call, task
 
@@ -594,29 +595,71 @@ def push( context ):
     context.run( 'git push --tags', pty = True )
 
 
-@task( pre = ( make, ) )
+@task
+def check_pip_install( context, index_url = '' ):
+    """ Checks import of current package after installation via Pip. """
+    venv_path = caches_path / 'venvs' / project_name
+    create_venv( venv_path, clear = True, with_pip = True )
+    index_url_option = ''
+    if index_url: index_url_option = f"--index-url {index_url}"
+    python_import_command = (
+        f"import {project_name}; "
+        f"print( {project_name}.__version__ )" )
+    project_version = parse_project_version( )
+    context.run(
+        f". {venv_path}/bin/activate "
+        f"&& pip install {index_url_option} {project_name}=={project_version} "
+        f"&& python -c '{python_import_command}'", pty = True )
+
+
+@task(
+    pre = ( make, ),
+    post = (
+        call( check_pip_install, index_url = 'https://test.pypi.org/simple/' ),
+    )
+)
 def upload_test_pypi( context ):
     """ Publishes current sdist and wheels to Test PyPI. """
-    eprint( _render_boxed_title( 'Publication: Test PyPI' ) )
-    artifacts = _get_pypi_artifacts( )
-    context.run(
-        'twine upload --skip-existing --verbose --repository testpypi '
-        f"{artifacts}", pty = True )
+    _upload_pypi( context, 'testpypi' )
 
 
-@task( pre = ( make, test_all_versions, ) )
+@task(
+    pre = ( upload_test_pypi, test_all_versions, ),
+    post = ( check_pip_install, )
+)
 def upload_pypi( context ):
     """ Publishes current sdist and wheels to PyPI. """
-    eprint( _render_boxed_title( 'Publication: PyPI' ) )
+    _upload_pypi( context )
+
+
+def _upload_pypi( context, repository_name = '' ):
+    repository_option = ''
+    task_name_suffix = ''
+    if repository_name:
+        repository_option = f"--repository {respository_name}"
+        task_name_suffix = f" ({repository_name})"
+    eprint( _render_boxed_title( f"Publication: PyPI{task_name_suffix}" ) )
     artifacts = _get_pypi_artifacts( )
     context.run(
-        f"twine upload --skip-existing --verbose {artifacts}", pty = True )
+        f"twine upload --skip-existing --verbose {repository_option} "
+        f"{artifacts}",
+        env = _get_pypi_credentials( repository_name ), pty = True )
 
 
 def _get_pypi_artifacts( ):
     stems = ( _get_sdist_path( ), _get_wheel_path( ), )
     return ' '.join( chain(
         map( str, stems ), map( lambda p: f"{p}.asc", stems ) ) )
+
+
+def _get_pypi_credentials( repository_name ):
+    from tomli import load as load_toml
+    if '' == repository_name: repository_name = 'pypi'
+    with open( top_path / 'credentials.toml', 'rb' ) as file:
+        table = load_toml( file )[ table_name ]
+    return {
+        'TWINE_USERNAME': table[ 'username' ],
+        'TWINE_PASSWORD': table[ 'password' ], }
 
 
 # Inspiration: https://stackoverflow.com/a/58993849/14833542
