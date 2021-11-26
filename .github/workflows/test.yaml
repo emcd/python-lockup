@@ -1,40 +1,13 @@
 name: tests
 on:
-  pull_request:
-    branches: ['*']
   push:
-    branches: ['*']
+    branches: ['master', 'release-*']
 jobs:
   test:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        # Note: MyPy is broken on Python 3.10 as of 2021-11-21.
-        python-version: ['3.6', '3.7', '3.8', '3.9']
-    steps:
-      - name: Clone Repository Code
-        uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - name: Procure Baseline Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install Pipenv
-        run: sudo pip3 install pipenv
-      - name: Create Virtual Environment
-        run: pipenv sync --dev --python ${{ matrix.python-version }}
-      - name: Test
-        run: pipenv run invoke test
-      - name: Preserve Coverage Results
-        uses: actions/upload-artifact@v2
-        with:
-          name: coverage-results-${{ matrix.python-version }}
-          path: caches/pytest/coverage.sqlite3.*
+    uses: emcd/python-lockup/.github/workflows/reusable--test.yaml@master
   report-coverage:
     needs: test
     runs-on: ubuntu-latest
-    if: "${{ 'push' == github.event_name && 'refs/heads/master' == github.ref }}"
     steps:
       - name: Clone Repository Code
         uses: actions/checkout@v2
