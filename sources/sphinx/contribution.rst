@@ -165,7 +165,7 @@ some packages with your OS package manager first:
 
     .. code-block:: sh
 
-        sudo apt update && sudo apt install gpg libenchant-2-2
+        sudo apt update && sudo apt install gpg
 
 `EditorConfig <https://editorconfig.org>`_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
