@@ -105,10 +105,8 @@ ensure that the necessary Python environments are available:
     .. code-block:: sh
 
         . $HOME/.asdf/asdf.sh  # or equivalent for non-standard installation
-        asdf plugin-add python
-        for python_version in $(egrep ^python .tool-versions | sed 's|^python ||'); do
-            asdf install python ${python_version}
-        done
+        asdf plugin add python
+        asdf install python
 
 |dagger| Contemporary Bourne shells include ``ash``, ``bash``, and ``zsh``.
 
