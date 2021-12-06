@@ -228,13 +228,12 @@ def freshen_python( context ):
         minor_version = "{prefix}{minor}".format(
             prefix = groups.get( 'prefix' ) or '',
             minor = groups[ 'minor' ] )
-        latest_version = context.run(
+        latest_versions.append( context.run(
             f"asdf latest python {minor_version}",
-            hide = 'stdout' ).stdout.strip( )
-        latest_versions.append( latest_version )
-        context.run( f"asdf install python {latest_version}", pty = True )
+            hide = 'stdout' ).stdout.strip( ) )
     context.run( "asdf local python {versions}".format(
         versions = ' '.join( latest_versions ) ), pty = True )
+    context.run( "asdf install python", pty = True )
 
 
 @task( post = ( clean_pipenv, check_pipenv_security, ) )
