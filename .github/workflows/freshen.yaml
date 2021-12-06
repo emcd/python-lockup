@@ -1,0 +1,36 @@
+name: fresheners
+on:
+  schedule:
+    - cron: '0 0 * * *'
+jobs:
+  freshen:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Repository Code
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Procure Baseline Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.6
+      - name: Install Pipenv
+        run: sudo pip3 install pipenv
+      - name: Create Virtual Environment
+        run: pipenv sync --dev
+      - name: Install Asdf and Pythons
+        uses: asdf-vm/actions/install@v1
+      - name: Freshen Asdf and Pythons
+        run: pipenv run invoke freshen-python
+      - name: Freshen Project Dependencies
+        run: pipenv run invoke freshen
+      # TODO: PGP key setup for bot.
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          title: '[GHA] Freshen Project'
+          commit-message: '[GHA] Freshen Project'
+          # TODO: Committer which matches PGP key.
+          branch: gha-freshener
+          delete-branch: true
+          reviewers: emcd
