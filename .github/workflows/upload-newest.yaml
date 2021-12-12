@@ -1,0 +1,33 @@
+name: upload-newest
+on:
+  workflow_run:
+    workflows: ['tests']
+    branches: ['master']
+    types: ['completed']
+jobs:
+  upload-github-pages:
+    runs-on: ubuntu-latest
+    if: "${{ github.event.workflow_run.conclusion == 'success' }}"
+    steps:
+      - name: Clone Repository Code
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Procure Baseline Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.6
+      - name: Install Pipenv
+        run: sudo pip3 install pipenv
+      - name: Create Virtual Environment
+        run: pipenv sync --dev
+      - name: Configure Git
+        run: |
+          git config user.name '${{ github.repository }} Action'
+          git config user.email '${{ github.repository_owner }}@users.noreply.github.com'
+      # TODO: Setup GPG. Prepopulate gpg-agent with passphrase.
+      #       https://stackoverflow.com/a/57927025/14833542
+      #       https://www.gnupg.org/documentation/manuals/gnupg/gpg_002dpreset_002dpassphrase.html
+      #       https://www.gnupg.org/documentation/manuals/gnupg/Invoking-gpg_002dpreset_002dpassphrase.html#Invoking-gpg_002dpreset_002dpassphrase
+      - name: Upload Github Pages
+        run: pipenv run invoke upload-github-pages
