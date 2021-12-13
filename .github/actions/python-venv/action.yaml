@@ -1,0 +1,25 @@
+name: python-venv
+description: 'Clones project, configures Python, and populates virtual environment.'
+inputs:
+  python-version:
+    description: 'Version of the Python interpreter.'
+    required: true
+    default: 3.6
+runs:
+  using: composite
+  steps:
+    - name: Clone Repository Code
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: Procure Baseline Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '${{ inputs.python-version }}'
+    - name: Install Pipenv
+      run: sudo python -m pip install pipenv
+      shell: bash
+    - name: Create Virtual Environment
+      # Note: 'pipenv --skip-lock --dev' does not work properly as of 2012-12-12.
+      run: 'mv Pipfile.lock old-Pipfile.lock && pipenv --python ${{ inputs.python-version }} install --dev && mv --force old-Pipfile.lock Pipfile.lock'
+      shell: bash

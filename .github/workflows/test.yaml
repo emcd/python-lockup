@@ -9,18 +9,8 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - name: Clone Repository Code
-        uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - name: Procure Baseline Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.6
-      - name: Install Pipenv
-        run: sudo pip3 install pipenv
-      - name: Create Virtual Environment
-        run: pipenv sync --dev
+      - name: Prepare
+        uses: emcd/python-lockup/.github/actions/python-venv@master
       - name: Restore Coverage Results
         uses: actions/download-artifact@v2
         with:
