@@ -9,18 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     if: "${{ github.event.workflow_run.conclusion == 'success' }}"
     steps:
-      - name: Clone Repository Code
-        uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - name: Procure Baseline Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.6
-      - name: Install Pipenv
-        run: sudo pip3 install pipenv
-      - name: Create Virtual Environment
-        run: pipenv sync --dev
+      - name: Prepare
+        uses: emcd/python-lockup/.github/actions/python-venv@master
       - name: Configure Git
         run: |
           git config user.name '${{ github.repository }} Action'

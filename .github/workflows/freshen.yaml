@@ -6,18 +6,8 @@ jobs:
   freshen:
     runs-on: ubuntu-latest
     steps:
-      - name: Clone Repository Code
-        uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - name: Procure Baseline Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.6
-      - name: Install Pipenv
-        run: sudo pip3 install pipenv
-      - name: Create Virtual Environment
-        run: pipenv sync --dev
+      - name: Prepare
+        uses: emcd/python-lockup/.github/actions/python-venv@master
       - name: Install Asdf and Pythons
         uses: asdf-vm/actions/install@v1
       - name: Freshen Asdf and Pythons
