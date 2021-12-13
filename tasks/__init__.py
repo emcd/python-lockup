@@ -53,8 +53,14 @@ from venv import create as create_venv
 from invoke import Context, Exit, Failure, call, task
 
 
-eprint = partial_function( print, file = stderr )
-epprint = partial_function( pprint, stream = stderr )
+# If running in a Github Workflow,
+# then use 'stdout' for properly interleaved output.
+if 'CI' in psenv:
+    eprint = print
+    epprint = pprint
+else:
+    eprint = partial_function( print, file = stderr )
+    epprint = partial_function( pprint, stream = stderr )
 
 
 top_path = Path( __file__ ).parent.parent
