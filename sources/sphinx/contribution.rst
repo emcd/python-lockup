@@ -215,7 +215,7 @@ However, in to provide maximum portability
 and to reduce the number of languages that a developer needs to remember,
 we use a Python-native solution:
 `invoke <https://www.pyinvoke.org/>`_.
-The :command:`invoke` is available as part of the virtual environment
+The :command:`invoke` command is available as part of the virtual environment
 maintained by Pipenv for this project.
 
 Instead of defining tasks in a ``Makefile``,
