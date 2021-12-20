@@ -1,0 +1,959 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="License" href="license.html" /><link rel="prev" title="API Documentation" href="api.html" />
+
+    <meta name="generator" content="sphinx-4.3.2, furo 2021.11.23"/>
+        <title>Contribution - lockup 1.1a202111250533 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=7f0192ddeb2adecfbaa87ffbcf67d16358b30bc1" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/tabs.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=0af69da206d614734f649b27d4cdc2dd6c31f41d" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  body[data-theme="dark"] {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    body:not([data-theme="light"]) {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+  }
+</style></head>
+  <body>
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" />
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">lockup 1.1a202111250533 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Documentation</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Contribution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CHANGELOG.html">Changelog</a></li>
+</ul>
+
+</div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="contribution">
+<h1>Contribution<a class="headerlink" href="#contribution" title="Permalink to this headline">¶</a></h1>
+<p>Contribution to this project is welcome!
+Here are some ways that you can help:</p>
+<ul class="simple">
+<li><p>Filing <a class="reference external" href="https://github.com/emcd/python-lockup/issues">issues</a>
+for bug reports, feature requests, and other relevant discussion.</p></li>
+<li><p>Helping out with the <a class="reference internal" href="#development">development</a> of the source code and documentation.</p></li>
+</ul>
+<p>Please do note that all interactions about this project
+on media under its control are subject to its <a class="reference internal" href="#code-of-conduct">Code of Conduct</a>.</p>
+<section id="code-of-conduct">
+<h2>Code of Conduct<a class="headerlink" href="#code-of-conduct" title="Permalink to this headline">¶</a></h2>
+<p>Please take a look at:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.catb.org/~esr/faqs/smart-questions.html">How to Ask Questions the Smart Way</a> (but understand that
+some of the showcased responses to “stupid questions” may not be acceptable)</p></li>
+<li><p><a class="reference external" href="https://www.python.org/psf/conduct/">Python Software Foundation Code of Conduct</a> (in particular, the <code class="docutils literal notranslate"><span class="pre">Our</span> <span class="pre">Community</span></code>
+and <code class="docutils literal notranslate"><span class="pre">Our</span> <span class="pre">Standards:</span> <span class="pre">Inappropriate</span> <span class="pre">Behavior</span></code> sections)</p></li>
+</ul>
+<p>as well as note the following bullet points from the <a class="reference external" href="https://www.rust-lang.org/policies/code-of-conduct">Rust Code of Conduct</a>:</p>
+<blockquote>
+<div><p>• Respect that people have differences of opinion and that every design
+or implementation choice carries a trade-off and numerous costs. There is
+seldom a right answer.</p>
+<p>• Please keep unstructured critique to a minimum. If you have solid
+ideas you want to experiment with, make a fork and see how it works.</p>
+<p>• Likewise any spamming, trolling, flaming, baiting or other
+attention-stealing behavior is not welcome.</p>
+</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Please do not contact the authors of the above documents
+for anything related to this project.</p>
+</div>
+<p>Please act in the spirit of respect for others, whether you are asking
+questions, providing feedback, or answering questions. Please remember that
+volunteerism powers much of the open source available for you to use.</p>
+<p>Also, no need to create noise with “+1” or “me too” comments in issue
+tracker threads. Please only add substantive comments that will further advance
+the understanding of an issue. If you wish to upvote a comment, then please use
+an appropriate reacji on that comment.</p>
+</section>
+<section id="development">
+<h2>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h2>
+<section id="environment">
+<h3>Environment<a class="headerlink" href="#environment" title="Permalink to this headline">¶</a></h3>
+<section id="id1">
+<h4><a class="reference external" href="https://github.com/asdf-vm/asdf">asdf</a><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<p>We develop against one baseline version of the CPython reference
+implementation; this is the first version listed in the <code class="docutils literal notranslate"><span class="pre">.tool-versions</span></code>
+file, located at the top level of the project repository. However, we also test
+against successive minor versions beyond this baseline version, as well as
+equivalent versions for alternative implementations. Those versions are listed
+after the baseline version in the same file. This file is used by the excellent
+<a class="reference external" href="https://github.com/asdf-vm/asdf">asdf</a> version manager to determine which versions of Python are considered
+active for the project. We strongly recommend the use of <a class="reference external" href="https://github.com/asdf-vm/asdf">asdf</a> to manage
+multiple versions of Python.</p>
+<p>To build the CPython implementations that we support, you may need to install
+some packages with your OS package manager first:</p>
+<div class="tab-set docutils container">
+<input checked="True" class="tab-input" id="tab-set--0-input--1" name="tab-set--0" type="radio"/><label class="tab-label" for="tab-set--0-input--1">apt</label><div class="tab-content docutils container">
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>sudo apt update <span class="o">&amp;&amp;</span> sudo apt install libbz2-dev libffi-dev libsqlite3-dev libssl-dev libreadline-dev zlib1g-dev
+</pre></div>
+</div>
+</div>
+</div>
+<p>If you have installed <a class="reference external" href="https://github.com/asdf-vm/asdf">asdf</a>, then you can execute the following commands to
+ensure that the necessary Python environments are available:</p>
+<div class="tab-set docutils container">
+<input checked="True" class="tab-input" id="tab-set--1-input--1" name="tab-set--1" type="radio"/><label class="tab-label" for="tab-set--1-input--1">Bourne Shells †</label><div class="tab-content docutils container">
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>. <span class="nv">$HOME</span>/.asdf/asdf.sh  <span class="c1"># or equivalent for non-standard installation</span>
+asdf plugin add python
+asdf install python
+</pre></div>
+</div>
+</div>
+</div>
+<p>† Contemporary Bourne shells include <code class="docutils literal notranslate"><span class="pre">ash</span></code>, <code class="docutils literal notranslate"><span class="pre">bash</span></code>, and <code class="docutils literal notranslate"><span class="pre">zsh</span></code>.</p>
+<p><em>Why not use</em> <a class="reference external" href="https://github.com/pyenv/pyenv">pyenv</a> <em>?</em></p>
+<p>When one considers all of the other language-specific version
+managers out there, such as <a class="reference external" href="https://www.jenv.be/">jEnv</a>, <a class="reference external" href="https://github.com/rbenv/rbenv">rbenv</a>, and <a class="reference external" href="https://github.com/tfutils/tfenv">tfenv</a>, it becomes clear that having a single
+version management interface reduces cognitive load on developers, as they only
+need to remember one command-line interface and one file format for managed
+versions. And, while this project may only be Python-specific, the practice of
+using a more generalized version manager may cross to other projects.</p>
+</section>
+<section id="id2">
+<h4><a class="reference external" href="https://pypi.org/project/pipenv">pipenv</a><a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<p>If you have done any significant amount of Python development
+or have tried using Python on a machine where you do not have administrative
+privileges, then you have probably encountered the concept of virtual
+environments to provide sandboxes into which you can install packages.
+Traditionally, you would have to create such virtual environments,
+“activate” them, and then install packages into them. The creation of such an
+environment may involve a tool,
+like <a class="reference external" href="https://virtualenv.pypa.io/en/latest">virtualenv</a>,
+or the <a class="reference external" href="https://docs.python.org/3/library/venv.html">venv</a> module
+that comes with all recent versions of Python 3. Activation of such an
+environment typically involves using a shell script. And, installing
+into an activated environment is commonly done by running
+<a class="reference external" href="https://pypi.org/project/pip">pip</a> from within that environment.
+All of that is a lot of work if you simply want to play in a sandbox
+- and you do not even get reproducible installations for your hassle.</p>
+<p>The <a class="reference external" href="https://pypi.org/project/pipenv">pipenv</a> tool is a very respectable solution to the above problems.
+It creates a virtual environment and can transparently install packages
+into it. Installed development dependencies and runtime dependencies
+are both tracked as separate categories within a <code class="docutils literal notranslate"><span class="pre">Pipfile</span></code>.
+This grants portability and reproducibility of development
+environments and removes the need to maintain various <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code>
+files. Furthermore, the <code class="docutils literal notranslate"><span class="pre">pipenv</span> <span class="pre">shell</span></code> and <code class="docutils literal notranslate"><span class="pre">pipenv</span> <span class="pre">run</span></code> commands are
+very useful for iterating on dependency changes during development.
+For these reasons, we strongly recommend installing and using this tool.</p>
+<p>We provide a <code class="docutils literal notranslate"><span class="pre">Pipfile</span></code> in the top level of the project repository. After
+you clone the project and have installed <a class="reference external" href="https://pypi.org/project/pipenv">pipenv</a>, just run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pipenv</span> <span class="n">sync</span> <span class="o">--</span><span class="n">dev</span>
+</pre></div>
+</div>
+<p>to prepare a virtual environment for development.</p>
+<p>To use certain development tools that we support, you may need to install
+some packages with your OS package manager first:</p>
+<div class="tab-set docutils container">
+<input checked="True" class="tab-input" id="tab-set--2-input--1" name="tab-set--2" type="radio"/><label class="tab-label" for="tab-set--2-input--1">apt</label><div class="tab-content docutils container">
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>sudo apt update <span class="o">&amp;&amp;</span> sudo apt install gpg
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id3">
+<h4><a class="reference external" href="https://editorconfig.org">EditorConfig</a><a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<p>Most modern code editors support per-file type configuration via <a class="reference external" href="https://editorconfig.org">EditorConfig</a>.
+This ensures that project standards for things, such as maximum line length,
+trailing whitespace, and indentation are enforced without the need
+for lots of editor-specific configurations to be distributed with the project.
+We recommend that you install an EditorConfig plugin for your editor of choice,
+if necessary. We provide an <code class="docutils literal notranslate"><span class="pre">.editorconfig</span></code> file at the top level
+of the project repository; this file has configurations relevant
+to the project.</p>
+</section>
+<section id="commit-signatures">
+<h4>Commit Signatures<a class="headerlink" href="#commit-signatures" title="Permalink to this headline">¶</a></h4>
+<p>All commits to the project must be signed with a valid GPG/PGP or S/MIME secret
+key. You can use <a class="reference external" href="https://gnupg.org/">GNU Privacy Guard</a> or a similar tool to
+generate a signing key if you do not already have one. And, you can likewise
+use such a tool to sign your commits. Github has a good guide on the following
+topics:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification">Commit Signature Verification</a></p></li>
+<li><p><a class="reference external" href="https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key">GPG Key Generation</a></p></li>
+<li><p><a class="reference external" href="https://docs.github.com/en/authentication/managing-commit-signature-verification/adding-a-new-gpg-key-to-your-github-account">GPG Key Registration on Github</a></p></li>
+<li><p><a class="reference external" href="https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key">Git Client Configuration for Commit Signatures</a></p></li>
+</ul>
+<p>If you do not wish to expose a personal email address in association with a
+signing key, you can use the <a class="reference external" href="https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-user-account/managing-email-preferences/setting-your-commit-email-address">no-reply email address</a>
+associated with your Github account instead.</p>
+<p>In addition to registering the signature verification public key, which
+corresponds to your secret signing key, with Github, you may also publish the
+signature verification public key to well-known public key servers, such as:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://pgp.mit.edu/">MIT PGP Keyserver</a></p></li>
+<li><p><a class="reference external" href="https://keyserver.ubuntu.com/">Ubuntu Keyserver</a></p></li>
+</ul>
+</section>
+</section>
+<section id="common-tasks">
+<h3>Common Tasks<a class="headerlink" href="#common-tasks" title="Permalink to this headline">¶</a></h3>
+<p>During development, some tasks are repeated again and again.
+And some tasks are dependent upon other tasks.
+Traditionally, the <strong class="command">make</strong> command or a script or batch file
+would be used to automate such tasks.
+However, in to provide maximum portability
+and to reduce the number of languages that a developer needs to remember,
+we use a Python-native solution:
+<a class="reference external" href="https://www.pyinvoke.org/">invoke</a>.
+The <strong class="command">invoke</strong> command is available as part of the virtual environment
+maintained by Pipenv for this project.</p>
+<p>Instead of defining tasks in a <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>,
+we instead define them as Python code in <code class="file docutils literal notranslate"><span class="pre">tasks</span></code>.
+To see a summary of the available tasks, you can execute:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pipenv</span> <span class="n">run</span> <span class="n">invoke</span> <span class="o">--</span><span class="nb">list</span>
+</pre></div>
+</div>
+<p>We recommend the use of <strong class="command">invoke</strong> rather than running tools directly,
+since it performs environment sanitization
+and other frequently-overlooked tasks automatically,
+freeing you from fighting weird cache effects or various oversights,
+such as validating URLs in documentation or linting tests.</p>
+<section id="documentation">
+<h4>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h4>
+<p>Documentation artifacts are built by
+<a class="reference external" href="https://www.sphinx-doc.org/en/master/">Sphinx</a>
+using an extended form of the
+<a class="reference external" href="https://docutils.sourceforge.io/rst.html">reStructuredText</a> (<code class="docutils literal notranslate"><span class="pre">rst</span></code>)
+plaintext markup language. The sources for the documentation are under
+<code class="file docutils literal notranslate"><span class="pre">sources/sphinx</span></code>; the artifacts can be produced by:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pipenv</span> <span class="n">run</span> <span class="n">invoke</span> <span class="n">make</span><span class="o">-</span><span class="n">html</span>
+</pre></div>
+</div>
+<p>Some useful references for editing the sources are:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://docutils.sourceforge.io/docs/user/rst/quickref.html">reStructuredText Quick Reference</a></p></li>
+<li><p><a class="reference external" href="https://docutils.sourceforge.io/docs/ref/rst/directives.html">reStructuredText Directives</a></p></li>
+<li><p><a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html">reStructuredText Directives in Sphinx</a></p></li>
+<li><p><a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/roles.html">reStructuredText Roles in Sphinx</a></p></li>
+<li><p><a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html">reStructuredText Domains in Sphinx</a></p></li>
+</ul>
+<p><em>Why not use a flavor of Markdown instead?</em></p>
+<p>While Markdown is almost certainly better known than reStructuredText, Sphinx
+provides first-class support for the latter; Sphinx is a very powerful
+documentation generator and it is also the de facto standard within the Python
+community. Furthermore, reStructuredText is very well-suited to technical
+documentation, whereas Markdown is more general purpose. Although Markdown may
+have a somewhat simpler syntax than reStructuredText, <a class="reference external" href="https://about.gitlab.com/blog/2019/06/13/how-we-migrated-our-markdown-processing-to-commonmark/">multiple, competing
+flavors</a>
+of the language exist, which partially negates the simplicity. In light of
+these factors, we have standardized on 100% reStructuredText for all project
+documentation.</p>
+<p><em>Why not use Markdown for some things at least?</em></p>
+<p>Context-switching between multiple languages adds cognitive load
+and increases the chance of misapplied syntax.</p>
+</section>
+<section id="linting">
+<h4>Linting<a class="headerlink" href="#linting" title="Permalink to this headline">¶</a></h4>
+<p>Our primary Python linter is <a class="reference external" href="https://www.pylint.org/">Pylint</a>.
+Note that we use this as an actual static analysis tool
+and not merely a style checker. You can lint the sources by:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pipenv</span> <span class="n">run</span> <span class="n">invoke</span> <span class="n">lint</span>
+</pre></div>
+</div>
+<p><em>Why not use</em> <a class="reference external" href="https://flake8.pycqa.org/en/latest/">Flake8</a> <em>?</em></p>
+<p>Flake8 does not catch nearly as many issues as Pylint does and tends to focus
+on code style rather than finding actual bugs and smells. Because of Pylint’s
+greater sensitivity, it may have a reputation as “not working” out of the box,
+which may be why some people prefer Flake8. However, we prefer the fact that
+Pylint finds more bugs and smells and have already taken the time to tune it
+for the project’s needs.</p>
+</section>
+<section id="testing">
+<h4>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h4>
+<p>Our primary Python tester is <a class="reference external" href="https://docs.pytest.org/en/stable/">Pytest</a>.
+We use this to run unit tests and doctests.  In general, we prefer to write
+test functions rather than heavyweight <a class="reference external" href="https://docs.python.org/3/library/unittest.html">unittest</a> classes.  Also, we make
+extensive use of <a class="reference external" href="https://docs.pytest.org/en/stable/parametrize.html#parametrize-basics">parametrized tests</a> and
+<a class="reference external" href="https://hypothesis.readthedocs.io/en/latest/">property-based testing</a>.  To
+run the test suite in the current virtual environment maintained by <a class="reference external" href="https://pypi.org/project/pipenv">pipenv</a>,
+you can execute:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pipenv</span> <span class="n">run</span> <span class="n">invoke</span> <span class="n">test</span>
+</pre></div>
+</div>
+<p>To ensure that the test suite passes on all Python implementations,
+which are supported by the project, you can execute:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pipenv</span> <span class="n">run</span> <span class="n">invoke</span> <span class="n">test</span><span class="o">-</span><span class="nb">all</span><span class="o">-</span><span class="n">versions</span>
+</pre></div>
+</div>
+<p>This may take a longer time to complete.  Under the covers, it is using <a class="reference external" href="https://pypi.org/project/tox">tox</a>, which runs the test suite in an array of
+isolated virtual environments.  The virtual environments are instantiated via
+the <a class="reference external" href="https://pypi.org/project/tox-asdf/">tox-asdf</a> plugin, thus integrating
+with the Python implementations already available via <a class="reference external" href="https://github.com/asdf-vm/asdf">asdf</a>.</p>
+</section>
+</section>
+<section id="module-lockup.base">
+<span id="internal-api-documentation"></span><h3>Internal API Documentation<a class="headerlink" href="#module-lockup.base" title="Permalink to this headline">¶</a></h3>
+<p>Package foundation. Mostly internal classes and functions.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="lockup.base.Class">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">Class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namespace</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.Class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a></p>
+<p>Produces classes which have immutable attributes.</p>
+<p>Non-public attributes of each class are concealed from <a class="reference external" href="https://docs.python.org/3/library/functions.html#dir" title="(in Python v3.10)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dir()</span></code></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only class attributes are immutable. Instances of immutable classes
+will have mutable attributes without additional intervention beyond
+the scope of this package.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="lockup.base.Class.mro">
+<span class="sig-name descname"><span class="pre">mro</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a></span></span><a class="headerlink" href="#lockup.base.Class.mro" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a type’s method resolution order</p>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="lockup.base.NamespaceClass">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">NamespaceClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namespace</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.NamespaceClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lockup.base.Class" title="lockup.Class"><code class="xref py py-class docutils literal notranslate"><span class="pre">lockup.Class</span></code></a></p>
+<p>Produces namespace classes which have immutable attributes.</p>
+<p>Each produced namespace is a unique class, which cannot be
+instantiated.</p>
+<p>Non-public attributes of each class are concealed from <a class="reference external" href="https://docs.python.org/3/library/functions.html#dir" title="(in Python v3.10)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dir()</span></code></a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Although most descriptor attributes will be inert on a class,
+<a class="reference external" href="https://docs.python.org/3/library/types.html#types.DynamicClassAttribute" title="(in Python v3.10)"><code class="xref py py-func docutils literal notranslate"><span class="pre">types.DynamicClassAttribute()</span></code></a> and similar, may trigger
+attribute errors when accessed. However, these are a fairly rare
+case and are probably not needed on namespaces, in general.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="lockup.base.NamespaceClass.mro">
+<span class="sig-name descname"><span class="pre">mro</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a></span></span><a class="headerlink" href="#lockup.base.NamespaceClass.mro" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a type’s method resolution order</p>
+</dd></dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="lockup.base.create_namespace">
+<span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">create_namespace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">nomargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.create_namespace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates immutable namespaces from nominative arguments.</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lockup.base.DictionaryProxy">
+<span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">DictionaryProxy</span></span><a class="headerlink" href="#lockup.base.DictionaryProxy" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">mappingproxy</span></code></p>
+</dd></dl>
+<dl class="py exception">
+<dt class="sig sig-object py" id="lockup.base.Exception0">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">Exception0</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">things</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">sundry</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.Exception0" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#BaseException" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseException</span></code></a></p>
+<p>Base for all exceptions in the package.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lockup.base.Exception0.args">
+<span class="sig-name descname"><span class="pre">args</span></span><a class="headerlink" href="#lockup.base.Exception0.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="lockup.base.Exception0.with_traceback">
+<span class="sig-name descname"><span class="pre">with_traceback</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.Exception0.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+</dd></dl>
+<dl class="py exception">
+<dt class="sig sig-object py" id="lockup.base.FugitiveException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">FugitiveException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">supplement</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.FugitiveException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lockup.base.InvalidState" title="lockup.exceptions.InvalidState"><code class="xref py py-class docutils literal notranslate"><span class="pre">lockup.exceptions.InvalidState</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">RuntimeError</span></code></a></p>
+<p>Alert about fugitive exception intercepted at API boundary.</p>
+<p>An fugitive exception is one which is not intended
+to be reported across the package API boundary.
+Fugitive exceptions include Python built-ins,
+such as <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#IndexError" title="(in Python v3.10)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">IndexError</span></code></a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lockup.base.FugitiveException.args">
+<span class="sig-name descname"><span class="pre">args</span></span><a class="headerlink" href="#lockup.base.FugitiveException.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="lockup.base.FugitiveException.with_traceback">
+<span class="sig-name descname"><span class="pre">with_traceback</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.FugitiveException.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+</dd></dl>
+<dl class="py exception">
+<dt class="sig sig-object py" id="lockup.base.ImpermissibleAttributeOperation">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">ImpermissibleAttributeOperation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">things</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">sundry</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.ImpermissibleAttributeOperation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lockup.base.ImpermissibleOperation" title="lockup.exceptions.ImpermissibleOperation"><code class="xref py py-class docutils literal notranslate"><span class="pre">lockup.exceptions.ImpermissibleOperation</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AttributeError</span></code></a></p>
+<p>Complaint about impermissible attribute operation.</p>
+<p>Cannot use <a class="reference internal" href="#lockup.base.ImpermissibleOperation" title="lockup.base.ImpermissibleOperation"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ImpermissibleOperation</span></code></a> because some packages,
+such as Sphinx Autodoc, expect an <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.10)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">AttributeError</span></code></a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lockup.base.ImpermissibleAttributeOperation.args">
+<span class="sig-name descname"><span class="pre">args</span></span><a class="headerlink" href="#lockup.base.ImpermissibleAttributeOperation.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="lockup.base.ImpermissibleAttributeOperation.with_traceback">
+<span class="sig-name descname"><span class="pre">with_traceback</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.ImpermissibleAttributeOperation.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+</dd></dl>
+<dl class="py exception">
+<dt class="sig sig-object py" id="lockup.base.ImpermissibleOperation">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">ImpermissibleOperation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">things</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">sundry</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.ImpermissibleOperation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lockup.base.InvalidOperation" title="lockup.exceptions.InvalidOperation"><code class="xref py py-class docutils literal notranslate"><span class="pre">lockup.exceptions.InvalidOperation</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeError</span></code></a></p>
+<p>Complaint about impermissible operation.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lockup.base.ImpermissibleOperation.args">
+<span class="sig-name descname"><span class="pre">args</span></span><a class="headerlink" href="#lockup.base.ImpermissibleOperation.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="lockup.base.ImpermissibleOperation.with_traceback">
+<span class="sig-name descname"><span class="pre">with_traceback</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.ImpermissibleOperation.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+</dd></dl>
+<dl class="py exception">
+<dt class="sig sig-object py" id="lockup.base.InaccessibleAttribute">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">InaccessibleAttribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">things</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">sundry</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.InaccessibleAttribute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lockup.base.InaccessibleEntity" title="lockup.exceptions.InaccessibleEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">lockup.exceptions.InaccessibleEntity</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AttributeError</span></code></a></p>
+<p>Complaint about attempt to retrieve inaccessible attribute.</p>
+<p>Cannot use <a class="reference internal" href="#lockup.base.InaccessibleEntity" title="lockup.base.InaccessibleEntity"><code class="xref py py-exc docutils literal notranslate"><span class="pre">InaccessibleEntity</span></code></a> because some Python internals
+expect an <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.10)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">AttributeError</span></code></a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lockup.base.InaccessibleAttribute.args">
+<span class="sig-name descname"><span class="pre">args</span></span><a class="headerlink" href="#lockup.base.InaccessibleAttribute.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="lockup.base.InaccessibleAttribute.with_traceback">
+<span class="sig-name descname"><span class="pre">with_traceback</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.InaccessibleAttribute.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+</dd></dl>
+<dl class="py exception">
+<dt class="sig sig-object py" id="lockup.base.InaccessibleEntity">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">InaccessibleEntity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">things</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">sundry</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.InaccessibleEntity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lockup.base.InvalidOperation" title="lockup.exceptions.InvalidOperation"><code class="xref py py-class docutils literal notranslate"><span class="pre">lockup.exceptions.InvalidOperation</span></code></a></p>
+<p>Complaint about attempt to retrieve inaccessible entity.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lockup.base.InaccessibleEntity.args">
+<span class="sig-name descname"><span class="pre">args</span></span><a class="headerlink" href="#lockup.base.InaccessibleEntity.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="lockup.base.InaccessibleEntity.with_traceback">
+<span class="sig-name descname"><span class="pre">with_traceback</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.InaccessibleEntity.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+</dd></dl>
+<dl class="py exception">
+<dt class="sig sig-object py" id="lockup.base.IncorrectData">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">IncorrectData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">things</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">sundry</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.IncorrectData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lockup.base.InvalidOperation" title="lockup.exceptions.InvalidOperation"><code class="xref py py-class docutils literal notranslate"><span class="pre">lockup.exceptions.InvalidOperation</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeError</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></a></p>
+<p>Complaint about incorrect data for invocation or operation.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lockup.base.IncorrectData.args">
+<span class="sig-name descname"><span class="pre">args</span></span><a class="headerlink" href="#lockup.base.IncorrectData.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="lockup.base.IncorrectData.with_traceback">
+<span class="sig-name descname"><span class="pre">with_traceback</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.IncorrectData.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+</dd></dl>
+<dl class="py exception">
+<dt class="sig sig-object py" id="lockup.base.InvalidOperation">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">InvalidOperation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">things</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">sundry</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.InvalidOperation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lockup.base.Exception0" title="lockup.exceptions.Exception0"><code class="xref py py-class docutils literal notranslate"><span class="pre">lockup.exceptions.Exception0</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Complaint about invalid operation.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lockup.base.InvalidOperation.args">
+<span class="sig-name descname"><span class="pre">args</span></span><a class="headerlink" href="#lockup.base.InvalidOperation.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="lockup.base.InvalidOperation.with_traceback">
+<span class="sig-name descname"><span class="pre">with_traceback</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.InvalidOperation.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+</dd></dl>
+<dl class="py exception">
+<dt class="sig sig-object py" id="lockup.base.InvalidState">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">InvalidState</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">supplement</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.InvalidState" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lockup.base.Exception0" title="lockup.exceptions.Exception0"><code class="xref py py-class docutils literal notranslate"><span class="pre">lockup.exceptions.Exception0</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Alert about invalid internal state in the package.</p>
+<p>Owner of problem: maintainers of this package.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lockup.base.InvalidState.args">
+<span class="sig-name descname"><span class="pre">args</span></span><a class="headerlink" href="#lockup.base.InvalidState.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="lockup.base.InvalidState.with_traceback">
+<span class="sig-name descname"><span class="pre">with_traceback</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.InvalidState.with_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception.with_traceback(tb) –
+set self.__traceback__ to tb and return self.</p>
+</dd></dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="lockup.base.calculate_class_label">
+<span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">calculate_class_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.calculate_class_label" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produces human-comprehensible label for class or tuple of classes.</p>
+<p>Each provided class may be a class object or namespace dictionary
+that is present during class creation.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="lockup.base.calculate_instance_label">
+<span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">calculate_instance_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.calculate_instance_label" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produces human-comprehensible label for instance of class.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="lockup.base.calculate_invocable_label">
+<span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">calculate_invocable_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">invocable</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.calculate_invocable_label" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produces human-comprehensible label for invocable object.</p>
+<p>An invocable object may be a function, bound method, class,
+or invocable instance of a class.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="lockup.base.calculate_label">
+<span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">calculate_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.calculate_label" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produces human-comprehensible label, based on classification.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="lockup.base.calculate_module_label">
+<span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">calculate_module_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.calculate_module_label" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produces human-comprehensible label for module.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="lockup.base.create_argument_validation_exception">
+<span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">create_argument_validation_exception</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">invocation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expectation_label</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.create_argument_validation_exception" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates error with context about invalid argument.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="lockup.base.create_attribute_immutability_exception">
+<span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">create_attribute_immutability_exception</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'assign'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.create_attribute_immutability_exception" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates error with context about immutable attribute.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="lockup.base.create_attribute_indelibility_exception">
+<span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">create_attribute_indelibility_exception</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.create_attribute_indelibility_exception" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates error with context about indelible attribute.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="lockup.base.create_attribute_nonexistence_exception">
+<span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">create_attribute_nonexistence_exception</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.create_attribute_nonexistence_exception" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates error with context about nonexistent attribute.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="lockup.base.create_class_attribute_rejection_exception">
+<span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">create_class_attribute_rejection_exception</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">class_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.create_class_attribute_rejection_exception" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates error with context about class attribute rejection.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="lockup.base.create_impermissible_instantiation_exception">
+<span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">create_impermissible_instantiation_exception</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.create_impermissible_instantiation_exception" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates error with context about impermissible instantiation.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="lockup.base.create_invocation_validation_exception">
+<span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">create_invocation_validation_exception</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">invocation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cause</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.create_invocation_validation_exception" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates error with context about invalid invocation.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="lockup.base.intercept">
+<span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">intercept</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">invocation</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.intercept" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorator to intercept fugitive exceptions.</p>
+<p>Fugitive exceptions are ones which are not expected
+to cross an API boundary.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="lockup.base.is_operational_name">
+<span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">is_operational_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.is_operational_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns <code class="docutils literal notranslate"><span class="pre">True</span></code> if name is operational.</p>
+<p>An operational name begins and ends
+with a double underscore (<code class="docutils literal notranslate"><span class="pre">__</span></code>).</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="lockup.base.is_public_name">
+<span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">is_public_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.is_public_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns <code class="docutils literal notranslate"><span class="pre">True</span></code> if name is user-public.</p>
+<p>A user-public name does not begin with an underscore (<code class="docutils literal notranslate"><span class="pre">_</span></code>).</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="lockup.base.is_public_or_operational_name">
+<span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">is_public_or_operational_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.is_public_or_operational_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns <code class="docutils literal notranslate"><span class="pre">True</span></code> if name is user-public or operational.</p>
+<p>See <a class="reference internal" href="#lockup.base.is_public_name" title="lockup.base.is_public_name"><code class="xref py py-func docutils literal notranslate"><span class="pre">is_public_name()</span></code></a> and <a class="reference internal" href="#lockup.base.is_operational_name" title="lockup.base.is_operational_name"><code class="xref py py-func docutils literal notranslate"><span class="pre">is_operational_name()</span></code></a>
+for details.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="lockup.base.is_python_identifier">
+<span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">is_python_identifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.is_python_identifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is object a legal Python identifier? Excludes Python keywords.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="lockup.base.module_qualify_class_name">
+<span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">module_qualify_class_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.module_qualify_class_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Concatenates module name and qualified name of class.</p>
+<p>Also supports class namespace dictionaries.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="lockup.base.select_public_attributes">
+<span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">select_public_attributes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">includes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excludes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.select_public_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Selects all attributes with user-public names on object.</p>
+<p>Can optionally include specific attributes that would not be selected
+under normal operation and can exclude specific attributes that would
+selected under normal operation.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="lockup.base.validate_argument_invocability">
+<span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">validate_argument_invocability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argument</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">invocation</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.validate_argument_invocability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validates argument as an invocable object, such as a function.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="lockup.base.validate_attribute_existence">
+<span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">validate_attribute_existence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.validate_attribute_existence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validates attribute exists on context object.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="lockup.base.validate_attribute_name">
+<span class="sig-prename descclassname"><span class="pre">lockup.base.</span></span><span class="sig-name descname"><span class="pre">validate_attribute_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lockup.base.validate_attribute_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validates attribute name as Python identifier.</p>
+</dd></dl>
+</section>
+<section id="principles-and-advices">
+<h3>Principles and Advices<a class="headerlink" href="#principles-and-advices" title="Permalink to this headline">¶</a></h3>
+<section id="assertions-and-exceptions">
+<h4>Assertions and Exceptions<a class="headerlink" href="#assertions-and-exceptions" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><p>Do not use <code class="docutils literal notranslate"><span class="pre">assert</span></code> statements except in unit tests.
+Assertions are not triggered in optimized compilations. Raise a
+<a class="reference internal" href="#lockup.base.InvalidState" title="lockup.exceptions.InvalidState"><code class="xref py py-exc docutils literal notranslate"><span class="pre">InvalidState</span></code></a> exception to report invalid internal state.</p></li>
+<li><p>Do not report incorrect invocations or invalid argument data
+as invalid internal state. I.e., raise an exception in the
+<a class="reference internal" href="#lockup.base.InvalidOperation" title="lockup.exceptions.InvalidOperation"><code class="xref py py-exc docutils literal notranslate"><span class="pre">InvalidOperation</span></code></a> family rather than an exception in the
+<a class="reference internal" href="#lockup.base.InvalidState" title="lockup.exceptions.InvalidState"><code class="xref py py-exc docutils literal notranslate"><span class="pre">InvalidState</span></code></a> family.</p></li>
+<li><p>Never raise a non-package exception from inside the package.
+Part of the API contract is that only exceptions in the
+<a class="reference internal" href="#lockup.base.InvalidOperation" title="lockup.exceptions.InvalidOperation"><code class="xref py py-exc docutils literal notranslate"><span class="pre">InvalidOperation</span></code></a> and <a class="reference internal" href="#lockup.base.InvalidState" title="lockup.exceptions.InvalidState"><code class="xref py py-exc docutils literal notranslate"><span class="pre">InvalidState</span></code></a> families are permitted
+to cross the API boundary.</p></li>
+<li><p>Always consider whether an invocation can leak Python built-in
+exceptions across the API boundary and explicitly manage those which can.</p></li>
+</ul>
+</section>
+<section id="code-style-and-legibility">
+<h4>Code Style and Legibility<a class="headerlink" href="#code-style-and-legibility" title="Permalink to this headline">¶</a></h4>
+<p>Code style can be a surprisingly contentious issue. This project <em>does not</em> run
+any style checker or code reformatter, such as <a class="reference external" href="https://pypi.org/project/autopep8/">autopep8</a> or <a class="reference external" href="https://pypi.org/project/black/">black</a>. However, it is expected that patches will
+follow a style similar to what is already present. Some basic guidance is
+enforced via <a class="reference external" href="https://editorconfig.org">EditorConfig</a>, but mostly it is up to the patch submitter to try
+to match the existing style. Though it is not perfect and good judgment will
+still need to be exercised, you can execute the following on an uncommitted
+patch to receive additional hints:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pipenv</span> <span class="n">run</span> <span class="n">invoke</span> <span class="n">check</span><span class="o">-</span><span class="n">code</span><span class="o">-</span><span class="n">style</span>
+</pre></div>
+</div>
+<p>Unwitting “offenses” in new code can be readily forgiven, but patches which
+contain reformatting noise against existing code will almost certainly be
+rejected. Please digest this <a class="reference external" href="https://softwareengineering.stackexchange.com/questions/226440/is-it-okay-to-make-coding-style-changes-on-an-open-source-project-that-doesnt-f">Stack Exchange discussion on reformatting</a>.</p>
+<p>Some tips:</p>
+<ul class="simple">
+<li><p>Horizontal space between identifiers and literals improves legibility. Prior
+to the introduction of spaces between words around fourteen centuries ago,
+readers had to either parse words from <a class="reference external" href="https://en.wikipedia.org/wiki/Scriptio_continua">scriptio continua</a> or with the use of a
+<a class="reference external" href="https://en.wikipedia.org/wiki/Word_divider">word divider</a> symbol, such as
+the <a class="reference external" href="https://en.wikipedia.org/wiki/Interpunct">interpunct</a>. Reading
+identifiers from code, which are separated only by delimiters, is equivalent
+to reading words separated by interpuncts, except that the cognitive load is
+even higher due to the variety of delimiters (parentheses, commas, colons,
+etc…). Using horizontal space, an innovation from nearly 1.5 millennia ago,
+can reduce this cognitive load.</p></li>
+<li><p>Try to keep function bodies under twenty (20) lines, no more than thirty
+(30) lines maximum. Long functions are probably doing too much and they
+are also difficult for the reader to comprehend. Bugs in them will be more
+likely to occur and possibly harder to track down.</p></li>
+<li><p>Related to the previous bullets is the principle of maintaining a vertically
+compact visual presentation for more related code on screen at the same time.
+To this end, single line conditional statements are not only accepted but
+encouraged. Examples include <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">&lt;condition&gt;:</span> <span class="pre">break</span></code>, <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">&lt;condition&gt;:</span>
+<span class="pre">continue</span></code>, <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">&lt;condition&gt;:</span> <span class="pre">return</span> <span class="pre">&lt;data&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">else:</span> <span class="pre">return</span> <span class="pre">&lt;data&gt;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">except</span> <span class="pre">&lt;exception-list&gt;</span> <span class="pre">as</span> <span class="pre">exc:</span> <span class="pre">pass</span></code>, etc….</p></li>
+<li><p>Please avoid excessive indentation. For example, using <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">not</span> <span class="pre">&lt;condition&gt;:</span>
+<span class="pre">continue</span></code> inside a loop body is generally preferable to using <code class="docutils literal notranslate"><span class="pre">if</span>
+<span class="pre">&lt;condition&gt;:</span></code> followed by indented lines inside that body. Excessive
+indentation tends to cause code to become smushed against the right margin,
+which reduces legibility.</p></li>
+<li><p>Please do not use lower camel case (<code class="docutils literal notranslate"><span class="pre">camelCase</span></code>) for anything. In addition
+to increasing the chance for typographic errors from not pressing or
+releasing the shift key on time, it suffers from legibility issues. Upper
+camel case (aka., Pascal case) (<code class="docutils literal notranslate"><span class="pre">CamelCase</span></code>) can be used for the names of
+types, but not for anything else. Aside from that, please use an underscore
+(<code class="docutils literal notranslate"><span class="pre">_</span></code>) to separate words within an identifier. Since Python does not support
+hyphens in identifiers, underscores can serve as reasonable visual separators
+instead, although they can also suffer typographic errors from incorrect
+shift key timing. I.e., prefer <code class="docutils literal notranslate"><span class="pre">is_function</span></code> to <code class="docutils literal notranslate"><span class="pre">isfunction</span></code> and
+<code class="docutils literal notranslate"><span class="pre">starts_with</span></code> to <code class="docutils literal notranslate"><span class="pre">startswith</span></code>, in spite of seeing the unseparated words
+convention in use on standard Python types and in the Python standard
+library. The convenience of legibility outweighs the inconvenience of
+mistyping underscores or letters around them, as code should be read more
+than it is written.</p></li>
+</ul>
+</section>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="license.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">License</div>
+              </div>
+              <svg><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="api.html">
+              <svg><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">API Documentation</div>
+                
+              </div>
+            </a>
+        </div>
+
+        <div class="related-information">
+              Copyright &#169; 2021, Eric McDonald |
+          Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+          <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+            | <a class="muted-link" href="_sources/contribution.rst.txt"
+               rel="nofollow">
+              Show Source
+            </a>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Contribution</a><ul>
+<li><a class="reference internal" href="#code-of-conduct">Code of Conduct</a></li>
+<li><a class="reference internal" href="#development">Development</a><ul>
+<li><a class="reference internal" href="#environment">Environment</a><ul>
+<li><a class="reference internal" href="#id1">asdf</a></li>
+<li><a class="reference internal" href="#id2">pipenv</a></li>
+<li><a class="reference internal" href="#id3">EditorConfig</a></li>
+<li><a class="reference internal" href="#commit-signatures">Commit Signatures</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#common-tasks">Common Tasks</a><ul>
+<li><a class="reference internal" href="#documentation">Documentation</a></li>
+<li><a class="reference internal" href="#linting">Linting</a></li>
+<li><a class="reference internal" href="#testing">Testing</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-lockup.base">Internal API Documentation</a></li>
+<li><a class="reference internal" href="#principles-and-advices">Principles and Advices</a><ul>
+<li><a class="reference internal" href="#assertions-and-exceptions">Assertions and Exceptions</a></li>
+<li><a class="reference internal" href="#code-style-and-legibility">Code Style and Legibility</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/scripts/furo.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/tabs.js"></script>
+    </body>
+</html>

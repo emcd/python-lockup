@@ -1,0 +1,563 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="API Documentation" href="api.html" />
+
+    <meta name="generator" content="sphinx-4.3.2, furo 2021.11.23"/>
+        <title>lockup 1.1a202111250533 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=7f0192ddeb2adecfbaa87ffbcf67d16358b30bc1" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/tabs.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=0af69da206d614734f649b27d4cdc2dd6c31f41d" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  body[data-theme="dark"] {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    body:not([data-theme="light"]) {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+  }
+</style></head>
+  <body>
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" />
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="#"><div class="brand">lockup 1.1a202111250533 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="#">
+  
+  
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contribution.html">Contribution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CHANGELOG.html">Changelog</a></li>
+</ul>
+
+</div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="lockup">
+<h1>lockup<a class="headerlink" href="#lockup" title="Permalink to this headline">¶</a></h1>
+<img alt="Python Versions" src="https://img.shields.io/pypi/pyversions/lockup"/>
+<a class="reference external image-reference" href="https://pypi.org/project/lockup/"><img alt="Project Version" src="https://img.shields.io/pypi/v/lockup"/></a>
+<a class="reference external image-reference" href="https://github.com/emcd/python-lockup/actions/workflows/test.yaml"><img alt="Tests Status" src="https://github.com/emcd/python-lockup/actions/workflows/test.yaml/badge.svg?branch=master&amp;event=push"/></a>
+<a class="reference external image-reference" href="https://app.codecov.io/gh/emcd/python-lockup"><img alt="https://codecov.io/gh/emcd/python-lockup/branch/master/graph/badge.svg?token=PA9QI9RL63" src="https://codecov.io/gh/emcd/python-lockup/branch/master/graph/badge.svg?token=PA9QI9RL63"/></a>
+<a class="reference external image-reference" href="https://github.com/emcd/python-lockup/blob/master/LICENSE.txt"><img alt="Project License" src="https://img.shields.io/pypi/l/lockup"/></a>
+<p><a class="reference external" href="https://python-lockup.readthedocs.io/en/stable/api.html">API Documentation (stable)</a>
+|
+<a class="reference external" href="https://emcd.github.io/python-lockup/api.html">API Documentation (current)</a>
+|
+<a class="reference external" href="https://emcd.github.io/python-lockup/contribution.html#code-of-conduct">Code of Conduct</a>
+|
+<a class="reference external" href="https://emcd.github.io/python-lockup/contribution.html">Contribution Guide</a></p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Enables the creation of classes, modules, and namespaces on which the following
+properties are true:</p>
+<ul>
+<li><p>All attributes are <strong>immutable</strong>. Immutability increases code safety by
+discouraging monkey-patching and preventing accidental or deliberate changes
+to state.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">math</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">lockup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lockup</span><span class="o">.</span><span class="n">reclassify_module</span><span class="p">(</span> <span class="n">math</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">e</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">lockup.exceptions.ImpermissibleAttributeOperation</span>: <span class="n">Attempt to assign immutable attribute 'pi' on module 'math'.</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">lockup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ns</span> <span class="o">=</span> <span class="n">lockup</span><span class="o">.</span><span class="n">create_namespace</span><span class="p">(</span> <span class="n">some_constant</span> <span class="o">=</span> <span class="mi">6</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ns</span><span class="o">.</span><span class="n">some_constant</span> <span class="o">=</span> <span class="mi">13</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">lockup.exceptions.ImpermissibleAttributeOperation</span>: <span class="n">Attempt to assign immutable attribute 'some_constant' on class 'lockup.Namespace'.</span>
+</pre></div>
+</div>
+</li>
+<li><p>Non-public attributes are <strong>concealed</strong>. Concealment means that functions,
+such as <a class="reference external" href="https://docs.python.org/3/library/functions.html#dir">dir</a>, can
+report a subset of attributes that are intended for programmers to use
+(without directly exposing internals).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">lockup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">dir</span><span class="p">(</span> <span class="n">lockup</span> <span class="p">)</span>
+<span class="go">['Class', 'Module', 'NamespaceClass', 'base', 'create_namespace', 'exceptions', 'reclassify_module']</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span> <span class="nb">dir</span><span class="p">(</span> <span class="n">lockup</span> <span class="p">)</span> <span class="p">)</span>
+<span class="go">7</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span> <span class="n">lockup</span><span class="o">.</span><span class="vm">__dict__</span> <span class="p">)</span>  
+<span class="go">18</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="quick-tour">
+<h2>Quick Tour<a class="headerlink" href="#quick-tour" title="Permalink to this headline">¶</a></h2>
+<section id="id1">
+<h3><a class="reference external" href="https://python-lockup.readthedocs.io/en/stable/api.html#lockup.Module">Module</a><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>Let us consider the mutable <a class="reference external" href="https://docs.python.org/3/library/os.html">os</a>
+module from the Python standard library and how we can alter “constants” that
+may be used in many places:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">EX_OK</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">os</span><span class="o">.</span><span class="n">EX_OK</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">EX_OK</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">AttributeError</span>: <span class="n">module 'os' has no attribute 'EX_OK'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">EX_OK</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span> <span class="n">os</span> <span class="p">)</span>
+<span class="go">&lt;class 'module'&gt;</span>
+</pre></div>
+</div>
+<p>Now, let us see what protection it gains from becoming immutable:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">lockup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lockup</span><span class="o">.</span><span class="n">reclassify_module</span><span class="p">(</span> <span class="n">os</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">os</span><span class="o">.</span><span class="n">EX_OK</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">lockup.exceptions.ImpermissibleAttributeOperation</span>: <span class="n">Attempt to delete indelible attribute 'EX_OK' on module 'os'.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">EX_OK</span> <span class="o">=</span> <span class="mi">255</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">lockup.exceptions.ImpermissibleAttributeOperation</span>: <span class="n">Attempt to assign immutable attribute 'EX_OK' on module 'os'.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span> <span class="n">os</span> <span class="p">)</span>
+<span class="go">&lt;class 'lockup.Module'&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h3><a class="reference external" href="https://python-lockup.readthedocs.io/en/stable/api.html#lockup.Class">Class Factory</a><a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>Let us monkey-patch a mutable class:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">A</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">expected_functionality</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span> <span class="k">return</span> <span class="mi">42</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">A</span><span class="p">(</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">expected_functionality</span><span class="p">(</span> <span class="p">)</span>
+<span class="go">42</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">monkey_patch</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="s1">'I selfishly change behavior upon which other consumers depend.'</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span><span class="o">.</span><span class="n">expected_functionality</span> <span class="o">=</span> <span class="n">monkey_patch</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">A</span><span class="p">(</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">expected_functionality</span><span class="p">(</span> <span class="p">)</span>
+<span class="go">'I selfishly change behavior upon which other consumers depend.'</span>
+</pre></div>
+</div>
+<p>Now, let us try to monkey-patch an immutable class:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">lockup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">B</span><span class="p">(</span> <span class="n">metaclass</span> <span class="o">=</span> <span class="n">lockup</span><span class="o">.</span><span class="n">Class</span> <span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">expected_functionality</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span> <span class="k">return</span> <span class="mi">42</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">B</span><span class="p">(</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">expected_functionality</span><span class="p">(</span> <span class="p">)</span>
+<span class="go">42</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">monkey_patch</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="s1">'I selfishly change behavior upon which other consumers depend.'</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">B</span><span class="o">.</span><span class="n">expected_functionality</span> <span class="o">=</span> <span class="n">monkey_patch</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">lockup.exceptions.ImpermissibleAttributeOperation</span>: <span class="n">Attempt to assign immutable attribute 'expected_functionality' on class ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span> <span class="n">B</span> <span class="p">)</span>
+<span class="go">&lt;class 'lockup.Class'&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="nb">type</span><span class="p">(</span> <span class="n">B</span> <span class="p">)</span><span class="o">.</span><span class="fm">__setattr__</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">lockup.exceptions.ImpermissibleAttributeOperation</span>: <span class="n">Attempt to delete indelible attribute '__setattr__' on class 'lockup.Class'.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">issubclass</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">B</span> <span class="p">),</span> <span class="nb">type</span> <span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only class attributes are immutable. Instances of immutable classes will
+have mutable attributes without additional intervention beyond the scope of
+this package.</p>
+</div>
+</section>
+<section id="id3">
+<h3><a class="reference external" href="https://python-lockup.readthedocs.io/en/stable/api.html#lockup.NamespaceClass">Namespace Factory</a><a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>An alternative to <a class="reference external" href="https://docs.python.org/3/library/types.html#types.SimpleNamespace">types.SimpleNamespace</a> is
+provided. First, let us observe the behaviors on a standard namespace:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">types</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sn</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">SimpleNamespace</span><span class="p">(</span> <span class="n">run</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="mi">42</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sn</span>
+<span class="go">namespace(run=&lt;function &lt;lambda&gt; at ...&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sn</span><span class="o">.</span><span class="n">run</span><span class="p">(</span> <span class="p">)</span>
+<span class="go">42</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span> <span class="n">sn</span> <span class="p">)</span>
+<span class="go">&lt;class 'types.SimpleNamespace'&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">dir</span><span class="p">(</span> <span class="n">sn</span> <span class="p">)</span>
+<span class="go">['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', 'run']</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sn</span><span class="o">.</span><span class="vm">__dict__</span>
+<span class="go">{'run': &lt;function &lt;lambda&gt; at ...&gt;}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span> <span class="n">sn</span><span class="o">.</span><span class="n">run</span> <span class="p">)</span>
+<span class="go">&lt;class 'function'&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sn</span><span class="o">.</span><span class="n">run</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="mi">666</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sn</span><span class="o">.</span><span class="n">run</span><span class="p">(</span> <span class="p">)</span>
+<span class="go">666</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sn</span><span class="p">(</span> <span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">TypeError</span>: <span class="n">'types.SimpleNamespace' object is not callable</span>
+</pre></div>
+</div>
+<p>Now, let us compare those behaviors to an immutable namespace:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">lockup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ns</span> <span class="o">=</span> <span class="n">lockup</span><span class="o">.</span><span class="n">create_namespace</span><span class="p">(</span> <span class="n">run</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="mi">42</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ns</span>
+<span class="go">NamespaceClass( 'Namespace', ('object',), { ... } )</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ns</span><span class="o">.</span><span class="n">run</span><span class="p">(</span> <span class="p">)</span>
+<span class="go">42</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span> <span class="n">ns</span> <span class="p">)</span>
+<span class="go">&lt;class 'lockup.NamespaceClass'&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ns</span><span class="o">.</span><span class="vm">__dict__</span>
+<span class="go">mappingproxy({...})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span> <span class="n">ns</span><span class="o">.</span><span class="n">run</span> <span class="p">)</span>
+<span class="go">&lt;class 'function'&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ns</span><span class="o">.</span><span class="n">run</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="mi">666</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">lockup.exceptions.ImpermissibleAttributeOperation</span>: <span class="n">Attempt to assign immutable attribute 'run' on class 'lockup.Namespace'.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ns</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span> <span class="s1">'run'</span> <span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="mi">666</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">TypeError</span>: <span class="n">'mappingproxy' object does not support item assignment</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ns</span><span class="p">(</span> <span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">lockup.exceptions.ImpermissibleOperation</span>: <span class="n">Impermissible instantiation of class 'lockup.Namespace'.</span>
+</pre></div>
+</div>
+<p>Also of note is that we can define namespace classes directly, allowing us to
+capture imports for internal use in a module without publicly exposing them as
+part of the module API, for example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">lockup</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">class</span> <span class="nc">__</span><span class="p">(</span> <span class="n">metaclass</span> <span class="o">=</span> <span class="n">lockup</span><span class="o">.</span><span class="n">NamespaceClass</span> <span class="p">):</span>
+<span class="o">...</span>     <span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">O_RDONLY</span><span class="p">,</span> <span class="n">O_RDWR</span>
+<span class="o">...</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">__</span><span class="o">.</span><span class="n">O_RDONLY</span>
+<span class="mi">0</span>
+</pre></div>
+</div>
+<p>The above technique is used internally within this package itself.</p>
+</section>
+<section id="id4">
+<h3><a class="reference external" href="https://python-lockup.readthedocs.io/en/stable/api.html#module-lockup.exceptions">Exceptions</a><a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>Exceptions can be intercepted with appropriate builtin exception classes or
+with package exception classes:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">lockup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">lockup.exceptions</span> <span class="kn">import</span> <span class="n">InvalidOperation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">O_RDONLY</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lockup</span><span class="o">.</span><span class="n">reclassify_module</span><span class="p">(</span> <span class="n">os</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">O_RDONLY</span> <span class="o">=</span> <span class="mi">15</span>
+<span class="gp">... </span><span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">type</span><span class="p">(</span> <span class="n">exc</span> <span class="p">)</span><span class="o">.</span><span class="n">mro</span><span class="p">(</span> <span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">[&lt;class 'lockup.exceptions.ImpermissibleAttributeOperation'&gt;, &lt;class 'lockup.exceptions.ImpermissibleOperation'&gt;, &lt;class 'lockup.exceptions.InvalidOperation'&gt;, &lt;class 'lockup.exceptions.Exception0'&gt;, &lt;class 'TypeError'&gt;, &lt;class 'AttributeError'&gt;, &lt;class 'Exception'&gt;, &lt;class 'BaseException'&gt;, &lt;class 'object'&gt;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">does_not_exist</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">InvalidOperation</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">type</span><span class="p">(</span> <span class="n">exc</span> <span class="p">)</span><span class="o">.</span><span class="n">mro</span><span class="p">(</span> <span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">[&lt;class 'lockup.exceptions.InaccessibleAttribute'&gt;, &lt;class 'lockup.exceptions.InaccessibleEntity'&gt;, &lt;class 'lockup.exceptions.InvalidOperation'&gt;, &lt;class 'lockup.exceptions.Exception0'&gt;, &lt;class 'AttributeError'&gt;, &lt;class 'Exception'&gt;, &lt;class 'BaseException'&gt;, &lt;class 'object'&gt;]</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="table-of-contents">
+<h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-0">Module <code class="docutils literal notranslate"><span class="pre">lockup</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-lockup.exceptions">Module <code class="docutils literal notranslate"><span class="pre">lockup.exceptions</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contribution.html">Contribution</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contribution.html#code-of-conduct">Code of Conduct</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribution.html#development">Development</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="contribution.html#environment">Environment</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="contribution.html#id1">asdf</a></li>
+<li class="toctree-l4"><a class="reference internal" href="contribution.html#id2">pipenv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="contribution.html#id3">EditorConfig</a></li>
+<li class="toctree-l4"><a class="reference internal" href="contribution.html#commit-signatures">Commit Signatures</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="contribution.html#common-tasks">Common Tasks</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="contribution.html#documentation">Documentation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="contribution.html#linting">Linting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="contribution.html#testing">Testing</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="contribution.html#module-lockup.base">Internal API Documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="contribution.html#principles-and-advices">Principles and Advices</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="contribution.html#assertions-and-exceptions">Assertions and Exceptions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="contribution.html#code-style-and-legibility">Code Style and Legibility</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CHANGELOG.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="CHANGELOG.html#v1-0-5">v1.0.5</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="CHANGELOG.html#documentation">Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="CHANGELOG.html#v1-0-3">v1.0.3</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="CHANGELOG.html#id1">Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="CHANGELOG.html#v1-0-2">v1.0.2</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="CHANGELOG.html#id2">Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="CHANGELOG.html#v1-0-1">v1.0.1</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="CHANGELOG.html#id3">Documentation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="indices">
+<h2>Indices<a class="headerlink" href="#indices" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+</ul>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="api.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">API Documentation</div>
+              </div>
+              <svg><use href="#svg-arrow-right"></use></svg>
+            </a>
+          
+        </div>
+
+        <div class="related-information">
+              Copyright &#169; 2021, Eric McDonald |
+          Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+          <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+            | <a class="muted-link" href="_sources/index.rst.txt"
+               rel="nofollow">
+              Show Source
+            </a>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">lockup</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#quick-tour">Quick Tour</a><ul>
+<li><a class="reference internal" href="#id1">Module</a></li>
+<li><a class="reference internal" href="#id2">Class Factory</a></li>
+<li><a class="reference internal" href="#id3">Namespace Factory</a></li>
+<li><a class="reference internal" href="#id4">Exceptions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#table-of-contents">Table of Contents</a></li>
+<li><a class="reference internal" href="#indices">Indices</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/scripts/furo.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/tabs.js"></script>
+    </body>
+</html>

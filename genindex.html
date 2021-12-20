@@ -1,0 +1,544 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="#" /><link rel="search" title="Search" href="search.html" />
+
+    <meta name="generator" content="sphinx-4.3.2, furo 2021.11.23"/><title>Index - lockup 1.1a202111250533 documentation</title>
+<link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=7f0192ddeb2adecfbaa87ffbcf67d16358b30bc1" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/tabs.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=0af69da206d614734f649b27d4cdc2dd6c31f41d" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  body[data-theme="dark"] {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    body:not([data-theme="light"]) {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+  }
+</style></head>
+  <body>
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" />
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">lockup 1.1a202111250533 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contribution.html">Contribution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CHANGELOG.html">Changelog</a></li>
+</ul>
+
+</div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          
+<section class="genindex-section">
+  <h1 id="index">Index</h1>
+  <div class="genindex-jumpbox"><a href="#A"><strong>A</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#V"><strong>V</strong></a> | <a href="#W"><strong>W</strong></a></div>
+</section>
+<section id="A" class="genindex-section">
+  <h2>A</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="contribution.html#lockup.base.Exception0.args">args (lockup.base.Exception0 attribute)</a>
+
+        <ul>
+          <li><a href="contribution.html#lockup.base.FugitiveException.args">(lockup.base.FugitiveException attribute)</a>
+</li>
+          <li><a href="contribution.html#lockup.base.ImpermissibleAttributeOperation.args">(lockup.base.ImpermissibleAttributeOperation attribute)</a>
+</li>
+          <li><a href="contribution.html#lockup.base.ImpermissibleOperation.args">(lockup.base.ImpermissibleOperation attribute)</a>
+</li>
+          <li><a href="contribution.html#lockup.base.InaccessibleAttribute.args">(lockup.base.InaccessibleAttribute attribute)</a>
+</li>
+          <li><a href="contribution.html#lockup.base.InaccessibleEntity.args">(lockup.base.InaccessibleEntity attribute)</a>
+</li>
+          <li><a href="contribution.html#lockup.base.IncorrectData.args">(lockup.base.IncorrectData attribute)</a>
+</li>
+          <li><a href="contribution.html#lockup.base.InvalidOperation.args">(lockup.base.InvalidOperation attribute)</a>
+</li>
+          <li><a href="contribution.html#lockup.base.InvalidState.args">(lockup.base.InvalidState attribute)</a>
+</li>
+          <li><a href="api.html#lockup.exceptions.Exception0.args">(lockup.exceptions.Exception0 attribute)</a>
+</li>
+          <li><a href="api.html#lockup.exceptions.FugitiveException.args">(lockup.exceptions.FugitiveException attribute)</a>
+</li>
+          <li><a href="api.html#lockup.exceptions.ImpermissibleAttributeOperation.args">(lockup.exceptions.ImpermissibleAttributeOperation attribute)</a>
+</li>
+          <li><a href="api.html#lockup.exceptions.ImpermissibleOperation.args">(lockup.exceptions.ImpermissibleOperation attribute)</a>
+</li>
+          <li><a href="api.html#lockup.exceptions.InaccessibleAttribute.args">(lockup.exceptions.InaccessibleAttribute attribute)</a>
+</li>
+          <li><a href="api.html#lockup.exceptions.InaccessibleEntity.args">(lockup.exceptions.InaccessibleEntity attribute)</a>
+</li>
+          <li><a href="api.html#lockup.exceptions.IncorrectData.args">(lockup.exceptions.IncorrectData attribute)</a>
+</li>
+          <li><a href="api.html#lockup.exceptions.InvalidOperation.args">(lockup.exceptions.InvalidOperation attribute)</a>
+</li>
+          <li><a href="api.html#lockup.exceptions.InvalidState.args">(lockup.exceptions.InvalidState attribute)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="C" class="genindex-section">
+  <h2>C</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="contribution.html#lockup.base.calculate_class_label">calculate_class_label() (in module lockup.base)</a>
+</li>
+        <li><a href="contribution.html#lockup.base.calculate_instance_label">calculate_instance_label() (in module lockup.base)</a>
+</li>
+        <li><a href="contribution.html#lockup.base.calculate_invocable_label">calculate_invocable_label() (in module lockup.base)</a>
+</li>
+        <li><a href="contribution.html#lockup.base.calculate_label">calculate_label() (in module lockup.base)</a>
+</li>
+        <li><a href="contribution.html#lockup.base.calculate_module_label">calculate_module_label() (in module lockup.base)</a>
+</li>
+        <li><a href="api.html#lockup.Class">Class (class in lockup)</a>
+
+        <ul>
+          <li><a href="contribution.html#lockup.base.Class">(class in lockup.base)</a>
+</li>
+        </ul></li>
+        <li><a href="contribution.html#lockup.base.create_argument_validation_exception">create_argument_validation_exception() (in module lockup.base)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="contribution.html#lockup.base.create_attribute_immutability_exception">create_attribute_immutability_exception() (in module lockup.base)</a>
+</li>
+        <li><a href="contribution.html#lockup.base.create_attribute_indelibility_exception">create_attribute_indelibility_exception() (in module lockup.base)</a>
+</li>
+        <li><a href="contribution.html#lockup.base.create_attribute_nonexistence_exception">create_attribute_nonexistence_exception() (in module lockup.base)</a>
+</li>
+        <li><a href="contribution.html#lockup.base.create_class_attribute_rejection_exception">create_class_attribute_rejection_exception() (in module lockup.base)</a>
+</li>
+        <li><a href="contribution.html#lockup.base.create_impermissible_instantiation_exception">create_impermissible_instantiation_exception() (in module lockup.base)</a>
+</li>
+        <li><a href="contribution.html#lockup.base.create_invocation_validation_exception">create_invocation_validation_exception() (in module lockup.base)</a>
+</li>
+        <li><a href="api.html#lockup.create_namespace">create_namespace() (in module lockup)</a>
+
+        <ul>
+          <li><a href="contribution.html#lockup.base.create_namespace">(in module lockup.base)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="D" class="genindex-section">
+  <h2>D</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="contribution.html#lockup.base.DictionaryProxy">DictionaryProxy (in module lockup.base)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="E" class="genindex-section">
+  <h2>E</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api.html#lockup.exceptions.Exception0">Exception0</a>, <a href="contribution.html#lockup.base.Exception0">[1]</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="F" class="genindex-section">
+  <h2>F</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api.html#lockup.exceptions.FugitiveException">FugitiveException</a>, <a href="contribution.html#lockup.base.FugitiveException">[1]</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="I" class="genindex-section">
+  <h2>I</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api.html#lockup.exceptions.ImpermissibleAttributeOperation">ImpermissibleAttributeOperation</a>, <a href="contribution.html#lockup.base.ImpermissibleAttributeOperation">[1]</a>
+</li>
+        <li><a href="api.html#lockup.exceptions.ImpermissibleOperation">ImpermissibleOperation</a>, <a href="contribution.html#lockup.base.ImpermissibleOperation">[1]</a>
+</li>
+        <li><a href="api.html#lockup.exceptions.InaccessibleAttribute">InaccessibleAttribute</a>, <a href="contribution.html#lockup.base.InaccessibleAttribute">[1]</a>
+</li>
+        <li><a href="api.html#lockup.exceptions.InaccessibleEntity">InaccessibleEntity</a>, <a href="contribution.html#lockup.base.InaccessibleEntity">[1]</a>
+</li>
+        <li><a href="api.html#lockup.exceptions.IncorrectData">IncorrectData</a>, <a href="contribution.html#lockup.base.IncorrectData">[1]</a>
+</li>
+        <li><a href="contribution.html#lockup.base.intercept">intercept() (in module lockup.base)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api.html#lockup.exceptions.InvalidOperation">InvalidOperation</a>, <a href="contribution.html#lockup.base.InvalidOperation">[1]</a>
+</li>
+        <li><a href="api.html#lockup.exceptions.InvalidState">InvalidState</a>, <a href="contribution.html#lockup.base.InvalidState">[1]</a>
+</li>
+        <li><a href="contribution.html#lockup.base.is_operational_name">is_operational_name() (in module lockup.base)</a>
+</li>
+        <li><a href="contribution.html#lockup.base.is_public_name">is_public_name() (in module lockup.base)</a>
+</li>
+        <li><a href="contribution.html#lockup.base.is_public_or_operational_name">is_public_or_operational_name() (in module lockup.base)</a>
+</li>
+        <li><a href="contribution.html#lockup.base.is_python_identifier">is_python_identifier() (in module lockup.base)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="L" class="genindex-section">
+  <h2>L</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    lockup
+
+        <ul>
+          <li><a href="api.html#module-0">module</a>
+</li>
+        </ul></li>
+        <li>
+    lockup.base
+
+        <ul>
+          <li><a href="contribution.html#module-lockup.base">module</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    lockup.exceptions
+
+        <ul>
+          <li><a href="api.html#module-lockup.exceptions">module</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="M" class="genindex-section">
+  <h2>M</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    module
+
+        <ul>
+          <li><a href="api.html#module-0">lockup</a>
+</li>
+          <li><a href="contribution.html#module-lockup.base">lockup.base</a>
+</li>
+          <li><a href="api.html#module-lockup.exceptions">lockup.exceptions</a>
+</li>
+        </ul></li>
+        <li><a href="api.html#lockup.Module">Module (class in lockup)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="contribution.html#lockup.base.module_qualify_class_name">module_qualify_class_name() (in module lockup.base)</a>
+</li>
+        <li><a href="contribution.html#lockup.base.Class.mro">mro() (lockup.base.Class method)</a>
+
+        <ul>
+          <li><a href="contribution.html#lockup.base.NamespaceClass.mro">(lockup.base.NamespaceClass method)</a>
+</li>
+          <li><a href="api.html#lockup.Class.mro">(lockup.Class method)</a>
+</li>
+          <li><a href="api.html#lockup.NamespaceClass.mro">(lockup.NamespaceClass method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="N" class="genindex-section">
+  <h2>N</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api.html#lockup.NamespaceClass">NamespaceClass (class in lockup)</a>
+
+        <ul>
+          <li><a href="contribution.html#lockup.base.NamespaceClass">(class in lockup.base)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="R" class="genindex-section">
+  <h2>R</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api.html#lockup.reclassify_module">reclassify_module() (in module lockup)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="S" class="genindex-section">
+  <h2>S</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="contribution.html#lockup.base.select_public_attributes">select_public_attributes() (in module lockup.base)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="V" class="genindex-section">
+  <h2>V</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="contribution.html#lockup.base.validate_argument_invocability">validate_argument_invocability() (in module lockup.base)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="contribution.html#lockup.base.validate_attribute_existence">validate_attribute_existence() (in module lockup.base)</a>
+</li>
+        <li><a href="contribution.html#lockup.base.validate_attribute_name">validate_attribute_name() (in module lockup.base)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="W" class="genindex-section">
+  <h2>W</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="contribution.html#lockup.base.Exception0.with_traceback">with_traceback() (lockup.base.Exception0 method)</a>
+
+        <ul>
+          <li><a href="contribution.html#lockup.base.FugitiveException.with_traceback">(lockup.base.FugitiveException method)</a>
+</li>
+          <li><a href="contribution.html#lockup.base.ImpermissibleAttributeOperation.with_traceback">(lockup.base.ImpermissibleAttributeOperation method)</a>
+</li>
+          <li><a href="contribution.html#lockup.base.ImpermissibleOperation.with_traceback">(lockup.base.ImpermissibleOperation method)</a>
+</li>
+          <li><a href="contribution.html#lockup.base.InaccessibleAttribute.with_traceback">(lockup.base.InaccessibleAttribute method)</a>
+</li>
+          <li><a href="contribution.html#lockup.base.InaccessibleEntity.with_traceback">(lockup.base.InaccessibleEntity method)</a>
+</li>
+          <li><a href="contribution.html#lockup.base.IncorrectData.with_traceback">(lockup.base.IncorrectData method)</a>
+</li>
+          <li><a href="contribution.html#lockup.base.InvalidOperation.with_traceback">(lockup.base.InvalidOperation method)</a>
+</li>
+          <li><a href="contribution.html#lockup.base.InvalidState.with_traceback">(lockup.base.InvalidState method)</a>
+</li>
+          <li><a href="api.html#lockup.exceptions.Exception0.with_traceback">(lockup.exceptions.Exception0 method)</a>
+</li>
+          <li><a href="api.html#lockup.exceptions.FugitiveException.with_traceback">(lockup.exceptions.FugitiveException method)</a>
+</li>
+          <li><a href="api.html#lockup.exceptions.ImpermissibleAttributeOperation.with_traceback">(lockup.exceptions.ImpermissibleAttributeOperation method)</a>
+</li>
+          <li><a href="api.html#lockup.exceptions.ImpermissibleOperation.with_traceback">(lockup.exceptions.ImpermissibleOperation method)</a>
+</li>
+          <li><a href="api.html#lockup.exceptions.InaccessibleAttribute.with_traceback">(lockup.exceptions.InaccessibleAttribute method)</a>
+</li>
+          <li><a href="api.html#lockup.exceptions.InaccessibleEntity.with_traceback">(lockup.exceptions.InaccessibleEntity method)</a>
+</li>
+          <li><a href="api.html#lockup.exceptions.IncorrectData.with_traceback">(lockup.exceptions.IncorrectData method)</a>
+</li>
+          <li><a href="api.html#lockup.exceptions.InvalidOperation.with_traceback">(lockup.exceptions.InvalidOperation method)</a>
+</li>
+          <li><a href="api.html#lockup.exceptions.InvalidState.with_traceback">(lockup.exceptions.InvalidState method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+
+        <div class="related-information">
+              Copyright &#169; 2021, Eric McDonald |
+          Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+          <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/scripts/furo.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/tabs.js"></script>
+    </body>
+</html>
