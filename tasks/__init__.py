@@ -42,12 +42,17 @@
 from contextlib import ExitStack as CMStack
 from functools import partial as partial_function
 from itertools import chain
+from json import load as json_load
 from os import environ as psenv
 from pathlib import Path
 from pprint import pprint
 from sys import stderr
+from tempfile import TemporaryDirectory
 from time import sleep
 import re
+from urllib.error import URLError as UrlError
+from urllib.parse import urlparse
+from urllib.request import ( Request as HttpRequest, urlopen, )
 from venv import create as create_venv
 
 from invoke import Context, Exit, Failure, call, task
@@ -628,9 +633,54 @@ def check_pip_install( context, index_url = '' ):
         else: break
 
 
+@task
+def check_pypi_integrity( context, index_url = '' ):
+    """ Checks integrity of current package uploads on PyPI. """
+    index_url = index_url or 'https://pypi.org'
+    project_url = f"{index_url}/pypi/{project_name}/json"
+    project_version = parse_project_version( )
+    request = HttpRequest(
+        project_url, headers = { 'Accept': 'application/json', } )
+    for attempt_count in range( 3 ):
+        try:
+            with urlopen( request ) as http_reader:
+                releases_info = json_load( http_reader )[ 'releases' ]
+                if project_version not in releases_info: raise KeyError
+                packages_info = releases_info[ project_version ]
+        except ( KeyError, UrlError, ): sleep( 2 ** attempt_count )
+        else: break
+    for package_info in packages_info:
+        url = package_info[ 'url' ]
+        if not package_info.get( 'has_sig', False ):
+            raise Exit( f"No signature found for: {url}" )
+        check_pypi_package( context, url )
+
+
+def check_pypi_package( context, package_url ):
+    """ Verifies signature on package. """
+    _assert_gpg_tty( )
+    package_filename = urlparse( package_url ).path.split( '/' )[ -1 ]
+    with TemporaryDirectory( ) as cache_path_raw:
+        cache_path = Path( cache_path_raw )
+        package_path = cache_path / package_filename
+        signature_path = cache_path / f"{package_filename}.asc"
+        for attempt_count in range( 3 ):
+            try:
+                with urlopen( package_url ) as http_reader:
+                    with package_path.open( 'wb' ) as file:
+                        file.write( http_reader.read( ) )
+                with urlopen( f"{package_url}.asc" ) as http_reader:
+                    with signature_path.open( 'wb' ) as file:
+                        file.write( http_reader.read( ) )
+            except UrlError: sleep( 2 ** attempt_count )
+            else: break
+        context.run( f"gpg --verify {signature_path}" )
+
+
 @task(
     pre = ( make, ),
     post = (
+        call( check_pypi_integrity, index_url = 'https://test.pypi.org' ),
         call( check_pip_install, index_url = 'https://test.pypi.org/simple/' ),
     )
 )
@@ -641,7 +691,7 @@ def upload_test_pypi( context ):
 
 @task(
     pre = ( upload_test_pypi, test_all_versions, ),
-    post = ( check_pip_install, )
+    post = ( check_pypi_integrity, check_pip_install, )
 )
 def upload_pypi( context ):
     """ Publishes current sdist and wheels to PyPI. """
