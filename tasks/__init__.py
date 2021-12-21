@@ -622,14 +622,17 @@ def check_pip_install( context, index_url = '' ):
         f"import {project_name}; "
         f"print( {project_name}.__version__ )" )
     project_version = parse_project_version( )
-    for attempt_count in range( 3 ):
+    attempts_count_max = 2
+    for attempts_count in range( attempts_count_max + 1 ):
         try:
             context.run(
                 f". {venv_path}/bin/activate "
                 f"&& pip install {index_url_option} "
                 f"     {project_name}=={project_version} "
                 f"&& python -c '{python_import_command}'", pty = True )
-        except Failure: sleep( 2 ** attempt_count )
+        except Failure:
+            if attempts_count_max == attempts_count: raise
+            sleep( 2 ** attempts_count )
         else: break
 
 
@@ -641,13 +644,15 @@ def check_pypi_integrity( context, index_url = '' ):
     project_version = parse_project_version( )
     request = HttpRequest(
         project_url, headers = { 'Accept': 'application/json', } )
-    for attempt_count in range( 3 ):
+    attempts_count_max = 2
+    for attempts_count in range( attempts_count_max + 1 ):
         try:
             with urlopen( request ) as http_reader:
-                releases_info = json_load( http_reader )[ 'releases' ]
-                if project_version not in releases_info: raise KeyError
-                packages_info = releases_info[ project_version ]
-        except ( KeyError, UrlError, ): sleep( 2 ** attempt_count )
+                packages_info = json_load(
+                    http_reader )[ 'releases' ][ project_version ]
+        except ( KeyError, UrlError, ):
+            if attempts_count_max == attempts_count: raise
+            sleep( 2 ** attempts_count )
         else: break
     for package_info in packages_info:
         url = package_info[ 'url' ]
@@ -664,7 +669,8 @@ def check_pypi_package( context, package_url ):
         cache_path = Path( cache_path_raw )
         package_path = cache_path / package_filename
         signature_path = cache_path / f"{package_filename}.asc"
-        for attempt_count in range( 3 ):
+        attempts_count_max = 2
+        for attempts_count in range( attempts_count_max + 1 ):
             try:
                 with urlopen( package_url ) as http_reader:
                     with package_path.open( 'wb' ) as file:
@@ -672,7 +678,9 @@ def check_pypi_package( context, package_url ):
                 with urlopen( f"{package_url}.asc" ) as http_reader:
                     with signature_path.open( 'wb' ) as file:
                         file.write( http_reader.read( ) )
-            except UrlError: sleep( 2 ** attempt_count )
+            except UrlError:
+                if attempts_count_max == attempts_count: raise
+                sleep( 2 ** attempts_count )
             else: break
         context.run( f"gpg --verify {signature_path}" )
 
