@@ -559,16 +559,23 @@ def bump_stage( context ): # pylint: disable=unused-argument
 
 
 @task( post = ( bump_stage, ) )
-def branch_release( context ):
+def branch_release( context, remote = 'origin' ):
     """ Makes a new branch for development torwards a release. """
     _ensure_clean_workspace( context )
     project_version = parse_project_version( )
-    # TODO: Assert mainline branch.
+    mainline_regex = re.compile(
+        r'''^\s+HEAD branch:\s+(.*)$''', re.MULTILINE )
+    mainline_branch = mainline_regex.match( context.run(
+        f"git remote show {remote}", hide = 'stdout' ).stdout.strip( ) )[ 1 ]
+    true_branch = context.run(
+        'git branch --show-current', hide = 'stdout' ).stdout.strip( )
+    if mainline_branch != true_branch:
+        raise Exit( f"Cannot create release from branch: {true_branch}" )
     this_version = Version.from_string( project_version )
     stage = this_version.stage
-    if 'a' != stage: raise Exit( f"Cannot create branch at stage: {stage}" )
-    new_version = Version( 'f', this_version.major, this_version.minor, 0 )
-    context.run( f"git checkout -b release-{new_version}", pty = True )
+    if 'a' != stage: raise Exit( f"Cannot create release from stage: {stage}" )
+    target_branch = f"release-{this_version.major}.{this_version.minor}"
+    context.run( f"git checkout -b {target_branch}", pty = True )
 
 
 @task
@@ -583,7 +590,7 @@ def check_code_style( context, write_changes = False ):
 
 
 @task( pre = ( test, ) )
-def push( context ):
+def push( context, remote = 'origin' ):
     """ Pushes commits on current branch, plus all tags. """
     eprint( _render_boxed_title( 'SCM: Push Branch with Tags' ) )
     _ensure_clean_workspace( context )
@@ -591,12 +598,8 @@ def push( context ):
     true_branch = context.run(
         'git branch --show-current', hide = 'stdout' ).stdout.strip( )
     this_version = Version.from_string( project_version )
-    new_version = Version( 'f', this_version.major, this_version.minor, 0 )
-    target_branch = f"release-{new_version}"
+    target_branch = f"release-{this_version.major}.{this_version.minor}"
     if true_branch == target_branch:
-        remote = context.run(
-            'git config --local branch.master.remote',
-            hide = 'stdout', pty = True ).stdout.strip( )
         context.run(
             f"git push --set-upstream {remote} {true_branch}", pty = True )
     else: context.run( 'git push', pty = True )
