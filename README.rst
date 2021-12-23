@@ -178,14 +178,6 @@ Now, let us try to monkey-patch an immutable class:
 	Traceback (most recent call last):
 	...
 	lockup.exceptions.ImpermissibleAttributeOperation: Attempt to assign immutable attribute 'expected_functionality' on class ...
-	>>> type( B )
-	<class 'lockup.Class'>
-	>>> del type( B ).__setattr__
-	Traceback (most recent call last):
-	...
-	lockup.exceptions.ImpermissibleAttributeOperation: Attempt to delete indelible attribute '__setattr__' on class 'lockup.Class'.
-	>>> issubclass( type( B ), type )
-	True
 
 .. note::
    Only class attributes are immutable. Instances of immutable classes will
@@ -209,8 +201,6 @@ provided. First, let us observe the behaviors on a standard namespace:
 	42
 	>>> type( sn )
 	<class 'types.SimpleNamespace'>
-	>>> dir( sn )
-	['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', 'run']
 	>>> sn.__dict__
 	{'run': <function <lambda> at ...>}
 	>>> type( sn.run )
@@ -218,7 +208,7 @@ provided. First, let us observe the behaviors on a standard namespace:
 	>>> sn.run = lambda: 666
 	>>> sn.run( )
 	666
-	>>> sn( )
+	>>> sn( )  # doctest: +SKIP
 	Traceback (most recent call last):
 	...
 	TypeError: 'types.SimpleNamespace' object is not callable

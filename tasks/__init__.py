@@ -46,6 +46,7 @@ from json import load as json_load
 from os import environ as psenv
 from pathlib import Path
 from pprint import pprint
+from shutil import which
 from sys import stderr
 from tempfile import TemporaryDirectory
 from time import sleep
@@ -232,7 +233,7 @@ def freshen_python( context ):
         current_versions = python_regex.match(
             versions_file.read( ) )[ 1 ].split( )
     minors_regex = re.compile(
-        r'''^(?P<prefix>\w+-)?(?P<minor>\d+\.\d+)\..*$''' )
+        r'''^(?P<prefix>\w+(?:\d+\.\d+)?-)?(?P<minor>\d+\.\d+)\..*$''' )
     latest_versions = [ ]
     for version in current_versions:
         groups = minors_regex.match( version ).groupdict( )
@@ -299,6 +300,9 @@ def lint_bandit( context ):
 def lint_mypy( context, packages, modules, files ):
     """ Lints the source code with Mypy. """
     eprint( _render_boxed_title( 'Lint: MyPy' ) )
+    if not which( 'mypy' ):
+        eprint( 'Mypy not available on this platform. Skipping.' )
+        return
     environment_str = f"MYPYPATH={top_path}:{python3_sources_path}"
     configuration_str = "--config-file {}".format( sources_path / 'mypy.ini' )
     if not packages and not modules and not files: packages = ( project_name, )
@@ -317,6 +321,9 @@ def lint_mypy( context, packages, modules, files ):
 def lint_pylint( context, targets, checks ):
     """ Lints the source code with Pylint. """
     eprint( _render_boxed_title( 'Lint: Pylint' ) )
+    if not which( 'pylint' ):
+        eprint( 'Pylint not available on this platform. Skipping.' )
+        return
     reports_str = '--reports=no --score=no' if targets or checks else ''
     if not targets:
         targets = (
