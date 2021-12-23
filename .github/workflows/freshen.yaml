@@ -10,9 +10,7 @@ jobs:
         uses: emcd/python-lockup/.github/actions/python-venv@master
       - name: Install Asdf and Pythons
         uses: asdf-vm/actions/install@v1
-      - name: Freshen Asdf and Pythons
-        run: pipenv run invoke freshen-python
-      - name: Freshen Project Dependencies
+      - name: Freshen Project
         run: pipenv run invoke freshen
       # TODO: PGP key setup for bot.
       - name: Create Pull Request
