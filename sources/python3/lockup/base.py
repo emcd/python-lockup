@@ -33,9 +33,10 @@
 base_package_name = __package__.split( '.', maxsplit = 1 )[ 0 ]
 
 
-from platform import python_implementation as _get_python_make
-python_implementation = _get_python_make( )
-from sys import version_info as python_version # pylint: disable=unused-import
+from sys import ( # pylint: disable=unused-import
+    implementation as python_implementation,
+    version_info as python_version,
+)
 from types import MappingProxyType as DictionaryProxy
 
 
@@ -370,7 +371,7 @@ class Class( type ):
     def __dir__( class_ ): return select_public_attributes( __class__, class_ )
 
 
-if python_implementation in ( 'CPython', ): # pragma: no branch
+if python_implementation.name in ( 'cpython', ): # pragma: no branch
 
     def _make_god_unto_itself( factory ):
         ''' Turns a class factory class into the factory for itself. '''
@@ -394,6 +395,35 @@ if python_implementation in ( 'CPython', ): # pragma: no branch
         f_struct.ob_type = c_void_p( f_pointer )
 
     _make_god_unto_itself( Class )
+
+# TODO: Find the secret sauce to make PyPy honor the metaclass change.
+#       Need to investigate, in more detail, how type lookups work in PyPy.
+#       Possible code of interest:
+#         https://foss.heptapod.net/pypy/pypy/-/blob/branch/default/pypy/objspace/std/typeobject.py
+#elif 'pypy' == python_implementation.name: # pragma: no branch
+#
+#    def _make_god_unto_itself( factory ):
+#        if not issubclass( factory, type ):
+#            raise InvalidState # pragma: no cover
+#        from ctypes import Structure, c_ssize_t, c_void_p
+#        #from pypyjit import releaseall
+#        #releaseall( )
+#        class PyObject( Structure ):
+#            ''' Structural representation of :c:struct:`PyObject`. '''
+#            _fields_ = tuple( (
+#                ( 'ob_refcnt', c_ssize_t ),
+#                ( 'ob_pypy_link', c_ssize_t ),
+#                ( 'ob_type', c_void_p )
+#            ) )
+#        # Although there are admonitions against relying upon 'id'
+#        # to get the address of an object in PyPy, the class address from 'id'
+#        # _seems_ stable and reliable.
+#        f_pointer = id( factory )
+#        f_struct = PyObject.from_address( f_pointer )
+#        f_struct.ob_type = c_void_p( f_pointer )
+#        #releaseall( )
+#
+#    _make_god_unto_itself( Class )
 
 
 #================================= Exceptions ================================#
