@@ -218,7 +218,9 @@ def check_pipenv_security( context ):
 
 @task
 def freshen_asdf( context ):
-    ''' Asks ASDF to update itself. '''
+    ''' Asks ASDF to update itself.
+
+        This task requires Internet access and may take some time. '''
     eprint( _render_boxed_title( 'Freshen: Version Manager' ) )
     context.run( 'asdf update', pty = True )
     context.run( 'asdf plugin update python', pty = True )
@@ -226,7 +228,9 @@ def freshen_asdf( context ):
 
 @task( pre = ( freshen_asdf, ) )
 def freshen_python( context ):
-    ''' Updates each supported Python minor version to latest patch. '''
+    ''' Updates each supported Python minor version to latest patch.
+
+        This task requires Internet access and may take some time. '''
     eprint( _render_boxed_title( 'Freshen: Python Versions' ) )
     python_regex = re.compile( r'''^python\s+(.*)$''', re.MULTILINE )
     with ( top_path / '.tool-versions' ).open( ) as versions_file:
@@ -281,7 +285,10 @@ def freshen_git_hooks( context ):
 
 
 @task(
-    pre = ( clean, freshen_pipenv, freshen_git_modules, freshen_git_hooks, )
+    pre = (
+        clean,
+        freshen_python, freshen_pipenv, freshen_git_modules, freshen_git_hooks,
+    )
 )
 def freshen( context ): # pylint: disable=unused-argument
     ''' Performs the various freshening tasks, cleaning first.
