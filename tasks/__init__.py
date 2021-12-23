@@ -1,4 +1,4 @@
-""" Project maintenance tasks, executed via :command:`invoke`.
+''' Project maintenance tasks, executed via :command:`invoke`.
 
     `Invoke Documentation <http://docs.pyinvoke.org/en/stable/index.html>`_
 
@@ -36,7 +36,7 @@
     * A summary of all available targets/subcommands
       along with brief descriptions can be listed by :command:`invoke`,
       whereas :command:`make` does not provide such a facility.
-"""
+'''
 
 
 from contextlib import ExitStack as CMStack
@@ -87,15 +87,15 @@ sphinx_options = f"-j auto -d {sphinx_cache_path} -n -T"
 
 
 def parse_project_name( ):
-    """ Returns project name, as parsed from configuration. """
+    ''' Returns project name, as parsed from configuration. '''
     return parse_project_information( )[ 'name' ]
 
 def parse_project_version( ):
-    """ Returns project version, as parsed from configuration. """
+    ''' Returns project version, as parsed from configuration. '''
     return parse_project_information( )[ 'version' ]
 
 def parse_project_information( ):
-    """ Returns project information, as parsed from configuration. """
+    ''' Returns project information, as parsed from configuration. '''
     path = top_path / 'setup.cfg'
     if path.is_file( ):
         from configparser import ConfigParser
@@ -117,7 +117,7 @@ def _assert_gpg_tty( ):
 
 
 def _unlink_recursively( path ):
-    """ Pure Python implementation of ``rm -rf``, essentially. """
+    ''' Pure Python implementation of ``rm -rf``, essentially. '''
     if not path.exists( ): return
     if not path.is_dir( ):
         path.unlink( )
@@ -133,7 +133,7 @@ def _unlink_recursively( path ):
 
 
 def _render_boxed_title( title ):
-    """ Renders box around title. """
+    ''' Renders box around title. '''
     columns_count = int( psenv.get( 'COLUMNS', 79 ) )
     icolumns_count = columns_count - 2
     content_template = (
@@ -155,7 +155,7 @@ def _render_boxed_title( title ):
 
 @task
 def install_git_hooks( context ):
-    """ Installs hooks to check goodness of code changes before commit. """
+    ''' Installs hooks to check goodness of code changes before commit. '''
     my_cfg_path = sources_path / 'pre-commit.yaml'
     context.run(
         f"pre-commit install --config {my_cfg_path} --install-hooks",
@@ -164,7 +164,7 @@ def install_git_hooks( context ):
 
 @task
 def clean_pycaches( context ): # pylint: disable=unused-argument
-    """ Removes all caches of compiled CPython bytecode. """
+    ''' Removes all caches of compiled CPython bytecode. '''
     eprint( _render_boxed_title( 'Clean: Python Caches' ) )
     anchors = ( python3_sources_path, python3_tests_path, )
     for path in chain.from_iterable( map(
@@ -177,7 +177,7 @@ def clean_pycaches( context ): # pylint: disable=unused-argument
 
 @task
 def clean_tool_caches( context ): # pylint: disable=unused-argument
-    """ Clears the caches used by code generation and testing utilities. """
+    ''' Clears the caches used by code generation and testing utilities. '''
     eprint( _render_boxed_title( 'Clean: Tool Caches' ) )
     anchors = caches_path.glob( '*' )
     gitignore_paths = set( caches_path.glob( '*/.gitignore' ) )
@@ -197,28 +197,28 @@ def clean_tool_caches( context ): # pylint: disable=unused-argument
 
 @task
 def clean_pipenv( context ):
-    """ Removes unused packages in the Python development virtualenv. """
+    ''' Removes unused packages in the Python development virtualenv. '''
     eprint( _render_boxed_title( 'Clean: Orphan Packages' ) )
     context.run( 'pipenv clean', pty = True )
 
 
 @task( pre = ( clean_pycaches, clean_tool_caches, clean_pipenv, ) )
 def clean( context ): # pylint: disable=unused-argument
-    """ Cleans all caches. """
+    ''' Cleans all caches. '''
 
 
 @task
 def check_pipenv_security( context ):
-    """ Checks for security issues in utilized packages and tools.
+    ''' Checks for security issues in utilized packages and tools.
 
-        This task requires Internet access and may take some time. """
+        This task requires Internet access and may take some time. '''
     eprint( _render_boxed_title( 'Lint: Package Security' ) )
     context.run( 'pipenv check', pty = True )
 
 
 @task
 def freshen_asdf( context ):
-    """ Asks ASDF to update itself. """
+    ''' Asks ASDF to update itself. '''
     eprint( _render_boxed_title( 'Freshen: Version Manager' ) )
     context.run( 'asdf update', pty = True )
     context.run( 'asdf plugin update python', pty = True )
@@ -226,7 +226,7 @@ def freshen_asdf( context ):
 
 @task( pre = ( freshen_asdf, ) )
 def freshen_python( context ):
-    """ Updates each supported Python minor version to latest patch. """
+    ''' Updates each supported Python minor version to latest patch. '''
     eprint( _render_boxed_title( 'Freshen: Python Versions' ) )
     python_regex = re.compile( r'''^python\s+(.*)$''', re.MULTILINE )
     with ( top_path / '.tool-versions' ).open( ) as versions_file:
@@ -252,19 +252,19 @@ def freshen_python( context ):
 
 @task( post = ( clean_pipenv, check_pipenv_security, ) )
 def freshen_pipenv( context ):
-    """ Updates packages for the Python development virtualenv.
+    ''' Updates packages for the Python development virtualenv.
 
-        This task requires Internet access and may take some time. """
+        This task requires Internet access and may take some time. '''
     eprint( _render_boxed_title( 'Freshen: Development Dependencies' ) )
     context.run( 'pipenv update --dev', pty = True )
 
 
 @task
 def freshen_git_modules( context ):
-    """ Performs recursive update of all Git modules.
+    ''' Performs recursive update of all Git modules.
 
         Initializes SCM modules as needed.
-        This task requires Internet access and may take some time. """
+        This task requires Internet access and may take some time. '''
     eprint( _render_boxed_title( 'Freshen: SCM Modules' ) )
     context.run(
         'git submodule update --init --recursive --remote', pty = True )
@@ -272,9 +272,9 @@ def freshen_git_modules( context ):
 
 @task
 def freshen_git_hooks( context ):
-    """ Updates Git hooks to latest tagged release.
+    ''' Updates Git hooks to latest tagged release.
 
-        This task requires Internet access and may take some time. """
+        This task requires Internet access and may take some time. '''
     eprint( _render_boxed_title( 'Freshen: SCM Hooks' ) )
     my_cfg_path = sources_path / 'pre-commit.yaml'
     context.run( f"pre-commit autoupdate --config {my_cfg_path}", pty = True )
@@ -284,21 +284,21 @@ def freshen_git_hooks( context ):
     pre = ( clean, freshen_pipenv, freshen_git_modules, freshen_git_hooks, )
 )
 def freshen( context ): # pylint: disable=unused-argument
-    """ Performs the various freshening tasks, cleaning first.
+    ''' Performs the various freshening tasks, cleaning first.
 
-        This task requires Internet access and may take some time. """
+        This task requires Internet access and may take some time. '''
 
 
 @task
 def lint_bandit( context ):
-    """ Security checks the source code with Bandit. """
+    ''' Security checks the source code with Bandit. '''
     eprint( _render_boxed_title( 'Lint: Bandit' ) )
     context.run( f"bandit --recursive --verbose {python3_sources_path}" )
 
 
 @task( iterable = ( 'packages', 'modules', 'files', ) )
 def lint_mypy( context, packages, modules, files ):
-    """ Lints the source code with Mypy. """
+    ''' Lints the source code with Mypy. '''
     eprint( _render_boxed_title( 'Lint: MyPy' ) )
     if not which( 'mypy' ):
         eprint( 'Mypy not available on this platform. Skipping.' )
@@ -319,7 +319,7 @@ def lint_mypy( context, packages, modules, files ):
 
 @task( iterable = ( 'targets', 'checks', ) )
 def lint_pylint( context, targets, checks ):
-    """ Lints the source code with Pylint. """
+    ''' Lints the source code with Pylint. '''
     eprint( _render_boxed_title( 'Lint: Pylint' ) )
     if not which( 'pylint' ):
         eprint( 'Pylint not available on this platform. Skipping.' )
@@ -341,7 +341,7 @@ def lint_pylint( context, targets, checks ):
 
 @task
 def lint_semgrep( context ):
-    """ Lints the source code with Semgrep. """
+    ''' Lints the source code with Semgrep. '''
     eprint( _render_boxed_title( 'Lint: Semgrep' ) )
     sgconfig_path = (
         scm_modules_path / 'semgrep-rules' / 'python' / 'lang' )
@@ -357,12 +357,12 @@ def lint_semgrep( context ):
     call( lint_bandit ),
 ) )
 def lint( context ): # pylint: disable=unused-argument
-    """ Lints the source code. """
+    ''' Lints the source code. '''
 
 
 @task
 def report_coverage( context ):
-    """ Combines multiple code coverage results into a single report. """
+    ''' Combines multiple code coverage results into a single report. '''
     eprint( _render_boxed_title( 'Artifact: Code Coverage Report' ) )
     context.run( 'coverage combine', pty = True )
     context.run( 'coverage report', pty = True )
@@ -372,7 +372,7 @@ def report_coverage( context ):
 
 @task( pre = ( lint, ) )
 def test( context ):
-    """ Runs the test suite with the current Python version. """
+    ''' Runs the test suite with the current Python version. '''
     eprint( _render_boxed_title( 'Test: Unit + Code Coverage' ) )
     context.run(
         f"coverage run --source {project_name}", pty = True,
@@ -382,7 +382,7 @@ def test( context ):
 
 @task( pre = ( lint, ), post = ( report_coverage, ) )
 def test_all_versions( context ):
-    """ Runs the test suite across multiple, isolated Python versions. """
+    ''' Runs the test suite across multiple, isolated Python versions. '''
     eprint( _render_boxed_title( 'Test: Unit + Code Coverage (all Pythons)' ) )
     context.run(
         'tox --asdf-no-fallback --asdf-install', pty = True,
@@ -393,7 +393,7 @@ def test_all_versions( context ):
 
 @task
 def check_urls( context ):
-    """ Checks the HTTP URLs in the documentation for liveness. """
+    ''' Checks the HTTP URLs in the documentation for liveness. '''
     eprint( _render_boxed_title( 'Test: Documentation URLs' ) )
     output_path = artifacts_path / 'sphinx-linkcheck'
     context.run(
@@ -403,7 +403,7 @@ def check_urls( context ):
 
 @task
 def check_readme( context ):
-    """ Checks that the README will render correctly on PyPI. """
+    ''' Checks that the README will render correctly on PyPI. '''
     eprint( _render_boxed_title( 'Test: README Render' ) )
     path = _get_sdist_path( )
     context.run( f"twine check {path}" )
@@ -411,7 +411,7 @@ def check_readme( context ):
 
 @task( pre = ( test, check_urls, ), post = ( check_readme, ) )
 def make_sdist( context ):
-    """ Packages the Python sources for release. """
+    ''' Packages the Python sources for release. '''
     eprint( _render_boxed_title( 'Artifact: Source Distribution' ) )
     _assert_gpg_tty( )
     path = _get_sdist_path( )
@@ -427,7 +427,7 @@ def _get_sdist_path( ):
 
 @task( pre = ( make_sdist, ) )
 def make_wheel( context ):
-    """ Packages a Python wheel for release. """
+    ''' Packages a Python wheel for release. '''
     eprint( _render_boxed_title( 'Artifact: Python Wheel' ) )
     _assert_gpg_tty( )
     path = _get_wheel_path( )
@@ -443,7 +443,7 @@ def _get_wheel_path( ):
 
 @task( pre = ( check_urls, ) )
 def make_html( context ):
-    """ Generates documentation as HTML artifacts. """
+    ''' Generates documentation as HTML artifacts. '''
     eprint( _render_boxed_title( 'Artifact: Documentation' ) )
     output_path = artifacts_path / 'html' / 'sphinx'
     _unlink_recursively( output_path )
@@ -454,11 +454,11 @@ def make_html( context ):
 
 @task( pre = ( clean, make_wheel, make_html, ) )
 def make( context ): # pylint: disable=unused-argument
-    """ Generates all of the artifacts. """
+    ''' Generates all of the artifacts. '''
 
 
 class Version:
-    """ Package version manager.
+    ''' Package version manager.
 
         Compatible with the version scheme laid forth in
         `PEP 440 <https://www.python.org/dev/peps/pep-0440/#version-scheme>`_.
@@ -471,11 +471,11 @@ class Version:
         Release candidates extend the core format by appending
         ``rc{{candidate}}``, where ``candidate`` starts at ``1`` and increases
         by one upon each increment.
-    """
+    '''
 
     @classmethod
     def from_string( kind, version ):
-        """ Constructs a version object by parsing it from a string. """
+        ''' Constructs a version object by parsing it from a string. '''
         from re import match
         matched = match(
             r"(?P<major>\d+)\.(?P<minor>\d+)"
@@ -508,9 +508,9 @@ class Version:
             f"{stage}{patch}" if stage in ( 'a', 'rc' ) else '' ) ) )
 
     def as_bumped( self, piece ):
-        """ Returns a derivative of the version,
+        ''' Returns a derivative of the version,
             altered according to current state and desired modification.
-        """
+        '''
         from datetime import datetime as DateTime
         Version_ = type( self )
         stage, major, minor, patch = (
@@ -532,7 +532,7 @@ class Version:
 
 
 def _ensure_clean_workspace( context ):
-    """ Error if version control reports any dirty or untracked files. """
+    ''' Error if version control reports any dirty or untracked files. '''
     result = context.run( 'git status --short', pty = True )
     if result.stdout or result.stderr:
         raise Exit( 'Dirty workspace. Please stash or commit changes.' )
@@ -540,7 +540,7 @@ def _ensure_clean_workspace( context ):
 
 @task
 def bump( context, piece ):
-    """ Bumps a piece of the current version. """
+    ''' Bumps a piece of the current version. '''
     eprint( _render_boxed_title( f"Version: Adjust" ) )
     _ensure_clean_workspace( context )
     _assert_gpg_tty( )
@@ -562,17 +562,17 @@ def bump( context, piece ):
 
 @task( post = ( call( bump, piece = 'patch' ), ) )
 def bump_patch( context ): # pylint: disable=unused-argument
-    """ Bumps to next patch level. """
+    ''' Bumps to next patch level. '''
 
 
 @task( post = ( call( bump, piece = 'stage' ), ) )
 def bump_stage( context ): # pylint: disable=unused-argument
-    """ Bumps to next release stage. """
+    ''' Bumps to next release stage. '''
 
 
 @task( post = ( bump_stage, ) )
 def branch_release( context, remote = 'origin' ):
-    """ Makes a new branch for development torwards a release. """
+    ''' Makes a new branch for development torwards a release. '''
     _ensure_clean_workspace( context )
     project_version = parse_project_version( )
     mainline_regex = re.compile(
@@ -592,7 +592,7 @@ def branch_release( context, remote = 'origin' ):
 
 @task
 def check_code_style( context, write_changes = False ):
-    """ Checks code style of new changes. """
+    ''' Checks code style of new changes. '''
     yapf_options = [ ]
     if write_changes: yapf_options.append( '--in-place --verbose' )
     yapf_options_string = ' '.join( yapf_options )
@@ -603,7 +603,7 @@ def check_code_style( context, write_changes = False ):
 
 @task( pre = ( test, ) )
 def push( context, remote = 'origin' ):
-    """ Pushes commits on current branch, plus all tags. """
+    ''' Pushes commits on current branch, plus all tags. '''
     eprint( _render_boxed_title( 'SCM: Push Branch with Tags' ) )
     _ensure_clean_workspace( context )
     project_version = parse_project_version( )
@@ -620,7 +620,7 @@ def push( context, remote = 'origin' ):
 
 @task
 def check_pip_install( context, index_url = '' ):
-    """ Checks import of current package after installation via Pip. """
+    ''' Checks import of current package after installation via Pip. '''
     venv_path = caches_path / 'venvs' / project_name
     create_venv( venv_path, clear = True, with_pip = True )
     index_url_option = ''
@@ -645,7 +645,7 @@ def check_pip_install( context, index_url = '' ):
 
 @task
 def check_pypi_integrity( context, index_url = '' ):
-    """ Checks integrity of current package uploads on PyPI. """
+    ''' Checks integrity of current package uploads on PyPI. '''
     index_url = index_url or 'https://pypi.org'
     project_url = f"{index_url}/pypi/{project_name}/json"
     project_version = parse_project_version( )
@@ -669,7 +669,7 @@ def check_pypi_integrity( context, index_url = '' ):
 
 
 def check_pypi_package( context, package_url ):
-    """ Verifies signature on package. """
+    ''' Verifies signature on package. '''
     _assert_gpg_tty( )
     package_filename = urlparse( package_url ).path.split( '/' )[ -1 ]
     with TemporaryDirectory( ) as cache_path_raw:
@@ -700,7 +700,7 @@ def check_pypi_package( context, package_url ):
     )
 )
 def upload_test_pypi( context ):
-    """ Publishes current sdist and wheels to Test PyPI. """
+    ''' Publishes current sdist and wheels to Test PyPI. '''
     _upload_pypi( context, 'testpypi' )
 
 
@@ -709,7 +709,7 @@ def upload_test_pypi( context ):
     post = ( check_pypi_integrity, check_pip_install, )
 )
 def upload_pypi( context ):
-    """ Publishes current sdist and wheels to PyPI. """
+    ''' Publishes current sdist and wheels to PyPI. '''
     _upload_pypi( context )
 
 
@@ -746,7 +746,7 @@ def _get_pypi_credentials( repository_name ):
 # Inspiration: https://stackoverflow.com/a/58993849/14833542
 @task( pre = ( test, make_html, ) )
 def upload_github_pages( context ):
-    """ Publishes Sphinx HTML output to Github Pages for project. """
+    ''' Publishes Sphinx HTML output to Github Pages for project. '''
     eprint( _render_boxed_title( 'Publication: Github Pages' ) )
     # Use relative path, since 'git subtree' needs it.
     html_path = artifacts_path.relative_to( top_path ) / 'html' / 'sphinx'
@@ -776,9 +776,9 @@ def upload_github_pages( context ):
 
 @task( pre = ( bump_patch, push, upload_pypi, ) )
 def release_new_patch( context ): # pylint: disable=unused-argument
-    """ Unleashes a new patch upon the world. """
+    ''' Unleashes a new patch upon the world. '''
 
 
 @task( pre = ( bump_stage, push, upload_pypi, ) )
 def release_new_stage( context ): # pylint: disable=unused-argument
-    """ Unleashes a new stage upon the world. """
+    ''' Unleashes a new stage upon the world. '''
