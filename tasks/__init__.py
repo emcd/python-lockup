@@ -584,7 +584,7 @@ def branch_release( context, remote = 'origin' ):
     project_version = parse_project_version( )
     mainline_regex = re.compile(
         r'''^\s+HEAD branch:\s+(.*)$''', re.MULTILINE )
-    mainline_branch = mainline_regex.match( context.run(
+    mainline_branch = mainline_regex.search( context.run(
         f"git remote show {remote}", hide = 'stdout' ).stdout.strip( ) )[ 1 ]
     true_branch = context.run(
         'git branch --show-current', hide = 'stdout' ).stdout.strip( )
