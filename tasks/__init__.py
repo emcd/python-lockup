@@ -222,8 +222,8 @@ def freshen_asdf( context ):
 
         This task requires Internet access and may take some time. '''
     eprint( _render_boxed_title( 'Freshen: Version Manager' ) )
-    context.run( 'asdf update', pty = True )
-    context.run( 'asdf plugin update python', pty = True )
+    context.run( 'asdf update', pty = stderr.isatty( ) )
+    context.run( 'asdf plugin update python', pty = stderr.isatty( ) )
 
 
 @task( pre = ( freshen_asdf, ) )
@@ -260,7 +260,7 @@ def freshen_pipenv( context ):
 
         This task requires Internet access and may take some time. '''
     eprint( _render_boxed_title( 'Freshen: Development Dependencies' ) )
-    context.run( 'pipenv update --dev', pty = True )
+    context.run( 'pipenv update --dev', pty = stderr.isatty( ) )
 
 
 @task
