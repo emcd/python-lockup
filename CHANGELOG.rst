@@ -22,6 +22,9 @@ Changelog
 v1.1.0
 -------------------------------------------------------------------------------
 
+Documentation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 * Officially verify and mention PyPy and Pyston support.
 * More documentation improvements.
 
