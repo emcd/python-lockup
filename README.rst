@@ -285,3 +285,18 @@ with package exception classes:
 	...     type( exc ).mro( )
 	...
 	[<class 'lockup.exceptions.InaccessibleAttribute'>, <class 'lockup.exceptions.InaccessibleEntity'>, <class 'lockup.exceptions.InvalidOperation'>, <class 'lockup.exceptions.Exception0'>, <class 'AttributeError'>, <class 'Exception'>, <class 'BaseException'>, <class 'object'>]
+
+Compatibility
+===============================================================================
+
+This package has been verified to work on the following Python implementations:
+
+* `CPython <https://github.com/python/cpython>`_
+* `PyPy <https://www.pypy.org/>`_
+* `Pyston <https://www.pyston.org/>`_
+
+It likely works on others as well, but please report if it does not.
+
+.. TODO: https://github.com/oracle/graalpython
+.. TODO: https://github.com/IronLanguages/ironpython3
+.. TODO: https://github.com/RustPython/RustPython
