@@ -12,17 +12,22 @@ jobs:
     steps:
       - name: Prepare
         uses: emcd/python-lockup/.github/actions/python-venv@master
+      - name: Load PGP Key
+        uses: crazy-max/ghaction-import-gpg@v4
+        with:
+          git_commit_gpgsign: true
+          git_user_signingkey: true
+          gpg_private_key: '${{ secrets.GHA_COMMIT_SIGNING_KEY }}'
       - name: Install Asdf and Pythons
         uses: asdf-vm/actions/install@v1
       - name: Freshen Project
         run: pipenv run invoke freshen
-      # TODO: PGP key setup for bot.
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
         with:
           title: '[GHA] Freshen Project'
           commit-message: '[GHA] Freshen Project'
-          # TODO: Committer which matches PGP key.
+          committer: 'Github Actions Robot <emcd@users.noreply.github.com>'
           branch: gha-freshener
           delete-branch: true
           reviewers: emcd
