@@ -86,7 +86,8 @@ equivalent versions for alternative implementations. Those versions are listed
 after the baseline version in the same file. This file is used by the excellent
 asdf_ version manager to determine which versions of Python are considered
 active for the project. We strongly recommend the use of asdf_ to manage
-multiple versions of Python.
+multiple versions of Python, if you use an operating system that is supported
+by asdf_.
 
 To build the CPython implementations that we support, you may need to install
 some packages with your OS package manager first:
@@ -175,6 +176,15 @@ We recommend that you install an EditorConfig plugin for your editor of choice,
 if necessary. We provide an ``.editorconfig`` file at the top level
 of the project repository; this file has configurations relevant
 to the project.
+
+`pre-commit <https://pre-commit.com>`_
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+As part of the development environment that we provide via Pipenv, there is the
+pre-commit_ command. Among other things, this allows you to install
+Git pre-commit hooks which will perform additional checks, such as TOML and
+YAML linting, before recording a new commit. To use these hooks, you can run::
+
+    pre-commit install --config sources/pre-commit.yaml
 
 Commit Signatures
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -367,17 +377,17 @@ rejected. Please digest this `Stack Exchange discussion on reformatting
 
 Some tips:
 
-* Horizontal space between identifiers and literals improves legibility. Prior
-  to the introduction of spaces between words around fourteen centuries ago,
-  readers had to either parse words from `scriptio continua
+* Horizontal space surrounding identifiers and literals improves legibility.
+  Prior to the introduction of spaces between words around fourteen centuries
+  ago, readers had to either parse words from `scriptio continua
   <https://en.wikipedia.org/wiki/Scriptio_continua>`_ or with the use of a
   `word divider <https://en.wikipedia.org/wiki/Word_divider>`_ symbol, such as
   the `interpunct <https://en.wikipedia.org/wiki/Interpunct>`_. Reading
   identifiers from code, which are separated only by delimiters, is equivalent
-  to reading words separated by interpuncts, except that the cognitive load is
+  to reading words separated by interpuncts, except that the syntactic noise is
   even higher due to the variety of delimiters (parentheses, commas, colons,
   etc...). Using horizontal space, an innovation from nearly 1.5 millennia ago,
-  can reduce this cognitive load.
+  can reduce the cognitive load of filtering noise from syntactic markers.
 
 * Try to keep function bodies under twenty (20) lines, no more than thirty
   (30) lines maximum. Long functions are probably doing too much and they
