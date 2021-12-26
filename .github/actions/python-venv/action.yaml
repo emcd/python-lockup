@@ -17,9 +17,18 @@ runs:
       with:
         python-version: '${{ inputs.python-version }}'
     - name: Install Pipenv
-      run: sudo python -m pip install pipenv
+      run: |
+        set -e
+        python -m pip install --upgrade pip setuptools wheel
+        python -m pip install --upgrade pipenv
       shell: bash
     - name: Create Virtual Environment
-      # Note: 'pipenv --skip-lock --dev' does not work properly as of 2012-12-12.
-      run: 'mv Pipfile.lock old-Pipfile.lock && pipenv --python ${{ inputs.python-version }} install --dev && mv --force old-Pipfile.lock Pipfile.lock'
+      run: |
+        set -eu
+        # Note: 'pipenv --skip-lock --dev' does not work properly as of 2012-12-12.
+        mv Pipfile.lock old-Pipfile.lock
+        trap "mv --force old-Pipfile.lock Pipfile.lock" ERR EXIT
+        # Properly handle versions like 'pypy-3.8'.
+        python_version=$(echo ${{ inputs.python-version }} | awk -F- '{print $NF}')
+        pipenv --python ${python_version} install --dev
       shell: bash
