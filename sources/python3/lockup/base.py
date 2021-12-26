@@ -377,11 +377,10 @@ if python_implementation.name in ( 'cpython', ): # pragma: no branch
         ''' Turns a class factory class into the factory for itself. '''
         if not issubclass( factory, type ):
             raise InvalidState # pragma: no cover
-        from ctypes import Structure, c_ssize_t, c_void_p, pythonapi
+        from ctypes import Structure, c_ssize_t, c_void_p
+        import sys
         # Detect whether CPython is compiled with the 'TRACE_REFS' macro.
-        try: pythonapi._Py_ForgetReference # pylint: disable=protected-access
-        except AttributeError: trace_refs = False
-        else: trace_refs = True
+        trace_refs = hasattr( sys, 'getobjects' )
         class PyObject( Structure ):
             ''' Structural representation of :c:struct:`PyObject`. '''
             _fields_ = tuple( filter( None, (
