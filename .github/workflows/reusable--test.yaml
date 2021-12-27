@@ -5,12 +5,18 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # TODO: Fix weird 'crayons' stack trace with PyPy3 and Pipenv.
-        # TODO: Fix weird dependency resolution issue with CPython 3.10 and Pipenv.
-        python-version: ['3.6', '3.7', '3.8', '3.9']
+        python-version:
+          - '3.6.15'
+          - '3.7.12'
+          - '3.8.12'
+          - '3.9.9'
+          - '3.10.1'
+          #- 'pyston-2.3.1'
+          #- 'pypy3.7-7.3.7'
+          #- 'pypy3.8-7.3.7'
     steps:
       - name: Prepare
-        uses: emcd/python-lockup/.github/actions/python-venv@master
+        uses: emcd/python-lockup/.github/actions/python-venv@test-gha-no-toolcaches
         with:
           python-version: '${{ matrix.python-version }}'
       - name: Test
@@ -20,5 +26,4 @@ jobs:
         with:
           name: coverage-results-${{ matrix.python-version }}
           path: caches/pytest/coverage.sqlite3.*
-    # TODO: Add parallel job for tests on supported Pyston versions.
-    # TODO: Add parallel job for test on 'TRACE_REFS' build of CPython.
+  # TODO: Add parallel job for test on 'TRACE_REFS' build of CPython.
