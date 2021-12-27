@@ -15,20 +15,42 @@ runs:
     - name: Procure Baseline Python
       uses: actions/setup-python@v2
       with:
-        python-version: '${{ inputs.python-version }}'
+        python-version: '3.6'
     - name: Install Pipenv
       run: |
         set -e
-        python -m pip install --upgrade pip setuptools wheel
+        #python -m pip install --upgrade pip setuptools wheel
         python -m pip install --upgrade pipenv
       shell: bash
+    - name: Select Python Version (if requested)
+      if: "${{ 'all' != inputs.python-version }}"
+      run: |
+        set -eu
+        echo 'ASDF_PYTHON_VERSION=${{ inputs.python-version }}' >>${GITHUB_ENV}
+      shell: bash
+    - name: Install Asdf and Managed Versions
+      uses: asdf-vm/actions/install@v1
+#    - name: Procure Baseline Python
+#      uses: actions/setup-python@v2
+#      with:
+#        python-version: '${{ inputs.python-version }}'
+#    - name: Install Pipenv
+#      run: |
+#        set -e
+#        python -m pip install --upgrade pip setuptools wheel
+#        python -m pip install --upgrade pipenv
+#        asdf reshim python ${{ inputs.python-version }}
+#      shell: bash
     - name: Create Virtual Environment
       run: |
         set -eu
-        # Note: 'pipenv --skip-lock --dev' does not work properly as of 2012-12-12.
-        mv Pipfile.lock old-Pipfile.lock
-        trap "mv --force old-Pipfile.lock Pipfile.lock" ERR EXIT
-        # Properly handle versions like 'pypy-3.8'.
-        python_version=$(echo ${{ inputs.python-version }} | awk -F- '{print $NF}')
-        pipenv --python ${python_version} install --dev
+        python_version_pipenv=$(python -c 'import sys; print( ".".join( map( str, sys.version_info[ : 2 ] ) ) )')
+        export PIPENV_PIPFILE=Pipfile-override
+        sed 's;^python_version = .*$;python_version = "'${python_version_pipenv}'";' Pipfile >${PIPENV_PIPFILE}
+        printenv | egrep ^PIPENV_PIPFILE >>${GITHUB_ENV}
+        # Note: '--skip-lock --dev' does not work properly with development dependencies
+        #       in 'setup.cfg' as of 2012-12-12. So, we have this bit of file-shuffling.
+        mv Pipfile.lock BACKUP-Pipfile.lock
+        pipenv install --dev
+        mv --force BACKUP-Pipfile.lock Pipfile.lock
       shell: bash
