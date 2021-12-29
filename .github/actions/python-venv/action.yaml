@@ -4,7 +4,7 @@ inputs:
   python-version:
     description: 'Version of the Python interpreter.'
     required: true
-    default: 3.6
+    default: 3.6.15
 runs:
   using: composite
   steps:
