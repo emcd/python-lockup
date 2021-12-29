@@ -28,11 +28,11 @@ jobs:
         with:
           python-version: '3.8'
           python-configure-flags: '--with-trace-refs'
-      # TODO: Workaround ABI compatibility issue with 'cyaml'.
-#      - name: Test
-#        run: pipenv run invoke test
-#      - name: Preserve Coverage Results
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: coverage-results-3.8-trace-refs
-#          path: caches/pytest/coverage.sqlite3.*
+      # Ensure that we can import the package successfully.
+      # Cannot run test suite because of ABI incompatibility issues
+      # with some dependencies.
+      - name: Import Package
+        run: |
+          package_name="$(grep --extended-regexp '^name\s+=.*$' setup.cfg | sed --regexp-extended 's;name\s+=\s+;;')"
+          python -c "import ${package_name}"
+        shell: bash
