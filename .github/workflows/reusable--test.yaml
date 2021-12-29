@@ -1,22 +1,16 @@
 name: reusable--tests
 on: ['workflow_call']
 jobs:
-  test:
+  test-standard-suite:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version:
-          - '3.6.15'
-          - '3.7.12'
-          - '3.8.12'
-          - '3.9.9'
-          - '3.10.1'
-          #- 'pyston-2.3.1'
-          #- 'pypy3.7-7.3.7'
-          #- 'pypy3.8-7.3.7'
+        # TODO: PyPy 3.7 and 3.8.
+        # TODO: Pyston 2.3.
+        python-version: ['3.6', '3.7', '3.8', '3.9', '3.10']
     steps:
       - name: Prepare
-        uses: emcd/python-lockup/.github/actions/python-venv@master
+        uses: emcd/python-lockup/.github/actions/python-venv@test-gha-build-flags
         with:
           python-version: '${{ matrix.python-version }}'
       - name: Test
@@ -26,4 +20,18 @@ jobs:
         with:
           name: coverage-results-${{ matrix.python-version }}
           path: caches/pytest/coverage.sqlite3.*
-  # TODO: Add parallel job for test on 'TRACE_REFS' build of CPython.
+  test-cpython-trace-refs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepare
+        uses: emcd/python-lockup/.github/actions/python-venv@test-gha-build-flags
+        with:
+          python-version: '3.8'
+          python-configure-flags: '--with-trace-refs'
+      - name: Test
+        run: pipenv run invoke test
+      - name: Preserve Coverage Results
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-results-3.8-trace-refs
+          path: caches/pytest/coverage.sqlite3.*

@@ -4,7 +4,10 @@ inputs:
   python-version:
     description: 'Version of the Python interpreter.'
     required: true
-    default: 3.6.15
+    default: '3.6'
+  python-configure-flags:
+    description: 'Flags to pass to the configure script for Python builds.'
+    required: false
 runs:
   using: composite
   steps:
@@ -12,18 +15,24 @@ runs:
       uses: actions/checkout@v2
       with:
         submodules: recursive
+    - name: Install Asdf Core and Plugins
+      uses: asdf-vm/actions/plugins-add@v1
     - name: Select Python Version (if requested)
       if: "${{ 'all' != inputs.python-version }}"
       run: |
         set -eu
-        echo 'ASDF_PYTHON_VERSION=${{ inputs.python-version }}' >>${GITHUB_ENV}
+        python_version="$(asdf latest python ${{ inputs.python-version }})"
+        echo "ASDF_PYTHON_VERSION=${python_version}" >>${GITHUB_ENV}
       shell: bash
-    - name: Install Asdf and Managed Versions
-      uses: asdf-vm/actions/install@v1
-#    - name: Procure Baseline Python
-#      uses: actions/setup-python@v2
-#      with:
-#        python-version: '${{ inputs.python-version }}'
+    - name: Add Python Configure Flags (if requested)
+      if: "${{ inputs.python-configure-flags }}"
+      run: |
+        set -eu
+        echo 'PYTHON_CONFIGURE_OPTS=${{ inputs.python-configure-flags }}' >>${GITHUB_ENV}
+      shell: bash
+    - name: Install Managed Versions
+      run: asdf install
+      shell: bash
     - name: Install Pipenv and Packages
       run: |
         set -e
