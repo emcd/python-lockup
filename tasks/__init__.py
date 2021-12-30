@@ -1,42 +1,6 @@
 ''' Project maintenance tasks, executed via :command:`invoke`.
 
-    `Invoke Documentation <http://docs.pyinvoke.org/en/stable/index.html>`_
-
-    Why use :command:`invoke` instead of :command:`make`?
-
-    * The Makefile language, while generally elegant and well-suited
-      to deterministic workflows, such as software maintenance automation,
-      is an additional language which must be remembered.
-
-    * While GNU Make is essentially ubiquitous in the Unix world,
-      it is not available by default on Windows.
-      Moreover, Microsoft Nmake does not have entirely compatible syntax.
-      Dual maintenance of DOS/Windows batch files or Powershell scripts
-      is also undesirable.
-
-    * As Python is a prerequisite for this project
-      and we have the infrastructure to guarantee
-      a particular software environment,
-      we can ensure a specific version of :command:`invoke` is available.
-      We would have no similar assurance with a system-provided
-      :command:`make`
-      and cannot provide this command via the Python package ecosystem.
-
-    * We can avoid the use of commands, such as :command:`find`,
-      which have platform-specific variations,
-      and instead use equivalent standardized functions.
-      An additional benefit is that function invocations are
-      within the same Python interpreter session,
-      whereas command invocations have fork-exec overhead.
-
-    * Separate options can be passed for each of multiple targets
-      to :command:`invoke`, whereas :command:`make` only consumes
-      global options and variables.
-
-    * A summary of all available targets/subcommands
-      along with brief descriptions can be listed by :command:`invoke`,
-      whereas :command:`make` does not provide such a facility.
-'''
+    `Invoke Documentation <http://docs.pyinvoke.org/en/stable/index.html>`_ '''
 
 
 from contextlib import ExitStack as CMStack
@@ -218,7 +182,7 @@ def check_pipenv_security( context ):
 
 @task
 def freshen_asdf( context ):
-    ''' Asks ASDF to update itself.
+    ''' Asks Asdf to update itself.
 
         This task requires Internet access and may take some time. '''
     eprint( _render_boxed_title( 'Freshen: Version Manager' ) )
