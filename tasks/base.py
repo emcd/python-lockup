@@ -43,8 +43,7 @@ def _calculate_paths( ):
     project_path = Path( __file__ ).parent.parent
     local_path = project_path / '.local'
     paths_ = SimpleNamespace(
-        # TODO: Move artifacts under XDG-style local path.
-        artifacts = project_path / 'artifacts',
+        artifacts = local_path / 'artifacts',
         caches = local_path / 'caches',
         configuration = local_path / 'configuration',
         local = local_path,
