@@ -16,9 +16,9 @@ parallel = true
 [tool.coverage.report]
 precision = 2
 [tool.coverage.html]
-directory = "artifacts/coverage-pytest"
+directory = ".local/artifacts/coverage-pytest"
 [tool.coverage.xml]
-output = "artifacts/coverage-pytest/coverage.xml"
+output = ".local/artifacts/coverage-pytest/coverage.xml"
 
 [tool.pylint.MASTER]
 ignore = []
