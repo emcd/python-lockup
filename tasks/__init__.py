@@ -45,6 +45,7 @@ from venv import create as create_venv
 from invoke import Context, Exit, Failure, call, task
 
 from .base import (
+    derive_python_venv_variables,
     eprint, epprint,
     paths,
 )
@@ -608,31 +609,34 @@ def push( context, remote = 'origin' ):
 
 
 @task
-def check_pip_install( context, index_url = '' ):
+def check_pip_install( context, index_url = '', version = None ):
     ''' Checks import of current package after installation via Pip. '''
-    # TODO: Use TemporaryDirectory instead.
-    venv_path = paths.caches / 'venvs' / project_name
-    create_venv( venv_path, clear = True, with_pip = True )
-    index_url_option = ''
-    if index_url: index_url_option = f"--index-url {index_url}"
-    python_import_command = (
-        f"import {project_name}; "
-        f"print( {project_name}.__version__ )" )
-    project_version = parse_project_version( )
-    attempts_count_max = 2
-    for attempts_count in range( attempts_count_max + 1 ):
-        try:
-            # TODO: Consider non-Bourne shells or force use of Bourne shell.
-            #       Or... use Python activator to inject environment.
-            context.run(
-                f". {venv_path}/bin/activate "
-                f"&& pip install {index_url_option} "
-                f"     {project_name}=={project_version} "
-                f"&& python -c '{python_import_command}'", pty = True )
-        except Failure:
-            if attempts_count_max == attempts_count: raise
-            sleep( 2 ** attempts_count )
-        else: break
+    version = version or parse_project_version( )
+    eprint( _render_boxed_title(
+        f"Verify: Python Package Installation ({version})" ) )
+    with TemporaryDirectory( ) as venv_path:
+        venv_path = Path( venv_path )
+        create_venv( venv_path, clear = True, with_pip = True )
+        index_url_option = ''
+        if index_url: index_url_option = f"--index-url {index_url}"
+        venv_variables = derive_python_venv_variables( venv_path )
+        attempts_count_max = 2
+        for attempts_count in range( attempts_count_max + 1 ):
+            try:
+                context.run(
+                    f"pip install {index_url_option} "
+                    f"  {project_name}=={version}",
+                    env = venv_variables, replace_env = True, pty = True )
+            except Failure:
+                if attempts_count_max == attempts_count: raise
+                sleep( 2 ** attempts_count )
+            else: break
+        python_import_command = (
+            f"import {project_name}; "
+            f"print( {project_name}.__version__ )" )
+        context.run(
+            f"python -c '{python_import_command}'",
+            env = venv_variables, replace_env = True, pty = True )
 
 
 @task

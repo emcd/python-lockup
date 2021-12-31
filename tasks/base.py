@@ -78,3 +78,13 @@ paths = _calculate_paths( )
 def ensure_directory( path ):
     ''' Ensures existence of directory, creating if necessary. '''
     path.mkdir( parents = True, exist_ok = True )
+
+
+def derive_python_venv_variables( venv_path, variables = None ):
+    ''' Derives environment variables from Python virtual environment path. '''
+    variables = variables or psenv.copy( )
+    variables.pop( 'PYTHONHOME', None )
+    variables[ 'PATH' ] = "{venv_path}/bin:{original_path}".format(
+        venv_path = venv_path, original_path = variables[ 'PATH' ] )
+    variables[ 'VIRTUAL_ENV' ] = str( venv_path )
+    return variables
