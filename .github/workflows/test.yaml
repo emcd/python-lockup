@@ -14,9 +14,9 @@ jobs:
       - name: Restore Coverage Results
         uses: actions/download-artifact@v2
         with:
-          path: caches/pytest
+          path: .local/caches/pytest
       - name: Relocate Coverage Results
-        run: mv caches/pytest/coverage-results-*/coverage.sqlite3.* caches/pytest
+        run: mv .local/caches/pytest/coverage-results-*/coverage.sqlite3.* .local/caches/pytest
       - name: Report Coverage
         run: pipenv run invoke report-coverage
       - name: Upload Coverage Report
