@@ -623,6 +623,7 @@ def check_pip_install( context, index_url = '' ):
     for attempts_count in range( attempts_count_max + 1 ):
         try:
             # TODO: Consider non-Bourne shells or force use of Bourne shell.
+            #       Or... use Python activator to inject environment.
             context.run(
                 f". {venv_path}/bin/activate "
                 f"&& pip install {index_url_option} "

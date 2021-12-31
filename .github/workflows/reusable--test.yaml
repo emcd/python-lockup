@@ -19,7 +19,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: coverage-results-${{ matrix.python-version }}
-          path: caches/pytest/coverage.sqlite3.*
+          path: .local/caches/pytest/coverage.sqlite3.*
   test-cpython-trace-refs:
     runs-on: ubuntu-latest
     steps:
