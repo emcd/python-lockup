@@ -22,7 +22,7 @@
 
 
 # https://www.python.org/dev/peps/pep-0396/
-__version__ = '1.1a202112231941'
+__version__ = '2.0a202112310633'
 
 
 from . import exceptions
