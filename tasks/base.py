@@ -48,9 +48,10 @@ def _calculate_paths( ):
         # TODO: Move artifacts and caches under XDG-style local path.
         artifacts = project_path / 'artifacts',
         caches = project_path / 'caches',
+        configuration = local_path / 'configuration',
         scm_modules = project_path / 'scm-modules',
-        state = local_path / 'state',
         sources = project_path / 'sources',
+        state = local_path / 'state',
         tests = project_path / 'tests',
     )
     paths_.python3 = _calculate_python3_paths( paths_ )
