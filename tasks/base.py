@@ -43,12 +43,13 @@ def _calculate_paths( ):
     project_path = Path( __file__ ).parent.parent
     local_path = project_path / '.local'
     paths_ = SimpleNamespace(
-        project = project_path,
-        local = local_path,
-        # TODO: Move artifacts and caches under XDG-style local path.
+        # TODO: Move artifacts under XDG-style local path.
         artifacts = project_path / 'artifacts',
-        caches = project_path / 'caches',
+        caches = local_path / 'caches',
         configuration = local_path / 'configuration',
+        local = local_path,
+        project = project_path,
+        # TODO: Move SCM modules under XDG-style local path.
         scm_modules = project_path / 'scm-modules',
         sources = project_path / 'sources',
         state = local_path / 'state',
