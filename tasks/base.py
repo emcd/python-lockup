@@ -48,8 +48,7 @@ def _calculate_paths( ):
         configuration = local_path / 'configuration',
         local = local_path,
         project = project_path,
-        # TODO: Move SCM modules under XDG-style local path.
-        scm_modules = project_path / 'scm-modules',
+        scm_modules = local_path / 'scm-modules',
         sources = project_path / 'sources',
         state = local_path / 'state',
         tests = project_path / 'tests',
