@@ -4,7 +4,9 @@
 #       The 'whey' build backend as a replacement for 'setuptools' is another.
 
 [build-system]
-requires = ["setuptools>=40.9.0", "wheel"]
+requires = ["setuptools>=40.9.0", "tomli", "wheel"]
+# Explicit build backend, in case we use frontend other than Pip or Pip default changes.
+build-backend = "setuptools.build_meta"
 
 [tool.coverage.run]
 branch = true
