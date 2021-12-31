@@ -125,7 +125,7 @@ def _render_boxed_title( title ):
 @task
 def install_git_hooks( context ):
     ''' Installs hooks to check goodness of code changes before commit. '''
-    my_cfg_path = paths.sources / 'pre-commit.yaml'
+    my_cfg_path = paths.configuration / 'pre-commit.yaml'
     context.run(
         f"pre-commit install --config {my_cfg_path} --install-hooks",
         pty = True )
@@ -261,7 +261,7 @@ def freshen_git_hooks( context ):
 
         This task requires Internet access and may take some time. '''
     eprint( _render_boxed_title( 'Freshen: SCM Hooks' ) )
-    my_cfg_path = paths.sources / 'pre-commit.yaml'
+    my_cfg_path = paths.configuration / 'pre-commit.yaml'
     context.run( f"pre-commit autoupdate --config {my_cfg_path}", pty = True )
 
 
@@ -292,7 +292,8 @@ def lint_mypy( context, packages, modules, files ):
         eprint( 'Mypy not available on this platform. Skipping.' )
         return
     environment_str = f"MYPYPATH={paths.project}:{paths.python3.sources}"
-    configuration_str = "--config-file {}".format( paths.sources / 'mypy.ini' )
+    configuration_str = "--config-file {}".format(
+        paths.configuration / 'mypy.ini' )
     if not packages and not modules and not files: packages = ( project_name, )
     packages_str = ' '.join( map(
         lambda package: f"--package {package}", packages ) )
@@ -540,7 +541,7 @@ def bump( context, piece ):
         if current_version.stage in ( 'a', 'rc' ): part = 'prerelease'
         else: part = 'patch'
     else: part = piece
-    my_cfg_path = paths.sources / 'bumpversion.cfg'
+    my_cfg_path = paths.configuration / 'bumpversion.cfg'
     context.run(
         f"bumpversion --config-file={my_cfg_path}"
         f" --current-version {current_version}"
