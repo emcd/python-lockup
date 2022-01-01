@@ -22,6 +22,7 @@
 
 
 from functools import partial as partial_function
+import os
 from os import environ as psenv
 from pathlib import Path
 from pprint import pprint
@@ -93,6 +94,20 @@ def ensure_directory( path ):
     return path
 
 
+def derive_python_venv_execution_options(
+        context, venv_path = None, variables = None
+):
+    ''' Derives flags for Python virtual environment in execution context. '''
+    if None is venv_path:
+        version = psenv.get( 'ASDF_PYTHON_VERSION' )
+        if None is version:
+            version = next( iter( indicate_python_versions_support( ) ) )
+        venv_path = derive_python_venv_path( context, version )
+    return dict(
+        env = derive_python_venv_variables( venv_path, variables = variables ),
+        replace_env = True )
+
+
 def indicate_python_versions_support( ):
     ''' Lists supported Python versions. '''
     regex = re.compile( r'''^python\s+(.*)$''', re.MULTILINE )
@@ -100,11 +115,28 @@ def indicate_python_versions_support( ):
         return regex.match( file.read( ) )[ 1 ].split( )
 
 
+def derive_python_venv_path( context, version, python_path = None ):
+    ''' Derives Python virtual environment path from version handle. '''
+    python_path = python_path or detect_vmgr_python_path( context, version )
+    abi_detector_path = paths.scripts.python3 / 'report-abi.py'
+    abi_tag = context.run(
+        f"{python_path} {abi_detector_path} {version}",
+        hide = 'stdout' ).stdout.strip( )
+    return paths.python3.venvs / abi_tag
+
+
 def derive_python_venv_variables( venv_path, variables = None ):
     ''' Derives environment variables from Python virtual environment path. '''
-    variables = variables or psenv.copy( )
+    variables = ( variables or psenv ).copy( )
     variables.pop( 'PYTHONHOME', None )
-    variables[ 'PATH' ] = "{venv_path}/bin:{original_path}".format(
-        venv_path = venv_path, original_path = variables[ 'PATH' ] )
+    variables[ 'PATH' ] = os.pathsep.join( (
+        str( venv_path / 'bin' ), variables[ 'PATH' ] ) )
     variables[ 'VIRTUAL_ENV' ] = str( venv_path )
     return variables
+
+
+def detect_vmgr_python_path( context, version ):
+    ''' Detects Python path using version manager handle. '''
+    installation_path = Path( context.run(
+        f"asdf where python {version}", hide = 'stdout' ).stdout.strip( ) )
+    return installation_path / 'bin' / 'python'
