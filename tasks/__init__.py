@@ -32,11 +32,11 @@ from itertools import chain
 from json import load as json_load
 from os import environ as psenv
 from pathlib import Path
+import re
 from shutil import which
 from sys import stderr
 from tempfile import TemporaryDirectory
 from time import sleep
-import re
 from urllib.error import URLError as UrlError
 from urllib.parse import urlparse
 from urllib.request import ( Request as HttpRequest, urlopen, )
@@ -46,7 +46,9 @@ from invoke import Context, Exit, Failure, call, task
 
 from .base import (
     derive_python_venv_variables,
+    ensure_directory,
     eprint, epprint,
+    indicate_python_versions_support,
     paths,
 )
 
@@ -126,6 +128,7 @@ def _render_boxed_title( title ):
 @task
 def install_git_hooks( context ):
     ''' Installs hooks to check goodness of code changes before commit. '''
+    eprint( _render_boxed_title( 'Install: Git Pre-Commit Hooks' ) )
     my_cfg_path = paths.configuration / 'pre-commit.yaml'
     context.run(
         f"pre-commit install --config {my_cfg_path} --install-hooks",
@@ -134,8 +137,40 @@ def install_git_hooks( context ):
 
 @task
 def install_pythons( context ):
-    ''' Installs all Python releases relevant to the project. '''
+    ''' Installs each supported Python version.
+
+        This task requires Internet access and may take some time. '''
+    eprint( _render_boxed_title( 'Install: Python Releases' ) )
     context.run( 'asdf install python', pty = True )
+
+
+@task
+def build_python_venvs( context ):
+    ''' Creates virtual environment for each supported Python version. '''
+    for version in indicate_python_versions_support( ):
+        build_python_venv( context, version )
+
+
+@task
+def build_python_venv( context, version, overwrite = False ):
+    ''' Creates virtual environment for requested Python version. '''
+    eprint( _render_boxed_title(
+        f"Build: Python Virtual Environment ({version})" ) )
+    installation_path = Path( context.run(
+        f"asdf where python {version}", hide = 'stdout' ).stdout.strip( ) )
+    python_path = installation_path / 'bin' / 'python'
+    abi_detector_path = paths.scripts.python3 / 'report-abi.py'
+    abi_tag = context.run(
+        f"{python_path} {abi_detector_path} {version}",
+        hide = 'stdout' ).stdout.strip( )
+    venv_path = ensure_directory( paths.python3.venvs ) / abi_tag
+    venv_options = [ ]
+    if overwrite: venv_options.append( '--clear' )
+    venv_options_str = ' '.join( venv_options )
+    context.run(
+        f"{python_path} -m venv {venv_options_str} {venv_path}", pty = True )
+    # TODO: Upgrade Pip and friends first.
+    # TODO: Install packages into virtual environment.
 
 
 @task( pre = ( install_pythons, install_git_hooks, ) )
@@ -148,6 +183,7 @@ def clean_pycaches( context ): # pylint: disable=unused-argument
     ''' Removes all caches of compiled CPython bytecode. '''
     eprint( _render_boxed_title( 'Clean: Python Caches' ) )
     anchors = ( paths.python3.sources, paths.python3.tests, )
+    # TODO? Use 'shutil.rmtree' instead.
     for path in chain.from_iterable( map(
         lambda anchor: anchor.rglob( '__pycache__/*' ), anchors
     ) ): path.unlink( )
@@ -209,19 +245,15 @@ def freshen_asdf( context ):
 
 
 @task( pre = ( freshen_asdf, ) )
-def freshen_python( context ):
+def freshen_pythons( context ):
     ''' Updates each supported Python minor version to latest patch.
 
         This task requires Internet access and may take some time. '''
     eprint( _render_boxed_title( 'Freshen: Python Versions' ) )
-    python_regex = re.compile( r'''^python\s+(.*)$''', re.MULTILINE )
-    with ( paths.project / '.tool-versions' ).open( ) as versions_file:
-        current_versions = python_regex.match(
-            versions_file.read( ) )[ 1 ].split( )
     minors_regex = re.compile(
         r'''^(?P<prefix>\w+(?:\d+\.\d+)?-)?(?P<minor>\d+\.\d+)\..*$''' )
     latest_versions = [ ]
-    for version in current_versions:
+    for version in indicate_python_versions_support( ):
         groups = minors_regex.match( version ).groupdict( )
         minor_version = "{prefix}{minor}".format(
             prefix = groups.get( 'prefix' ) or '',
@@ -269,7 +301,8 @@ def freshen_git_hooks( context ):
 @task(
     pre = (
         clean,
-        freshen_python, freshen_pipenv, freshen_git_modules, freshen_git_hooks,
+        freshen_pythons, freshen_pipenv,
+        freshen_git_modules, freshen_git_hooks,
     )
 )
 def freshen( context ): # pylint: disable=unused-argument
