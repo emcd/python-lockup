@@ -45,7 +45,9 @@ from venv import create as create_venv
 from invoke import Context, Exit, Failure, call, task
 
 from .base import (
-    derive_python_venv_variables,
+    derive_python_venv_execution_options,
+    derive_python_venv_path,
+    detect_vmgr_python_path,
     ensure_directory,
     eprint, epprint,
     indicate_python_versions_support,
@@ -156,20 +158,17 @@ def build_python_venv( context, version, overwrite = False ):
     ''' Creates virtual environment for requested Python version. '''
     eprint( _render_boxed_title(
         f"Build: Python Virtual Environment ({version})" ) )
-    installation_path = Path( context.run(
-        f"asdf where python {version}", hide = 'stdout' ).stdout.strip( ) )
-    python_path = installation_path / 'bin' / 'python'
-    abi_detector_path = paths.scripts.python3 / 'report-abi.py'
-    abi_tag = context.run(
-        f"{python_path} {abi_detector_path} {version}",
-        hide = 'stdout' ).stdout.strip( )
-    venv_path = ensure_directory( paths.python3.venvs ) / abi_tag
+    python_path = detect_vmgr_python_path( context, version )
+    venv_path = ensure_directory( derive_python_venv_path(
+        context, version, python_path ) )
     venv_options = [ ]
     if overwrite: venv_options.append( '--clear' )
     venv_options_str = ' '.join( venv_options )
     context.run(
         f"{python_path} -m venv {venv_options_str} {venv_path}", pty = True )
-    # TODO: Upgrade Pip and friends first.
+    options = derive_python_venv_execution_options( context, venv_path )
+    context.run(
+        'pip install --upgrade setuptools pip wheel', pty = True, **options )
     # TODO: Install packages into virtual environment.
 
 
@@ -652,14 +651,13 @@ def check_pip_install( context, index_url = '', version = None ):
         create_venv( venv_path, clear = True, with_pip = True )
         index_url_option = ''
         if index_url: index_url_option = f"--index-url {index_url}"
-        venv_variables = derive_python_venv_variables( venv_path )
+        options = derive_python_venv_execution_options( context, venv_path )
         attempts_count_max = 2
         for attempts_count in range( attempts_count_max + 1 ):
             try:
                 context.run(
                     f"pip install {index_url_option} "
-                    f"  {project_name}=={version}",
-                    env = venv_variables, replace_env = True, pty = True )
+                    f"  {project_name}=={version}", pty = True, **options )
             except Failure:
                 if attempts_count_max == attempts_count: raise
                 sleep( 2 ** attempts_count )
@@ -668,8 +666,7 @@ def check_pip_install( context, index_url = '', version = None ):
             f"import {project_name}; "
             f"print( {project_name}.__version__ )" )
         context.run(
-            f"python -c '{python_import_command}'",
-            env = venv_variables, replace_env = True, pty = True )
+            f"python -c '{python_import_command}'", pty = True, **options )
 
 
 @task
