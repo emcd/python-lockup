@@ -25,6 +25,7 @@ from functools import partial as partial_function
 from os import environ as psenv
 from pathlib import Path
 from pprint import pprint
+import re
 from sys import stderr
 from types import SimpleNamespace
 
@@ -47,21 +48,32 @@ def _calculate_paths( ):
         caches = local_path / 'caches',
         configuration = local_path / 'configuration',
         local = local_path,
+        platform_versions = project_path / '.tool-versions',
         project = project_path,
         scm_modules = local_path / 'scm-modules',
+        scripts = _calculate_scripts_paths( local_path ),
         sources = project_path / 'sources',
         state = local_path / 'state',
         tests = project_path / 'tests',
+        venvs = local_path / 'venvs',
     )
     paths_.python3 = _calculate_python3_paths( paths_ )
     paths_.sphinx = _calculate_sphinx_paths( paths_ )
     return paths_
 
 
+def _calculate_scripts_paths( local_path ):
+    scripts_path = local_path / 'scripts'
+    return SimpleNamespace(
+        python3 = scripts_path / 'python3',
+    )
+
+
 def _calculate_python3_paths( paths_ ):
     return SimpleNamespace(
         sources = paths_.sources / 'python3',
         tests = paths_.tests / 'python3',
+        venvs = paths_.venvs / 'python3',
     )
 
 
@@ -78,6 +90,14 @@ paths = _calculate_paths( )
 def ensure_directory( path ):
     ''' Ensures existence of directory, creating if necessary. '''
     path.mkdir( parents = True, exist_ok = True )
+    return path
+
+
+def indicate_python_versions_support( ):
+    ''' Lists supported Python versions. '''
+    regex = re.compile( r'''^python\s+(.*)$''', re.MULTILINE )
+    with paths.platform_versions.open( ) as file:
+        return regex.match( file.read( ) )[ 1 ].split( )
 
 
 def derive_python_venv_variables( venv_path, variables = None ):
