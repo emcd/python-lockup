@@ -27,15 +27,17 @@
     environments. '''
 
 
+import re
+import shlex
+
 from contextlib import ExitStack as CMStack
 from itertools import chain
 from json import load as json_load
 from os import environ as psenv
 from pathlib import Path
-import re
 from shutil import which
 from sys import stderr
-from tempfile import TemporaryDirectory
+from tempfile import NamedTemporaryFile, TemporaryDirectory
 from time import sleep
 from urllib.error import URLError as UrlError
 from urllib.parse import urlparse
@@ -50,6 +52,7 @@ from .base import (
     detect_vmgr_python_path,
     ensure_directory,
     eprint, epprint,
+    generate_pip_requirements,
     indicate_python_versions_support,
     paths,
 )
@@ -146,7 +149,7 @@ def install_pythons( context ):
     context.run( 'asdf install python', pty = True )
 
 
-@task
+@task( pre = ( install_pythons, ) )
 def build_python_venvs( context ):
     ''' Creates virtual environment for each supported Python version. '''
     for version in indicate_python_versions_support( ):
@@ -169,10 +172,21 @@ def build_python_venv( context, version, overwrite = False ):
     options = derive_python_venv_execution_options( context, venv_path )
     context.run(
         'pip install --upgrade setuptools pip wheel', pty = True, **options )
-    # TODO: Install packages into virtual environment.
+    requirements = generate_pip_requirements( )
+    # Unfortunately, Pip does not support reading requirements from stdin,
+    # as of 2022-01-02. To workaround, we need to write and then read
+    # a temporary file. More details: https://github.com/pypa/pip/issues/7822
+    with NamedTemporaryFile( mode = 'w+' ) as requirements_file:
+        requirements_file.write( requirements )
+        requirements_file.flush( )
+        context.run(
+            "pip install --upgrade --requirement {requirements_file}".format(
+                requirements_file = shlex.quote( requirements_file.name ) ),
+            pty = True, **options )
+    context.run( 'pip install --editable .', pty = True, **options )
 
 
-@task( pre = ( install_pythons, install_git_hooks, ) )
+@task( pre = ( build_python_venvs, install_git_hooks, ) )
 def bootstrap( context ): # pylint: disable=unused-argument
     ''' Bootstraps the development environment and utilities. '''
 

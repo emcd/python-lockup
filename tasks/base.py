@@ -21,12 +21,18 @@
 ''' Constants and utilities for project maintenance tasks. '''
 
 
-from functools import partial as partial_function
+import re
+import shlex
+import subprocess
+import sys
 import os
+
+from collections.abc import Mapping as AbstractDictionary
+from functools import partial as partial_function
+from itertools import chain
 from os import environ as psenv
 from pathlib import Path
 from pprint import pprint
-import re
 from sys import stderr
 from types import SimpleNamespace
 
@@ -49,29 +55,31 @@ def _calculate_paths( ):
         caches = local_path / 'caches',
         configuration = local_path / 'configuration',
         local = local_path,
-        platform_versions = project_path / '.tool-versions',
         project = project_path,
         scm_modules = local_path / 'scm-modules',
-        scripts = _calculate_scripts_paths( local_path ),
+        scripts = local_path / 'scripts',
         sources = project_path / 'sources',
         state = local_path / 'state',
         tests = project_path / 'tests',
-        venvs = local_path / 'venvs',
+        venvs = local_path / 'virtual-environments',
     )
+    paths_.common = _calculate_common_paths( paths_ )
     paths_.python3 = _calculate_python3_paths( paths_ )
     paths_.sphinx = _calculate_sphinx_paths( paths_ )
     return paths_
 
 
-def _calculate_scripts_paths( local_path ):
-    scripts_path = local_path / 'scripts'
+def _calculate_common_paths( paths_ ):
+    # Note: Does not exist yet. Placeholder for a future refactor.
+    common_path = paths_.scm_modules / 'emcd-common'
     return SimpleNamespace(
-        python3 = scripts_path / 'python3',
+        sources = common_path / 'sources',
     )
 
 
 def _calculate_python3_paths( paths_ ):
     return SimpleNamespace(
+        scripts = paths_.scripts / 'python3',
         sources = paths_.sources / 'python3',
         tests = paths_.tests / 'python3',
         venvs = paths_.venvs / 'python3',
@@ -109,16 +117,16 @@ def derive_python_venv_execution_options(
 
 
 def indicate_python_versions_support( ):
-    ''' Lists supported Python versions. '''
+    ''' Returns supported Python versions. '''
     regex = re.compile( r'''^python\s+(.*)$''', re.MULTILINE )
-    with paths.platform_versions.open( ) as file:
+    with ( paths.project / '.tool-versions' ).open( ) as file:
         return regex.match( file.read( ) )[ 1 ].split( )
 
 
 def derive_python_venv_path( context, version, python_path = None ):
     ''' Derives Python virtual environment path from version handle. '''
     python_path = python_path or detect_vmgr_python_path( context, version )
-    abi_detector_path = paths.scripts.python3 / 'report-abi.py'
+    abi_detector_path = paths.python3.scripts / 'report-abi.py'
     abi_tag = context.run(
         f"{python_path} {abi_detector_path} {version}",
         hide = 'stdout' ).stdout.strip( )
@@ -140,3 +148,41 @@ def detect_vmgr_python_path( context, version ):
     installation_path = Path( context.run(
         f"asdf where python {version}", hide = 'stdout' ).stdout.strip( ) )
     return installation_path / 'bin' / 'python'
+
+
+def generate_pip_requirements( folio = None ):
+    ''' Generates Pip requirements list from packages folio.
+
+        Uses the complete folio from local configuration by default. '''
+    folio = collapse_multilevel_dictionary(
+        folio or indicate_python_package_dependencies( ) )
+    # TODO: Handle structured entries.
+    return '\n'.join( folio )
+
+
+def collapse_multilevel_dictionary( dictionary ):
+    ''' Collapses a hierarchical dictionary into a list. '''
+    return tuple( chain.from_iterable(
+        (   collapse_multilevel_dictionary( value )
+            if isinstance( value, AbstractDictionary ) else value )
+        for value in dictionary.values( ) ) )
+
+
+def indicate_python_package_dependencies( ):
+    ''' Returns dictionary of Python package dependencies. '''
+    ensure_python_development_package( 'tomli' )
+    from tomli import load
+    with ( paths.configuration / 'pypackages.toml' ).open( ) as file:
+        return load( file )
+
+
+def ensure_python_development_package( package_name ):
+    ''' Ensures availability of development support package. '''
+    cache_path = ensure_directory( paths.caches / 'packages' / 'python3' )
+    if cache_path not in sys.path: sys.path.insert( 0, cache_path )
+    # TODO: Use 'capture_output' after Python 3.7.
+    subprocess.run(
+        ( *shlex.split( 'pip install --upgrade --target' ),
+          cache_path, package_name ),
+        check = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE )
+    # TODO: Verify package installation and return path to it.
