@@ -172,7 +172,7 @@ def indicate_python_package_dependencies( ):
     ''' Returns dictionary of Python package dependencies. '''
     ensure_python_development_package( 'tomli' )
     from tomli import load
-    with ( paths.configuration / 'pypackages.toml' ).open( ) as file:
+    with ( paths.configuration / 'pypackages.toml' ).open( 'rb' ) as file:
         return load( file )
 
 
@@ -180,9 +180,8 @@ def ensure_python_development_package( package_name ):
     ''' Ensures availability of development support package. '''
     cache_path = ensure_directory( paths.caches / 'packages' / 'python3' )
     if cache_path not in sys.path: sys.path.insert( 0, cache_path )
-    # TODO: Use 'capture_output' after Python 3.7.
     subprocess.run(
         ( *shlex.split( 'pip install --upgrade --target' ),
           cache_path, package_name ),
-        check = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE )
+        check = True, capture_output = True )
     # TODO: Verify package installation and return path to it.
