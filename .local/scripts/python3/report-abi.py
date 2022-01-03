@@ -29,7 +29,7 @@ system_type = platform.system( ).lower( )
 cpu_architecture = platform.machine( )
 
 if system_type not in ( 'java', 'windows', ):
-    system_abi_version = '-'.join( platform.libc_ver( ) ).replace( '.', '_' )
+    system_abi_version = '-'.join( platform.libc_ver( ) )
 elif 'java' == system_type:
     # TODO: Implement.
     raise NotImplementedError
@@ -46,7 +46,7 @@ if 'cpython' == implementation_name and hasattr( sys, 'getobjects' ):
     python_abi_extras.append( 'trace_refs' )
 if implementation_name in ( 'pyston', 'pypy', ):
     python_abi_extras.append(
-        version_handle.split( '-' )[ -1 ].replace( '.', '_' ) )
+        '.'.join( version_handle.split( '-' )[ -1 ].split( '.' )[ : 2 ] ) )
 if not python_abi_extras: python_abi_extras.append( 'none' )
 
 python_abi_version = "{implementation_name}-{version_mm}-{extras}".format(
