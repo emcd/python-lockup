@@ -4,7 +4,7 @@ inputs:
   python-version:
     description: 'Version of the Python interpreter.'
     required: true
-    default: '3.6'
+    default: '3.7'
   python-configure-flags:
     description: 'Flags to pass to the configure script for Python builds.'
     required: false

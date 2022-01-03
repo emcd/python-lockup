@@ -85,7 +85,7 @@ legacy_tox_ini = """
 [tox]
 minversion = 3.20
 toxworkdir = .local/caches/tox
-envlist = py36, py37, py38, py39, py310
+envlist = py37, py38, py39, py310
 
 [testenv]
 deps = pipenv
