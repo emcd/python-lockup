@@ -5,16 +5,15 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # TODO: PyPy 3.7 and 3.8.
         # TODO: Pyston 2.3.
-        python-version: ['3.7', '3.8', '3.9', '3.10']
+        python-version: ['3.7', '3.8', '3.9', '3.10', 'pypy3.7', 'pypy3.8']
     steps:
       - name: Prepare
         uses: emcd/python-lockup/.github/actions/python-venv@master
         with:
           python-version: '${{ matrix.python-version }}'
       - name: Test
-        run: pipenv run invoke test
+        run: invoke test
       - name: Preserve Coverage Results
         uses: actions/upload-artifact@v2
         with:
@@ -33,6 +32,7 @@ jobs:
       # with some dependencies.
       - name: Import Package
         run: |
+          set -eu
           package_name="$(grep --extended-regexp '^name\s+=.*$' setup.cfg | sed --regexp-extended 's;name\s+=\s+;;')"
-          python -c "import ${package_name}"
+          invoke run "python -c 'import ${package_name}'"
         shell: bash

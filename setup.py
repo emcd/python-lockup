@@ -53,14 +53,12 @@ from pathlib import Path
 project_path = Path( __file__ ).parent
 python_search_paths.insert(
     0, str( project_path / '.local' / 'sources' / 'python3' ) )
-#from our_setuptools_shim import (
-#    generate_install_requirements,
-#    generate_setup_requirements,
-#)
+from our_setuptools_shim import (
+    generate_installation_requirements,
+)
 
 
 # https://docs.python.org/3/distutils/setupscript.html#writing-the-setup-script
 setup(
-#    setup_requires = generate_setup_requirements( ),
-#    install_requires = generate_install_requirements( ),
+    install_requires = generate_installation_requirements( ),
 )
