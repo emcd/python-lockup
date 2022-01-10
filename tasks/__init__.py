@@ -28,13 +28,13 @@
 
 
 import re
-import shlex
 
 from contextlib import ExitStack as CMStack
 from itertools import chain
 from json import load as json_load
 from os import environ as psenv
 from pathlib import Path
+from shlex import quote as shell_quote
 from shutil import which
 from sys import stderr
 from tempfile import NamedTemporaryFile, TemporaryDirectory
@@ -50,16 +50,18 @@ from .base import (
     derive_python_venv_execution_options,
     derive_python_venv_path,
     detect_vmgr_python_path,
-    ensure_directory,
     eprint, epprint,
     generate_pip_requirements,
     indicate_python_versions_support,
     paths,
 )
+from our_base import (
+    ensure_directory,
+)
 
 
 # https://www.sphinx-doc.org/en/master/man/sphinx-build.html
-sphinx_options = f"-j auto -d {paths.sphinx.caches} -n -T"
+sphinx_options = f"-j auto -d {paths.caches.sphinx} -n -T"
 
 
 def parse_project_name( ):
@@ -72,7 +74,7 @@ def parse_project_version( ):
 
 def parse_project_information( ):
     ''' Returns project information, as parsed from configuration. '''
-    path = paths.project / 'setup.cfg'
+    path = paths.configuration.setuptools
     if path.is_file( ):
         from configparser import ConfigParser
         config = ConfigParser( )
@@ -134,10 +136,9 @@ def _render_boxed_title( title ):
 def install_git_hooks( context ):
     ''' Installs hooks to check goodness of code changes before commit. '''
     eprint( _render_boxed_title( 'Install: Git Pre-Commit Hooks' ) )
-    my_cfg_path = paths.configuration / 'pre-commit.yaml'
     context.run(
-        f"pre-commit install --config {my_cfg_path} --install-hooks",
-        pty = True )
+        f"pre-commit install --config {paths.configuration.pre_commit} "
+        f"--install-hooks", pty = True )
 
 
 @task
@@ -181,7 +182,7 @@ def build_python_venv( context, version, overwrite = False ):
         requirements_file.flush( )
         context.run(
             "pip install --upgrade --requirement {requirements_file}".format(
-                requirements_file = shlex.quote( requirements_file.name ) ),
+                requirements_file = shell_quote( requirements_file.name ) ),
             pty = True, **options )
     context.run( 'pip install --editable .', pty = True, **options )
 
@@ -195,7 +196,7 @@ def bootstrap( context ): # pylint: disable=unused-argument
 def clean_pycaches( context ): # pylint: disable=unused-argument
     ''' Removes all caches of compiled CPython bytecode. '''
     eprint( _render_boxed_title( 'Clean: Python Caches' ) )
-    anchors = ( paths.python3.sources, paths.python3.tests, )
+    anchors = ( paths.sources.p.python3, paths.tests.p.python3, )
     # TODO? Use 'shutil.rmtree' instead.
     for path in chain.from_iterable( map(
         lambda anchor: anchor.rglob( '__pycache__/*' ), anchors
@@ -210,8 +211,8 @@ def clean_tool_caches( context ): # pylint: disable=unused-argument
     ''' Clears the caches used by code generation and testing utilities. '''
     eprint( _render_boxed_title( 'Clean: Tool Caches' ) )
     # TODO? Simplify by using a single .gitignore in paths.caches.
-    anchors = paths.caches.glob( '*' )
-    gitignore_paths = set( paths.caches.glob( '*/.gitignore' ) )
+    anchors = paths.caches.SELF.glob( '*' )
+    gitignore_paths = set( paths.caches.SELF.glob( '*/.gitignore' ) )
     dirs_stack = [ ]
     for path in chain.from_iterable( map(
         lambda anchor: anchor.rglob( '*' ), anchors
@@ -222,8 +223,7 @@ def clean_tool_caches( context ): # pylint: disable=unused-argument
             continue
         path.unlink( )
     while dirs_stack: dirs_stack.pop( ).rmdir( )
-    # Note: 'setuptools' hardcodes this path.
-    _unlink_recursively( paths.project / '.eggs' )
+    _unlink_recursively( paths.caches.eggs )
 
 
 @task
@@ -307,8 +307,9 @@ def freshen_git_hooks( context ):
 
         This task requires Internet access and may take some time. '''
     eprint( _render_boxed_title( 'Freshen: SCM Hooks' ) )
-    my_cfg_path = paths.configuration / 'pre-commit.yaml'
-    context.run( f"pre-commit autoupdate --config {my_cfg_path}", pty = True )
+    context.run(
+        f"pre-commit autoupdate --config {paths.configuration.pre_commit}",
+        pty = True )
 
 
 @task(
@@ -328,7 +329,7 @@ def freshen( context ): # pylint: disable=unused-argument
 def lint_bandit( context ):
     ''' Security checks the source code with Bandit. '''
     eprint( _render_boxed_title( 'Lint: Bandit' ) )
-    context.run( f"bandit --recursive --verbose {paths.python3.sources}" )
+    context.run( f"bandit --recursive --verbose {paths.sources.p.python3}" )
 
 
 @task( iterable = ( 'packages', 'modules', 'files', ) )
@@ -338,9 +339,8 @@ def lint_mypy( context, packages, modules, files ):
     if not which( 'mypy' ):
         eprint( 'Mypy not available on this platform. Skipping.' )
         return
-    environment_str = f"MYPYPATH={paths.project}:{paths.python3.sources}"
-    configuration_str = "--config-file {}".format(
-        paths.configuration / 'mypy.ini' )
+    environment_str = f"MYPYPATH={paths.project}:{paths.sources.p.python3}"
+    configuration_str = f"--config-file {paths.configuration.mypy}"
     if not packages and not modules and not files: packages = ( project_name, )
     packages_str = ' '.join( map(
         lambda package: f"--package {package}", packages ) )
@@ -364,8 +364,9 @@ def lint_pylint( context, targets, checks ):
     if not targets:
         targets = (
             project_name,
-            *paths.python3.tests.rglob( '*.py' ),
-            paths.sphinx.sources / 'conf.py',
+            *paths.tests.p.python3.rglob( '*.py' ),
+            *paths.sources.d.python3.rglob( '*.py' ),
+            paths.sources.p.sphinx / 'conf.py',
             __package__, )
     targets_str = ' '.join( map( str, targets ) )
     checks_str = (
@@ -379,11 +380,10 @@ def lint_pylint( context, targets, checks ):
 def lint_semgrep( context ):
     ''' Lints the source code with Semgrep. '''
     eprint( _render_boxed_title( 'Lint: Semgrep' ) )
-    sgconfig_path = (
-        paths.scm_modules / 'semgrep-rules' / 'python' / 'lang' )
+    sgconfig_path = paths.scm_modules / 'semgrep-rules' / 'python' / 'lang'
     context.run(
         f"semgrep --config {sgconfig_path} --use-git-ignore "
-        f"{paths.python3.sources}", pty = stderr.isatty( ) )
+        f"{paths.sources.p.python3}", pty = stderr.isatty( ) )
 
 
 @task( pre = (
@@ -412,8 +412,7 @@ def test( context ):
     eprint( _render_boxed_title( 'Test: Unit + Code Coverage' ) )
     context.run(
         f"coverage run --source {project_name}", pty = True,
-        env = dict(
-            HYPOTHESIS_STORAGE_DIRECTORY = paths.caches / 'hypothesis', ) )
+        env = dict( HYPOTHESIS_STORAGE_DIRECTORY = paths.caches.hypothesis, ) )
 
 
 @task( pre = ( lint, ), post = ( report_coverage, ) )
@@ -423,7 +422,7 @@ def test_all_versions( context ):
     context.run(
         'tox --asdf-no-fallback --asdf-install', pty = True,
         env = dict(
-            HYPOTHESIS_STORAGE_DIRECTORY = paths.caches / 'hypothesis',
+            HYPOTHESIS_STORAGE_DIRECTORY = paths.caches.hypothesis,
             _PROJECT_NAME = f"{project_name}" ) )
 
 
@@ -431,10 +430,9 @@ def test_all_versions( context ):
 def check_urls( context ):
     ''' Checks the HTTP URLs in the documentation for liveness. '''
     eprint( _render_boxed_title( 'Test: Documentation URLs' ) )
-    output_path = paths.artifacts / 'sphinx-linkcheck'
     context.run(
         f"sphinx-build -b linkcheck {sphinx_options} "
-        f"{paths.sphinx.sources} {output_path}" )
+        f"{paths.sources.p.sphinx} {paths.artifacts.sphinx_linkcheck}" )
 
 
 @task
@@ -458,7 +456,7 @@ def make_sdist( context ):
 def _get_sdist_path( ):
     project_version = parse_project_version( )
     name = f"{project_name}-{project_version}.tar.gz"
-    return paths.artifacts / 'sdists' / name
+    return paths.artifacts.sdists / name
 
 
 @task( pre = ( make_sdist, ) )
@@ -474,18 +472,17 @@ def make_wheel( context ):
 def _get_wheel_path( ):
     project_version = parse_project_version( )
     name = f"{project_name}-{project_version}-py3-none-any.whl"
-    return paths.artifacts / 'wheels' / name
+    return paths.artifacts.wheels / name
 
 
 @task( pre = ( check_urls, ) )
 def make_html( context ):
     ''' Generates documentation as HTML artifacts. '''
     eprint( _render_boxed_title( 'Artifact: Documentation' ) )
-    output_path = paths.artifacts / 'html' / 'sphinx'
-    _unlink_recursively( output_path )
+    _unlink_recursively( paths.artifacts.sphinx_html )
     context.run(
         f"sphinx-build -b html {sphinx_options} "
-        f"{paths.sphinx.sources} {output_path}" )
+        f"{paths.sources.p.sphinx} {paths.artifacts.sphinx_html}" )
 
 
 @task( pre = ( clean, make_wheel, make_html, ) )
@@ -588,9 +585,8 @@ def bump( context, piece ):
         if current_version.stage in ( 'a', 'rc' ): part = 'prerelease'
         else: part = 'patch'
     else: part = piece
-    my_cfg_path = paths.configuration / 'bumpversion.cfg'
     context.run(
-        f"bumpversion --config-file={my_cfg_path}"
+        f"bumpversion --config-file={paths.configuration.bumpversion}"
         f" --current-version {current_version}"
         f" --new-version {new_version}"
         f" {part}", pty = True )
@@ -633,7 +629,7 @@ def check_code_style( context, write_changes = False ):
     if write_changes: yapf_options.append( '--in-place --verbose' )
     yapf_options_string = ' '.join( yapf_options )
     context.run(
-        f"git diff --unified=0 --no-color -- {paths.python3.sources} "
+        f"git diff --unified=0 --no-color -- {paths.sources.p.python3} "
         f"| yapf-diff {yapf_options_string}" )
 
 
@@ -789,8 +785,7 @@ def upload_github_pages( context ):
     ''' Publishes Sphinx HTML output to Github Pages for project. '''
     eprint( _render_boxed_title( 'Publication: Github Pages' ) )
     # Use relative path, since 'git subtree' needs it.
-    html_path = (
-        paths.artifacts.relative_to( paths.project ) / 'html' / 'sphinx' )
+    html_path = paths.artifacts.sphinx_html.relative_to( paths.project )
     nojekyll_path = html_path / '.nojekyll'
     target_branch = 'documentation'
     with CMStack( ) as cm_stack:

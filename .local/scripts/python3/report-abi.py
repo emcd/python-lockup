@@ -24,7 +24,7 @@ import sys
 
 implementation_name = sys.implementation.name
 version_handle = sys.argv[ 1 ]
-version_mm = '_'.join( map( str, sys.version_info[ : 2 ] ) )
+version_mm = '.'.join( map( str, sys.version_info[ : 2 ] ) )
 system_type = platform.system( ).lower( )
 cpu_architecture = platform.machine( )
 

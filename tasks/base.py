@@ -22,19 +22,22 @@
 
 
 import re
-import shlex
-import subprocess
-import sys
-import os
 
 from collections.abc import Mapping as AbstractDictionary
 from functools import partial as partial_function
 from itertools import chain
-from os import environ as psenv
+from os import environ as psenv, pathsep
 from pathlib import Path
 from pprint import pprint
-from sys import stderr
-from types import SimpleNamespace
+from sys import path as python_search_paths, stderr
+
+project_path = Path( __file__ ).parent.parent
+python_search_paths.insert(
+    0, str( project_path / '.local' / 'sources' / 'python3' ) )
+from our_base import (
+    ensure_python_package,
+    paths,
+)
 
 
 # If running in a Github Workflow,
@@ -45,61 +48,6 @@ if 'CI' in psenv:
 else:
     eprint = partial_function( print, file = stderr )
     epprint = partial_function( pprint, stream = stderr )
-
-
-def _calculate_paths( ):
-    project_path = Path( __file__ ).parent.parent
-    local_path = project_path / '.local'
-    paths_ = SimpleNamespace(
-        artifacts = local_path / 'artifacts',
-        caches = local_path / 'caches',
-        configuration = local_path / 'configuration',
-        local = local_path,
-        project = project_path,
-        scm_modules = local_path / 'scm-modules',
-        scripts = local_path / 'scripts',
-        sources = project_path / 'sources',
-        state = local_path / 'state',
-        tests = project_path / 'tests',
-        venvs = local_path / 'virtual-environments',
-    )
-    paths_.common = _calculate_common_paths( paths_ )
-    paths_.python3 = _calculate_python3_paths( paths_ )
-    paths_.sphinx = _calculate_sphinx_paths( paths_ )
-    return paths_
-
-
-def _calculate_common_paths( paths_ ):
-    # Note: Does not exist yet. Placeholder for a future refactor.
-    common_path = paths_.scm_modules / 'emcd-common'
-    return SimpleNamespace(
-        sources = common_path / 'sources',
-    )
-
-
-def _calculate_python3_paths( paths_ ):
-    return SimpleNamespace(
-        scripts = paths_.scripts / 'python3',
-        sources = paths_.sources / 'python3',
-        tests = paths_.tests / 'python3',
-        venvs = paths_.venvs / 'python3',
-    )
-
-
-def _calculate_sphinx_paths( paths_ ):
-    return SimpleNamespace(
-        caches = paths_.caches / 'sphinx',
-        sources = paths_.sources / 'sphinx',
-    )
-
-
-paths = _calculate_paths( )
-
-
-def ensure_directory( path ):
-    ''' Ensures existence of directory, creating if necessary. '''
-    path.mkdir( parents = True, exist_ok = True )
-    return path
 
 
 def derive_python_venv_execution_options(
@@ -119,25 +67,25 @@ def derive_python_venv_execution_options(
 def indicate_python_versions_support( ):
     ''' Returns supported Python versions. '''
     regex = re.compile( r'''^python\s+(.*)$''', re.MULTILINE )
-    with ( paths.project / '.tool-versions' ).open( ) as file:
+    with paths.configuration.asdf.open( ) as file:
         return regex.match( file.read( ) )[ 1 ].split( )
 
 
 def derive_python_venv_path( context, version, python_path = None ):
     ''' Derives Python virtual environment path from version handle. '''
     python_path = python_path or detect_vmgr_python_path( context, version )
-    abi_detector_path = paths.python3.scripts / 'report-abi.py'
+    abi_detector_path = paths.scripts.d.python3 / 'report-abi.py'
     abi_tag = context.run(
         f"{python_path} {abi_detector_path} {version}",
         hide = 'stdout' ).stdout.strip( )
-    return paths.python3.venvs / abi_tag
+    return paths.environments / abi_tag
 
 
 def derive_python_venv_variables( venv_path, variables = None ):
     ''' Derives environment variables from Python virtual environment path. '''
     variables = ( variables or psenv ).copy( )
     variables.pop( 'PYTHONHOME', None )
-    variables[ 'PATH' ] = os.pathsep.join( (
+    variables[ 'PATH' ] = pathsep.join( (
         str( venv_path / 'bin' ), variables[ 'PATH' ] ) )
     variables[ 'VIRTUAL_ENV' ] = str( venv_path )
     return variables
@@ -170,18 +118,7 @@ def collapse_multilevel_dictionary( dictionary ):
 
 def indicate_python_package_dependencies( ):
     ''' Returns dictionary of Python package dependencies. '''
-    ensure_python_development_package( 'tomli' )
+    ensure_python_package( 'tomli' )
     from tomli import load
-    with ( paths.configuration / 'pypackages.toml' ).open( 'rb' ) as file:
+    with paths.configuration.pypackages.open( 'rb' ) as file:
         return load( file )
-
-
-def ensure_python_development_package( package_name ):
-    ''' Ensures availability of development support package. '''
-    cache_path = ensure_directory( paths.caches / 'packages' / 'python3' )
-    if cache_path not in sys.path: sys.path.insert( 0, cache_path )
-    subprocess.run(
-        ( *shlex.split( 'pip install --upgrade --target' ),
-          cache_path, package_name ),
-        check = True, capture_output = True )
-    # TODO: Verify package installation and return path to it.
