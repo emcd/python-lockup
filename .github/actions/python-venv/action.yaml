@@ -33,25 +33,24 @@ runs:
     - name: Install Managed Versions
       run: asdf install
       shell: bash
-    - name: Install Pipenv and Packages
+    - name: Install Invoke
       run: |
-        set -e
-        python -m pip install --upgrade pip setuptools wheel
-        python -m pip install --upgrade pipenv
-        python -m pip --verbose install --requirement sources/packages.pip
-        python -m pip --verbose install --editable .
+        set -eu
+        python -m pip install --upgrade invoke pip setuptools wheel
         asdf reshim python
       shell: bash
-#    - name: Create Virtual Environment
+    - name: Create Virtual Environments
+      run: |
+        set -eu
+        invoke build-python-venvs
+        asdf reshim python
+      shell: bash
+#    - name: Install Pipenv and Packages
 #      run: |
-#        set -eu
-#        python_version_pipenv=$(python -c 'import sys; print( ".".join( map( str, sys.version_info[ : 2 ] ) ) )')
-#        export PIPENV_PIPFILE=Pipfile-override
-#        sed 's;^python_version = .*$;python_version = "'${python_version_pipenv}'";' Pipfile >${PIPENV_PIPFILE}
-#        printenv | egrep ^PIPENV_PIPFILE >>${GITHUB_ENV}
-#        # Note: '--skip-lock --dev' does not work properly with development dependencies
-#        #       in 'setup.cfg' as of 2012-12-12. So, we have this bit of file-shuffling.
-#        mv Pipfile.lock BACKUP-Pipfile.lock
-#        pipenv --verbose install --dev
-#        mv --force BACKUP-Pipfile.lock Pipfile.lock
+#        set -e
+#        python -m pip install --upgrade pip setuptools wheel
+#        python -m pip install --upgrade pipenv
+#        python -m pip --verbose install --requirement sources/packages.pip
+#        python -m pip --verbose install --editable .
+#        asdf reshim python
 #      shell: bash

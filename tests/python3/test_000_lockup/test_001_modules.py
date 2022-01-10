@@ -79,7 +79,7 @@ module_names = tuple( chain(
     (   path.stem for path in Path( package.__file__ ).parent.glob( '*.py' )
         if '__init__.py' != path.name ),
     (   path.name for path in Path( package.__file__ ).parent.glob( '*' )
-        if path.is_dir( ) ) ) )
+        if '__pycache__' != path.name and path.is_dir( ) ) ) )
 
 attributes_by_module = tuple( chain.from_iterable(
     tuple( zip(

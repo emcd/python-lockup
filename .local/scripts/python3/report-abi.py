@@ -23,7 +23,6 @@ import platform
 import sys
 
 implementation_name = sys.implementation.name
-version_handle = sys.argv[ 1 ]
 version_mm = '.'.join( map( str, sys.version_info[ : 2 ] ) )
 system_type = platform.system( ).lower( )
 cpu_architecture = platform.machine( )
@@ -37,16 +36,15 @@ elif 'windows' == system_type:
     # TODO: Implement.
     raise NotImplementedError
 
-# Hack around fact that Pyston reports itself as CPython. (As of 2021-12-31.)
-if 'cpython' == implementation_name and version_handle.startswith( 'pyston' ):
-    implementation_name = 'pyston'
-
 python_abi_extras = [ ]
 if 'cpython' == implementation_name and hasattr( sys, 'getobjects' ):
     python_abi_extras.append( 'trace_refs' )
-if implementation_name in ( 'pyston', 'pypy', ):
+if 'pypy' == implementation_name:
     python_abi_extras.append(
-        '.'.join( version_handle.split( '-' )[ -1 ].split( '.' )[ : 2 ] ) )
+        '.'.join( map( str, sys.pypy_version_info[ : 2 ] ) ) )
+if 'pyston' == implementation_name:
+    python_abi_extras.append(
+        '.'.join( map( str, sys.pyston_version_info[ : 2 ] ) ) )
 if not python_abi_extras: python_abi_extras.append( 'none' )
 
 python_abi_version = "{implementation_name}-{version_mm}-{extras}".format(
