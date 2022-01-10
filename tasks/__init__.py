@@ -47,12 +47,13 @@ from venv import create as create_venv
 from invoke import Context, Exit, Failure, call, task
 
 from .base import (
-    derive_python_venv_execution_options,
-    derive_python_venv_path,
+    derive_venv_context_options,
+    derive_venv_path,
     detect_vmgr_python_path,
     eprint, epprint,
     generate_pip_requirements,
     indicate_python_versions_support,
+    on_tty,
     paths,
 )
 from our_base import (
@@ -138,7 +139,7 @@ def install_git_hooks( context ):
     eprint( _render_boxed_title( 'Install: Git Pre-Commit Hooks' ) )
     context.run(
         f"pre-commit install --config {paths.configuration.pre_commit} "
-        f"--install-hooks", pty = True )
+        f"--install-hooks", pty = True, **derive_venv_context_options( ) )
 
 
 @task
@@ -162,17 +163,17 @@ def build_python_venv( context, version, overwrite = False ):
     ''' Creates virtual environment for requested Python version. '''
     eprint( _render_boxed_title(
         f"Build: Python Virtual Environment ({version})" ) )
-    python_path = detect_vmgr_python_path( context, version )
-    venv_path = ensure_directory( derive_python_venv_path(
-        context, version, python_path ) )
+    python_path = detect_vmgr_python_path( version )
+    venv_path = ensure_directory( derive_venv_path( version, python_path ) )
     venv_options = [ ]
     if overwrite: venv_options.append( '--clear' )
     venv_options_str = ' '.join( venv_options )
     context.run(
         f"{python_path} -m venv {venv_options_str} {venv_path}", pty = True )
-    options = derive_python_venv_execution_options( context, venv_path )
+    context_options = derive_venv_context_options( venv_path )
     context.run(
-        'pip install --upgrade setuptools pip wheel', pty = True, **options )
+        'pip install --upgrade setuptools pip wheel',
+        pty = on_tty, **context_options )
     requirements = generate_pip_requirements( )
     # Unfortunately, Pip does not support reading requirements from stdin,
     # as of 2022-01-02. To workaround, we need to write and then read
@@ -183,8 +184,8 @@ def build_python_venv( context, version, overwrite = False ):
         context.run(
             "pip install --upgrade --requirement {requirements_file}".format(
                 requirements_file = shell_quote( requirements_file.name ) ),
-            pty = True, **options )
-    context.run( 'pip install --editable .', pty = True, **options )
+            pty = on_tty, **context_options )
+    context.run( 'pip install --editable .', pty = on_tty, **context_options )
 
 
 @task( pre = ( build_python_venvs, install_git_hooks, ) )
@@ -226,25 +227,27 @@ def clean_tool_caches( context ): # pylint: disable=unused-argument
     _unlink_recursively( paths.caches.eggs )
 
 
-@task
-def clean_pipenv( context ):
-    ''' Removes unused packages in the Python development virtualenv. '''
-    eprint( _render_boxed_title( 'Clean: Orphan Packages' ) )
-    context.run( 'pipenv clean', pty = True )
+# TODO: Remove excess Pip-installed packages directly.
+#@task
+#def clean_pipenv( context ):
+#    ''' Removes unused packages in the Python development virtualenv. '''
+#    eprint( _render_boxed_title( 'Clean: Orphan Packages' ) )
+#    context.run( 'pipenv clean', pty = True )
 
 
-@task( pre = ( clean_pycaches, clean_tool_caches, clean_pipenv, ) )
+@task( pre = ( clean_pycaches, clean_tool_caches, ) )
 def clean( context ): # pylint: disable=unused-argument
     ''' Cleans all caches. '''
 
 
-@task
-def check_pipenv_security( context ):
-    ''' Checks for security issues in utilized packages and tools.
-
-        This task requires Internet access and may take some time. '''
-    eprint( _render_boxed_title( 'Lint: Package Security' ) )
-    context.run( 'pipenv check', pty = True )
+# TODO: Check security of Pip-installed packages directly.
+#@task
+#def check_pipenv_security( context ):
+#    ''' Checks for security issues in utilized packages and tools.
+#
+#        This task requires Internet access and may take some time. '''
+#    eprint( _render_boxed_title( 'Lint: Package Security' ) )
+#    context.run( 'pipenv check', pty = True )
 
 
 @task
@@ -253,8 +256,8 @@ def freshen_asdf( context ):
 
         This task requires Internet access and may take some time. '''
     eprint( _render_boxed_title( 'Freshen: Version Manager' ) )
-    context.run( 'asdf update', pty = stderr.isatty( ) )
-    context.run( 'asdf plugin update python', pty = stderr.isatty( ) )
+    context.run( 'asdf update', pty = on_tty )
+    context.run( 'asdf plugin update python', pty = on_tty )
 
 
 @task( pre = ( freshen_asdf, ) )
@@ -281,13 +284,14 @@ def freshen_pythons( context ):
         versions = ' '.join( latest_versions ) ), pty = True )
 
 
-@task( post = ( clean_pipenv, check_pipenv_security, ) )
-def freshen_pipenv( context ):
-    ''' Updates packages for the Python development virtualenv.
-
-        This task requires Internet access and may take some time. '''
-    eprint( _render_boxed_title( 'Freshen: Development Dependencies' ) )
-    context.run( 'pipenv update --dev', pty = stderr.isatty( ) )
+# TODO: Replace with Pip-specific refresher.
+#@task( post = ( clean_pipenv, check_pipenv_security, ) )
+#def freshen_pipenv( context ):
+#    ''' Updates packages for the Python development virtualenv.
+#
+#        This task requires Internet access and may take some time. '''
+#    eprint( _render_boxed_title( 'Freshen: Development Dependencies' ) )
+#    context.run( 'pipenv update --dev', pty = on_tty )
 
 
 @task
@@ -309,13 +313,14 @@ def freshen_git_hooks( context ):
     eprint( _render_boxed_title( 'Freshen: SCM Hooks' ) )
     context.run(
         f"pre-commit autoupdate --config {paths.configuration.pre_commit}",
-        pty = True )
+        pty = True, **derive_venv_context_options( ) )
 
 
+# TODO: Freshen virtual environments.
 @task(
     pre = (
         clean,
-        freshen_pythons, freshen_pipenv,
+        freshen_pythons,
         freshen_git_modules, freshen_git_hooks,
     )
 )
@@ -329,7 +334,10 @@ def freshen( context ): # pylint: disable=unused-argument
 def lint_bandit( context ):
     ''' Security checks the source code with Bandit. '''
     eprint( _render_boxed_title( 'Lint: Bandit' ) )
-    context.run( f"bandit --recursive --verbose {paths.sources.p.python3}" )
+    # TODO? Use pty.
+    context.run(
+        f"bandit --recursive --verbose {paths.sources.p.python3}",
+        **derive_venv_context_options( ) )
 
 
 @task( iterable = ( 'packages', 'modules', 'files', ) )
@@ -350,7 +358,8 @@ def lint_mypy( context, packages, modules, files ):
     context.run(
         f"{environment_str} "
         f"mypy {configuration_str} "
-        f"{packages_str} {modules_str} {files_str}", pty = True )
+        f"{packages_str} {modules_str} {files_str}",
+        pty = True, **derive_venv_context_options( ) )
 
 
 @task( iterable = ( 'targets', 'checks', ) )
@@ -373,7 +382,8 @@ def lint_pylint( context, targets, checks ):
         "--disable=all --enable={}".format( ','.join( checks ) )
         if checks else '' )
     context.run(
-        f"pylint {reports_str} {checks_str} {targets_str}", pty = True )
+        f"pylint {reports_str} {checks_str} {targets_str}",
+        pty = True, **derive_venv_context_options( ) )
 
 
 @task
@@ -383,7 +393,8 @@ def lint_semgrep( context ):
     sgconfig_path = paths.scm_modules / 'semgrep-rules' / 'python' / 'lang'
     context.run(
         f"semgrep --config {sgconfig_path} --use-git-ignore "
-        f"{paths.sources.p.python3}", pty = stderr.isatty( ) )
+        f"{paths.sources.p.python3}",
+        pty = on_tty, **derive_venv_context_options( ) )
 
 
 @task( pre = (
@@ -400,30 +411,33 @@ def lint( context ): # pylint: disable=unused-argument
 def report_coverage( context ):
     ''' Combines multiple code coverage results into a single report. '''
     eprint( _render_boxed_title( 'Artifact: Code Coverage Report' ) )
-    context.run( 'coverage combine', pty = True )
-    context.run( 'coverage report', pty = True )
-    context.run( 'coverage html', pty = True )
-    context.run( 'coverage xml', pty = True )
+    context_options = derive_venv_context_options( )
+    context.run( 'coverage combine', pty = True, **context_options )
+    context.run( 'coverage report', pty = True, **context_options )
+    context.run( 'coverage html', pty = True, **context_options )
+    context.run( 'coverage xml', pty = True, **context_options )
 
 
 @task( pre = ( lint, ) )
-def test( context ):
-    ''' Runs the test suite with the current Python version. '''
-    eprint( _render_boxed_title( 'Test: Unit + Code Coverage' ) )
+def test( context, version = None ):
+    ''' Runs the test suite with current or specified Python version. '''
+    base_title = 'Test: Unit + Code Coverage'
+    if None is version: eprint( _render_boxed_title( base_title ) )
+    else: eprint( _render_boxed_title( f"{base_title} ({version})" ) )
+    context_options = derive_venv_context_options( version = version )
+    context_options[ 'env' ].update( dict(
+        HYPOTHESIS_STORAGE_DIRECTORY = paths.caches.hypothesis,
+    ) )
     context.run(
-        f"coverage run --source {project_name}", pty = True,
-        env = dict( HYPOTHESIS_STORAGE_DIRECTORY = paths.caches.hypothesis, ) )
+        f"coverage run --source {project_name}",
+        pty = True, **context_options )
 
 
 @task( pre = ( lint, ), post = ( report_coverage, ) )
 def test_all_versions( context ):
     ''' Runs the test suite across multiple, isolated Python versions. '''
-    eprint( _render_boxed_title( 'Test: Unit + Code Coverage (all Pythons)' ) )
-    context.run(
-        'tox --asdf-no-fallback --asdf-install', pty = True,
-        env = dict(
-            HYPOTHESIS_STORAGE_DIRECTORY = paths.caches.hypothesis,
-            _PROJECT_NAME = f"{project_name}" ) )
+    for version in indicate_python_versions_support( ):
+        test( context, version )
 
 
 @task
@@ -432,7 +446,8 @@ def check_urls( context ):
     eprint( _render_boxed_title( 'Test: Documentation URLs' ) )
     context.run(
         f"sphinx-build -b linkcheck {sphinx_options} "
-        f"{paths.sources.p.sphinx} {paths.artifacts.sphinx_linkcheck}" )
+        f"{paths.sources.p.sphinx} {paths.artifacts.sphinx_linkcheck}",
+        pty = on_tty, **derive_venv_context_options( ) )
 
 
 @task
@@ -440,7 +455,8 @@ def check_readme( context ):
     ''' Checks that the README will render correctly on PyPI. '''
     eprint( _render_boxed_title( 'Test: README Render' ) )
     path = _get_sdist_path( )
-    context.run( f"twine check {path}" )
+    context.run(
+        f"twine check {path}", pty = on_tty, **derive_venv_context_options( ) )
 
 
 @task( pre = ( test, check_urls, ), post = ( check_readme, ) )
@@ -449,7 +465,7 @@ def make_sdist( context ):
     eprint( _render_boxed_title( 'Artifact: Source Distribution' ) )
     _assert_gpg_tty( )
     path = _get_sdist_path( )
-    context.run( 'python3 setup.py sdist' )
+    context.run( 'python3 setup.py sdist', **derive_venv_context_options( ) )
     context.run( f"gpg --detach-sign --armor {path}", pty = True )
 
 
@@ -465,7 +481,8 @@ def make_wheel( context ):
     eprint( _render_boxed_title( 'Artifact: Python Wheel' ) )
     _assert_gpg_tty( )
     path = _get_wheel_path( )
-    context.run( 'python3 setup.py bdist_wheel' )
+    context.run(
+        'python3 setup.py bdist_wheel', **derive_venv_context_options( ) )
     context.run( f"gpg --detach-sign --armor {path}", pty = True )
 
 
@@ -482,7 +499,8 @@ def make_html( context ):
     _unlink_recursively( paths.artifacts.sphinx_html )
     context.run(
         f"sphinx-build -b html {sphinx_options} "
-        f"{paths.sources.p.sphinx} {paths.artifacts.sphinx_html}" )
+        f"{paths.sources.p.sphinx} {paths.artifacts.sphinx_html}",
+        pty = on_tty, **derive_venv_context_options( ) )
 
 
 @task( pre = ( clean, make_wheel, make_html, ) )
@@ -589,7 +607,7 @@ def bump( context, piece ):
         f"bumpversion --config-file={paths.configuration.bumpversion}"
         f" --current-version {current_version}"
         f" --new-version {new_version}"
-        f" {part}", pty = True )
+        f" {part}", pty = True, **derive_venv_context_options( ) )
 
 
 @task( post = ( call( bump, piece = 'patch' ), ) )
@@ -630,7 +648,8 @@ def check_code_style( context, write_changes = False ):
     yapf_options_string = ' '.join( yapf_options )
     context.run(
         f"git diff --unified=0 --no-color -- {paths.sources.p.python3} "
-        f"| yapf-diff {yapf_options_string}" )
+        f"| yapf-diff {yapf_options_string}",
+        pty = on_tty, **derive_venv_context_options( ) )
 
 
 @task( pre = ( test, ) )
@@ -661,13 +680,14 @@ def check_pip_install( context, index_url = '', version = None ):
         create_venv( venv_path, clear = True, with_pip = True )
         index_url_option = ''
         if index_url: index_url_option = f"--index-url {index_url}"
-        options = derive_python_venv_execution_options( context, venv_path )
+        context_options = derive_venv_context_options( venv_path )
         attempts_count_max = 2
         for attempts_count in range( attempts_count_max + 1 ):
             try:
                 context.run(
                     f"pip install {index_url_option} "
-                    f"  {project_name}=={version}", pty = True, **options )
+                    f"  {project_name}=={version}",
+                    pty = on_tty, **context_options )
             except Failure:
                 if attempts_count_max == attempts_count: raise
                 sleep( 2 ** attempts_count )
@@ -676,7 +696,8 @@ def check_pip_install( context, index_url = '', version = None ):
             f"import {project_name}; "
             f"print( {project_name}.__version__ )" )
         context.run(
-            f"python -c '{python_import_command}'", pty = True, **options )
+            f"python -c '{python_import_command}'",
+            pty = True, **context_options )
 
 
 @task
@@ -757,10 +778,11 @@ def _upload_pypi( context, repository_name = '' ):
         task_name_suffix = f" ({repository_name})"
     eprint( _render_boxed_title( f"Publication: PyPI{task_name_suffix}" ) )
     artifacts = _get_pypi_artifacts( )
+    context_options = derive_venv_context_options( )
+    context_options.update( _get_pypi_credentials( repository_name ) )
     context.run(
         f"twine upload --skip-existing --verbose {repository_option} "
-        f"{artifacts}",
-        env = _get_pypi_credentials( repository_name ), pty = True )
+        f"{artifacts}", pty = True, **context_options )
 
 
 def _get_pypi_artifacts( ):
@@ -818,3 +840,11 @@ def release_new_patch( context ): # pylint: disable=unused-argument
 @task( pre = ( bump_stage, push, upload_pypi, ) )
 def release_new_stage( context ): # pylint: disable=unused-argument
     ''' Unleashes a new stage upon the world. '''
+
+
+@task
+def run( context, command, version = None ):
+    ''' Runs command in virtual environment. '''
+    context.run(
+        command,
+        pty = on_tty, **derive_venv_context_options( version = version ) )
