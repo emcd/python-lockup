@@ -33,11 +33,12 @@ if required_version > version:
 del required_version, version, error_message, version_info
 
 
-from sys import stderr
+from sys import path as python_search_paths, stderr
 from os import environ as psenv
 #psenv[ 'DISTUTILS_DEBUG' ] = 'True'
 
 
+# TODO: Replace with something that ensures local setuptools.
 # Sanity check tools.
 try:
     from setuptools import setup
@@ -46,8 +47,20 @@ except ImportError as exc:
         f"ERROR: Module '{exc.name}' is not installed, "
         'but is required to build this package.', file = stderr )
     raise SystemExit( EX_UNAVAILABLE )
-# TODO: Check 'setuptools' version.
+
+
+from pathlib import Path
+project_path = Path( __file__ ).parent
+python_search_paths.insert(
+    0, str( project_path / '.local' / 'sources' / 'python3' ) )
+#from our_setuptools_shim import (
+#    generate_install_requirements,
+#    generate_setup_requirements,
+#)
 
 
 # https://docs.python.org/3/distutils/setupscript.html#writing-the-setup-script
-setup( )
+setup(
+#    setup_requires = generate_setup_requirements( ),
+#    install_requires = generate_install_requirements( ),
+)
