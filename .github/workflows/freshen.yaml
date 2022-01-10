@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Prepare
-        uses: emcd/python-lockup/.github/actions/python-venv@master
+        uses: emcd/python-lockup/.github/actions/python-venv@rm-pipenv
         with:
           python-version: all
       - name: Load PGP Key
@@ -21,7 +21,7 @@ jobs:
           git_user_signingkey: true
           gpg_private_key: '${{ secrets.GHA_COMMIT_SIGNING_KEY }}'
       - name: Freshen Project
-        run: pipenv run invoke freshen
+        run: invoke freshen
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
         with:

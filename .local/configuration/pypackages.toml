@@ -30,8 +30,6 @@ test = [
   'coverage[toml] >= 6.2',
   'hypothesis',
   'pytest',
-  'tox',
-  'tox-asdf',
 ]
 
 [installation]
