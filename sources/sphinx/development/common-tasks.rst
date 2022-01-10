@@ -19,7 +19,6 @@
 .. include:: <isopub.txt>
 
 .. _asdf: https://github.com/asdf-vm/asdf
-.. _pipenv: https://pypi.org/project/pipenv
 
 *******************************************************************************
 Common Tasks
@@ -30,19 +29,19 @@ are dependent upon other tasks. Traditionally, the :command:`make` command or
 a script or batch file would be used to automate such tasks. However, in to
 provide maximum portability and to reduce the number of languages that a
 developer needs to remember, we use a Python-native solution: `invoke
-<https://www.pyinvoke.org/>`_. The :command:`invoke` command is available as
-part of the virtual environment maintained by Pipenv for this project.
+<https://www.pyinvoke.org/>`_.
 
 Instead of defining tasks in a ``Makefile``, we instead define them as Python
 code in :file:`tasks`. To see a summary of the available tasks, you can
 execute::
 
-    pipenv run invoke --list
+    invoke --list
 
 We recommend the use of :command:`invoke` rather than running tools directly,
 since it performs environment sanitization and other frequently-overlooked
 tasks automatically, freeing you from fighting weird cache effects or various
-oversights, such as validating URLs in documentation or linting tests.
+oversights, such as validating URLs in documentation or linting tests. Our
+invoke_ tasks also operate in virtual environments, when necessary.
 
 Documentation
 ===============================================================================
@@ -54,7 +53,7 @@ using an extended form of the
 plaintext markup language. The sources for the documentation are under
 :file:`sources/sphinx`; the artifacts can be produced by::
 
-    pipenv run invoke make-html
+    invoke make-html
 
 Some useful references for editing the sources are:
 
@@ -95,7 +94,7 @@ Our primary Python linter is `Pylint <https://www.pylint.org/>`_.
 Note that we use this as an actual static analysis tool
 and not merely a style checker. You can lint the sources by::
 
-    pipenv run invoke lint
+    invoke lint
 
 *Why not use* `Flake8 <https://flake8.pycqa.org/en/latest/>`_ *?*
 
@@ -116,18 +115,14 @@ test functions rather than heavyweight `unittest
 extensive use of `parametrized tests
 <https://docs.pytest.org/en/stable/parametrize.html#parametrize-basics>`_ and
 `property-based testing <https://hypothesis.readthedocs.io/en/latest/>`_.  To
-run the test suite in the current virtual environment maintained by pipenv_,
-you can execute::
+run the test suite in a relevant virtual environment, you can execute::
 
-    pipenv run invoke test
+    invoke test
 
 To ensure that the test suite passes on all Python implementations,
 which are supported by the project, you can execute::
 
-    pipenv run invoke test-all-versions
+    invoke test-all-versions
 
-This may take a longer time to complete.  Under the covers, it is using `tox
-<https://pypi.org/project/tox>`_, which runs the test suite in an array of
-isolated virtual environments.  The virtual environments are instantiated via
-the `tox-asdf <https://pypi.org/project/tox-asdf/>`_ plugin, thus integrating
-with the Python implementations already available via asdf_.
+This may take a longer time to complete, as it iterates over all virtual
+environments associated with the project.

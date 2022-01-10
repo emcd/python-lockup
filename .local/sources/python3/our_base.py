@@ -21,10 +21,16 @@
 ''' Constants and utilities for project maintenance tasks. '''
 
 
+from collections.abc import Mapping as AbstractDictionary
+from functools import partial as partial_function
+from itertools import chain
 from pathlib import Path
 from shlex import split as split_command
 from subprocess import run
-from sys import path as python_search_paths
+from sys import (
+    executable as active_python_path,
+    path as python_search_paths,
+)
 from types import SimpleNamespace
 
 
@@ -129,19 +135,51 @@ def _calculate_tests_paths( paths_ ):
 paths = _calculate_paths( )
 
 
-def ensure_directory( path ):
-    ''' Ensures existence of directory, creating if necessary. '''
-    path.mkdir( parents = True, exist_ok = True )
-    return path
+standard_execute_external = partial_function(
+    run, check = True, capture_output = True, text = True )
+
+
+def collapse_multilevel_dictionary( dictionary ):
+    ''' Collapses a hierarchical dictionary into a list. '''
+    return tuple( chain.from_iterable(
+        (   collapse_multilevel_dictionary( value )
+            if isinstance( value, AbstractDictionary ) else value )
+        for value in dictionary.values( ) ) )
+
+
+def indicate_python_package_dependencies( ):
+    ''' Returns dictionary of Python package dependencies. '''
+    ensure_python_package( 'tomli' )
+    from tomli import load
+    with paths.configuration.pypackages.open( 'rb' ) as file:
+        return load( file )
 
 
 def ensure_python_package( package_name ):
     ''' Ensures local availability of Python package. '''
-    cache_path = ensure_directory( paths.caches.packages.python3 )
+    # If 'pip' module is not available, then assume PEP 517 build in progress,
+    # which should have already ensured packages from 'build-requires'.
+    try: import pip # pylint: disable=unused-import
+    except ImportError: return
+    abi_label = calculate_abi_label( )
+    cache_path = ensure_directory( paths.caches.packages.python3 / abi_label )
     if cache_path not in python_search_paths:
-        python_search_paths.insert( 0, cache_path )
-    run(
+        python_search_paths.insert( 0, str( cache_path ) )
+    standard_execute_external(
         ( *split_command( 'pip install --upgrade --target' ),
-          cache_path, package_name ),
-        check = True, capture_output = True )
-    # TODO: Verify package installation and return path to it.
+          cache_path, package_name ) )
+
+
+def calculate_abi_label( python_path = active_python_path ):
+    ''' Returns ABI label for Python at specified path.
+
+        If no path is provided, then calculates from Python in current use. '''
+    abi_detector_path = paths.scripts.d.python3 / 'report-abi.py'
+    return standard_execute_external(
+        ( python_path, abi_detector_path ) ).stdout.strip( )
+
+
+def ensure_directory( path ):
+    ''' Ensures existence of directory, creating if necessary. '''
+    path.mkdir( parents = True, exist_ok = True )
+    return path

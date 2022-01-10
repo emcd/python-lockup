@@ -74,50 +74,14 @@ generalized version manager, such as asdf_, can be reused consistently across
 all projects, regardless of their implementation language, whereas pyenv_
 cannot.
 
-`pipenv <https://pypi.org/project/pipenv>`_
+`pipx <https://github.com/pypa/pipx>`_
 ===============================================================================
 
-If you have done any significant amount of Python development
-or have tried using Python on a machine where you do not have administrative
-privileges, then you have probably encountered the concept of virtual
-environments to provide sandboxes into which you can install packages.
-Traditionally, you would have to create such virtual environments,
-"activate" them, and then install packages into them. The creation of such an
-environment may involve a tool,
-like `virtualenv <https://virtualenv.pypa.io/en/latest>`_,
-or the `venv <https://docs.python.org/3/library/venv.html>`_ module
-that comes with all recent versions of Python 3. Activation of such an
-environment typically involves using a shell script. And, installing
-into an activated environment is commonly done by running
-`pip <https://pypi.org/project/pip>`_ from within that environment.
-All of that is a lot of work if you simply want to play in a sandbox
-- and you do not even get reproducible installations for your hassle.
-
-The pipenv_ tool is a very respectable solution to the above problems.
-It creates a virtual environment and can transparently install packages
-into it. Installed development dependencies and runtime dependencies
-are both tracked as separate categories within a ``Pipfile``.
-This grants portability and reproducibility of development
-environments and removes the need to maintain various ``requirements.txt``
-files. Furthermore, the ``pipenv shell`` and ``pipenv run`` commands are
-very useful for iterating on dependency changes during development.
-For these reasons, we strongly recommend installing and using this tool.
-
-We provide a ``Pipfile`` in the top level of the project repository. After
-you clone the project and have installed pipenv_, just run::
-
-    pipenv sync --dev
-
-to prepare a virtual environment for development.
-
-To use certain development tools that we support, you may need to install
-some packages with your OS package manager first:
-
-.. tab:: apt
-
-    .. code-block:: sh
-
-        sudo apt update && sudo apt install gpg
+Pipx is a tool for running Python applications in isolated environments. It can
+be installed non-intrusively onto a system, such that it does not require
+administrative privileges and minimizes "pollution" to an existing Python
+installation. With pipx_ installed, you can easily make additional Python tools
+available for use without disrupting an existing Python installation.
 
 `invoke <https://www.pyinvoke.org>`_
 ===============================================================================
@@ -127,12 +91,26 @@ uploading a new release, etc... can be automated. We use invoke_ to run such
 automations. It has various nice features, such as the ability to tee standard
 output streams, run commands in a pseudo-TTY, manage dependencies between
 tasks - to name a few. The :file:`tasks` directory contains the various task
-definitions available for use within the project. In the top-level directory of
-the project, assuming you have installed invoke_, you can run::
+definitions available for use within the project. If you do not already have
+invoke_ installed, then the recommended method of installation is::
+
+    pipx install invoke
+
+In the top-level directory of the project, assuming you have installed invoke_,
+you can run::
 
     invoke --list
 
 to see a list of the available development tasks.
+
+To use certain development tools that we support, you may need to install
+some packages with your OS package manager first:
+
+.. tab:: apt
+
+    .. code-block:: sh
+
+        sudo apt update && sudo apt install gpg
 
 Contrasts to Alternatives
 -------------------------------------------------------------------------------
@@ -177,7 +155,7 @@ This ensures that project standards for things, such as maximum line length,
 trailing whitespace, and indentation are enforced without the need
 for lots of editor-specific configurations to be distributed with the project.
 We recommend that you install an EditorConfig plugin for your editor of choice,
-if necessary. We provide an ``.editorconfig`` file at the top level
+if necessary. We provide an :file:`.editorconfig` file at the top level
 of the project repository; this file has configurations relevant
 to the project.
 
