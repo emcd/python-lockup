@@ -83,6 +83,13 @@ nitpick_ignore = [
     ( 'py:class', "None.  Remove all items from D.", ),
 ]
 
+# -- Options for linkcheck builder -------------------------------------------
+
+linkcheck_ignore = [
+    # Circular dependency between building HTML and publishing it.
+    # Ideally, we want to warn on failure rather than ignore.
+    fr'https://emcd\.github\.io/.*{project}.*/.*',
+]
 
 # -- Options for HTML output -------------------------------------------------
 
