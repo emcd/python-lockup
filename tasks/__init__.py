@@ -334,17 +334,17 @@ def freshen( context ): # pylint: disable=unused-argument
 def lint_bandit( context ):
     ''' Security checks the source code with Bandit. '''
     eprint( _render_boxed_title( 'Lint: Bandit' ) )
-    # TODO? Use pty.
     context.run(
         f"bandit --recursive --verbose {paths.sources.p.python3}",
-        **derive_venv_context_options( ) )
+        pty = True, **derive_venv_context_options( ) )
 
 
 @task( iterable = ( 'packages', 'modules', 'files', ) )
 def lint_mypy( context, packages, modules, files ):
     ''' Lints the source code with Mypy. '''
     eprint( _render_boxed_title( 'Lint: MyPy' ) )
-    if not which( 'mypy' ):
+    context_options = derive_venv_context_options( )
+    if not which( 'mypy', path = context_options[ 'env' ][ 'PATH' ] ):
         eprint( 'Mypy not available on this platform. Skipping.' )
         return
     environment_str = f"MYPYPATH={paths.project}:{paths.sources.p.python3}"
@@ -359,14 +359,15 @@ def lint_mypy( context, packages, modules, files ):
         f"{environment_str} "
         f"mypy {configuration_str} "
         f"{packages_str} {modules_str} {files_str}",
-        pty = True, **derive_venv_context_options( ) )
+        pty = True, **context_options )
 
 
 @task( iterable = ( 'targets', 'checks', ) )
 def lint_pylint( context, targets, checks ):
     ''' Lints the source code with Pylint. '''
     eprint( _render_boxed_title( 'Lint: Pylint' ) )
-    if not which( 'pylint' ):
+    context_options = derive_venv_context_options( )
+    if not which( 'pylint', path = context_options[ 'env' ][ 'PATH' ] ):
         eprint( 'Pylint not available on this platform. Skipping.' )
         return
     reports_str = '--reports=no --score=no' if targets or checks else ''
@@ -383,7 +384,7 @@ def lint_pylint( context, targets, checks ):
         if checks else '' )
     context.run(
         f"pylint {reports_str} {checks_str} {targets_str}",
-        pty = True, **derive_venv_context_options( ) )
+        pty = True, **context_options )
 
 
 @task
