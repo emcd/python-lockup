@@ -171,6 +171,11 @@ def build_python_venv( context, version, overwrite = False ):
     context.run(
         f"{python_path} -m venv {venv_options_str} {venv_path}", pty = True )
     context_options = derive_venv_context_options( venv_path )
+    # As of this writing (2022-01-16), Setuptools >= 60 breaks Pyston.
+    # https://github.com/pyston/pyston/issues/152
+    # TODO: Remove this hack when possible.
+    if version.startswith( 'pyston' ):
+        context_options[ 'env' ][ 'SETUPTOOLS_USE_DISTUTILS' ] = 'stdlib'
     context.run(
         'pip install --upgrade setuptools pip wheel',
         pty = on_tty, **context_options )
