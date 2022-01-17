@@ -37,9 +37,14 @@ Code of Conduct
 
 Please take a look at:
 
+* `How do I ask a good question? <https://stackoverflow.com/help/how-to-ask>`_
+
 * `How to Ask Questions the Smart Way
   <http://www.catb.org/~esr/faqs/smart-questions.html>`_ (but understand that
   some of the showcased responses to "stupid questions" may not be acceptable)
+
+* `How do I write a good answer?
+  <https://stackoverflow.com/help/how-to-answer>`_
 
 * `Python Software Foundation Code of Conduct
   <https://www.python.org/psf/conduct/>`_ (in particular, the ``Our Community``
@@ -63,7 +68,8 @@ as well as note the following bullet points from the `Rust Code of Conduct
 
 Please act in the spirit of respect for others, whether you are asking
 questions, providing feedback, or answering questions. Please remember that
-volunteerism powers much of the open source available for you to use.
+volunteerism by real human beings, like yourself, powers much of the open
+source available for you to use.
 
 Also, no need to create noise with "+1" or "me too" comments in issue
 tracker threads. Please only add substantive comments that will further advance
