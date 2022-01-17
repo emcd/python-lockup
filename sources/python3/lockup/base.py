@@ -371,7 +371,7 @@ class Class( type ):
     def __dir__( class_ ): return select_public_attributes( __class__, class_ )
 
 
-if python_implementation.name in ( 'cpython', ): # pragma: no branch
+if python_implementation.name in ( 'cpython', 'pyston', ): # pragma: no branch
 
     def _make_god_unto_itself( factory ):
         ''' Turns a class factory class into the factory for itself. '''
@@ -379,7 +379,7 @@ if python_implementation.name in ( 'cpython', ): # pragma: no branch
             raise InvalidState # pragma: no cover
         from ctypes import Structure, c_ssize_t, c_void_p
         import sys
-        # Detect whether CPython is compiled with the 'TRACE_REFS' macro.
+        # Detect if compiled with the 'TRACE_REFS' macro.
         trace_refs = hasattr( sys, 'getobjects' )
         class PyObject( Structure ):
             ''' Structural representation of :c:struct:`PyObject`. '''
