@@ -110,7 +110,7 @@ some packages with your OS package manager first:
 
     .. code-block:: sh
 
-        sudo apt update && sudo apt install gpg
+        sudo apt update && sudo apt install gpg rustc
 
 Contrasts to Alternatives
 -------------------------------------------------------------------------------
