@@ -17,6 +17,8 @@
 #                                                                            #
 #============================================================================#
 
+# TODO: Refactor module.
+# pylint: disable=too-many-lines
 
 ''' Project maintenance tasks, executed via :command:`invoke`.
 
@@ -31,14 +33,18 @@ import re
 
 from contextlib import ExitStack as CMStack
 from itertools import chain
-from json import load as json_load
+from json import load as load_json
 from os import environ as psenv
 from pathlib import Path
-from shlex import quote as shell_quote
+from shlex import (
+    split as split_command,
+    quote as shell_quote,
+)
 from shutil import which
 from sys import stderr
 from tempfile import NamedTemporaryFile, TemporaryDirectory
 from time import sleep
+from types import SimpleNamespace
 from urllib.error import URLError as UrlError
 from urllib.parse import urlparse
 from urllib.request import ( Request as HttpRequest, urlopen, )
@@ -51,13 +57,17 @@ from .base import (
     derive_venv_path,
     detect_vmgr_python_path,
     eprint, epprint,
-    generate_pip_requirements,
+    generate_pip_requirements_text,
     indicate_python_versions_support,
     on_tty,
     paths,
 )
 from our_base import (
     ensure_directory,
+    ensure_python_package,
+    identify_python,
+    indicate_python_packages,
+    standard_execute_external,
 )
 
 
@@ -171,26 +181,13 @@ def build_python_venv( context, version, overwrite = False ):
     context.run(
         f"{python_path} -m venv {venv_options_str} {venv_path}", pty = True )
     context_options = derive_venv_context_options( venv_path )
-    # As of this writing (2022-01-16), Setuptools >= 60 breaks Pyston.
-    # https://github.com/pyston/pyston/issues/152
-    # TODO: Remove this hack when possible.
-    if version.startswith( 'pyston' ):
-        context_options[ 'env' ][ 'SETUPTOOLS_USE_DISTUTILS' ] = 'stdlib'
-    context.run(
-        'pip install --upgrade setuptools pip wheel',
-        pty = on_tty, **context_options )
-    requirements = generate_pip_requirements( )
-    # Unfortunately, Pip does not support reading requirements from stdin,
-    # as of 2022-01-02. To workaround, we need to write and then read
-    # a temporary file. More details: https://github.com/pypa/pip/issues/7822
-    with NamedTemporaryFile( mode = 'w+' ) as requirements_file:
-        requirements_file.write( requirements )
-        requirements_file.flush( )
-        context.run(
-            "pip install --upgrade --requirement {requirements_file}".format(
-                requirements_file = shell_quote( requirements_file.name ) ),
-            pty = on_tty, **context_options )
-    context.run( 'pip install --editable .', pty = on_tty, **context_options )
+    install_python_packages( context, context_options )
+    fixtures = calculate_python_packages_fixtures( context_options )
+    identifier = identify_python(
+        'pep508-environment',
+        python_path = which(
+            'python', path = context_options[ 'env' ][ 'PATH' ] ) )
+    record_python_packages_fixtures( identifier, fixtures )
 
 
 @task( pre = ( build_python_venvs, install_git_hooks, ) )
@@ -232,27 +229,73 @@ def clean_tool_caches( context ): # pylint: disable=unused-argument
     _unlink_recursively( paths.caches.eggs )
 
 
-# TODO: Remove excess Pip-installed packages directly.
-#@task
-#def clean_pipenv( context ):
-#    ''' Removes unused packages in the Python development virtualenv. '''
-#    eprint( _render_boxed_title( 'Clean: Orphan Packages' ) )
-#    context.run( 'pipenv clean', pty = True )
+@task
+def clean_pythons_packages( context ):
+    ''' Removes unused Python packages in all virtual environments. '''
+    for version in indicate_python_versions_support( ):
+        clean_python_packages( context, version )
 
 
-@task( pre = ( clean_pycaches, clean_tool_caches, ) )
+@task
+def clean_python_packages( context, version = None ):
+    ''' Removes unused Python packages in virtual environment. '''
+    base_title = 'Clean: Unused Python Packages'
+    if None is version: eprint( _render_boxed_title( base_title ) )
+    else: eprint( _render_boxed_title( f"{base_title} ({version})" ) )
+    context_options = derive_venv_context_options( version = version )
+    identifier = identify_python(
+        'pep508-environment',
+        python_path = which(
+            'python', path = context_options[ 'env' ][ 'PATH' ] ) )
+    _, fixtures = indicate_python_packages( identifier = identifier )
+    requested = frozenset( fixture[ 'name' ] for fixture in fixtures )
+    installed = frozenset(
+        entry.requirement.name
+        for entry in indicate_current_python_packages( context_options ) )
+    requirements_text = '\n'.join( installed - requested - { project_name } )
+    if not requirements_text: return
+    execute_pip_with_requirements(
+        context, context_options, 'uninstall', requirements_text,
+        pip_options = ( '--yes', ) )
+
+
+def execute_pip_with_requirements(
+    context, context_options, command, requirements, pip_options = None
+):
+    ''' Executes a Pip command with requirements.
+
+        (This task requires Internet access and may take some time. '''
+    pip_options = pip_options or ( )
+    # Unfortunately, Pip does not support reading requirements from stdin,
+    # as of 2022-01-02. To workaround, we need to write and then read
+    # a temporary file. More details: https://github.com/pypa/pip/issues/7822
+    with NamedTemporaryFile( mode = 'w+' ) as requirements_file:
+        requirements_file.write( requirements )
+        requirements_file.flush( )
+        context.run(
+            "pip {command} {options} --requirement {requirements_file}".format(
+                command = command,
+                options = ' '.join( pip_options ),
+                requirements_file = shell_quote( requirements_file.name ) ),
+            pty = on_tty, **context_options )
+
+
+
+@task( pre = ( clean_pythons_packages, clean_pycaches, clean_tool_caches, ) )
 def clean( context ): # pylint: disable=unused-argument
     ''' Cleans all caches. '''
 
 
-# TODO: Check security of Pip-installed packages directly.
-#@task
-#def check_pipenv_security( context ):
-#    ''' Checks for security issues in utilized packages and tools.
-#
-#        This task requires Internet access and may take some time. '''
-#    eprint( _render_boxed_title( 'Lint: Package Security' ) )
-#    context.run( 'pipenv check', pty = True )
+@task
+def check_python_packages_security( context, version = None ):
+    ''' Checks for security issues in utilized packages and tools.
+
+        This task requires Internet access and may take some time. '''
+    base_title = 'Lint: Package Security'
+    if None is version: eprint( _render_boxed_title( base_title ) )
+    else: eprint( _render_boxed_title( f"{base_title} ({version})" ) )
+    context_options = derive_venv_context_options( version = version )
+    context.run( f"safety check", pty = on_tty, **context_options )
 
 
 @task
@@ -289,14 +332,128 @@ def freshen_pythons( context ):
         versions = ' '.join( latest_versions ) ), pty = True )
 
 
-# TODO: Replace with Pip-specific refresher.
-#@task( post = ( clean_pipenv, check_pipenv_security, ) )
-#def freshen_pipenv( context ):
-#    ''' Updates packages for the Python development virtualenv.
-#
-#        This task requires Internet access and may take some time. '''
-#    eprint( _render_boxed_title( 'Freshen: Development Dependencies' ) )
-#    context.run( 'pipenv update --dev', pty = on_tty )
+@task
+def freshen_pythons_packages( context ):
+    ''' Updates Python packages in all virtual environments. '''
+    for version in indicate_python_versions_support( ):
+        freshen_python_packages( context, version )
+
+
+@task
+def freshen_python_packages( context, version = None ):
+    ''' Updates Python packages in virtual environment. '''
+    base_title = 'Freshen: Python Package Versions'
+    if None is version: eprint( _render_boxed_title( base_title ) )
+    else: eprint( _render_boxed_title( f"{base_title} ({version})" ) )
+    context_options = derive_venv_context_options( version = version )
+    identifier = identify_python(
+        'pep508-environment',
+        python_path = which(
+            'python', path = context_options[ 'env' ][ 'PATH' ] ) )
+    install_python_packages( context, context_options )
+    fixtures = calculate_python_packages_fixtures( context_options )
+    record_python_packages_fixtures( identifier, fixtures )
+    check_python_packages_security( context, version = version )
+    test( context, version = version )
+
+
+def calculate_python_packages_fixtures( context_options ):
+    ''' Calculates Python package fixtures, such as digests or URLs. '''
+    fixtures = [ ]
+    for entry in indicate_current_python_packages( context_options ):
+        requirement = entry.requirement
+        fixture = dict( name = requirement.name )
+        if 'editable' in entry.flags: continue
+        if requirement.url: fixture.update( dict( url = requirement.url, ) )
+        else:
+            package_version = next( iter( requirement.specifier ) ).version
+            fixture.update( dict(
+                version = package_version,
+                digests = tuple( map(
+                    lambda s: f"sha256:{s}",
+                    aggregate_pypi_release_digests(
+                        requirement.name, package_version )
+                ) )
+            ) )
+        fixtures.append( fixture )
+    return fixtures
+
+
+def install_python_packages( context, context_options, identifier = None ):
+    ''' Installs required Python packages into virtual environment. '''
+    raw, frozen, unpublished = generate_pip_requirements_text(
+        identifier = identifier )
+    context.run(
+        'pip install --upgrade setuptools pip wheel',
+        pty = on_tty, **context_options )
+    if not identifier or not frozen:
+        pip_options = [ ]
+        if not identifier: pip_options.append( '--upgrade' )
+        execute_pip_with_requirements(
+            context, context_options, 'install', raw,
+            pip_options = pip_options )
+    else:
+        pip_options = [ '--require-hashes' ]
+        execute_pip_with_requirements(
+            context, context_options, 'install', frozen,
+            pip_options = pip_options )
+    if unpublished:
+        execute_pip_with_requirements(
+            context, context_options, 'install', unpublished )
+    # Pip cannot currently mix editable and digest-bound requirements,
+    # so we must install editable packages separately. (As of 2022-02-06.)
+    # https://github.com/pypa/pip/issues/4995
+    context.run( 'pip install --editable .', pty = on_tty, **context_options )
+
+
+def indicate_current_python_packages( context_options ):
+    ''' Returns currently-installed Python packages. '''
+    ensure_python_package( 'packaging' )
+    from packaging.requirements import Requirement
+    entries = [ ]
+    for line in standard_execute_external(
+        split_command( 'pip freeze' ), env = context_options[ 'env' ]
+    ).stdout.strip( ).splitlines( ):
+        entry = SimpleNamespace( flags = [ ] )
+        if line.startswith( '-e' ):
+            entry.flags.append( 'editable' )
+            # Replace '-e' with '{package_name}@'.
+            line = ' '.join( (
+                line.rsplit( '=', maxsplit = 1 )[ -1 ] + '@',
+                line.split( ' ', maxsplit = 1 )[ 1 ]
+            ) )
+        entry.requirement = Requirement( line )
+        entries.append( entry )
+    return entries
+
+
+pypi_release_digests_cache = { }
+def aggregate_pypi_release_digests( name, version, index_url = '' ):
+    ''' Aggregates hashes for release on PyPI. '''
+    cache_index = ( index_url, name, version )
+    digests = pypi_release_digests_cache.get( cache_index )
+    if digests: return digests
+    release_info = retrieve_pypi_release_information(
+        name, version, index_url = index_url )
+    digests = [
+        package_info[ 'digests' ][ 'sha256' ]
+        for package_info in release_info ]
+    pypi_release_digests_cache[ cache_index ] = digests
+    return digests
+
+
+def record_python_packages_fixtures( identifier, fixtures ):
+    ''' Records table of Python packages fixtures. '''
+    ensure_python_package( 'tomli' )
+    from tomli import load
+    ensure_python_package( 'tomli-w' )
+    from tomli_w import dump
+    fixtures_path = paths.configuration.pypackages_fixtures
+    if fixtures_path.exists( ):
+        with fixtures_path.open( 'rb' ) as file: document = load( file )
+    else: document = { }
+    document[ identifier ] = fixtures
+    with fixtures_path.open( 'wb' ) as file: dump( document, file )
 
 
 @task
@@ -321,11 +478,10 @@ def freshen_git_hooks( context ):
         pty = True, **derive_venv_context_options( ) )
 
 
-# TODO: Freshen virtual environments.
 @task(
     pre = (
         clean,
-        freshen_pythons,
+        freshen_pythons, freshen_pythons_packages,
         freshen_git_modules, freshen_git_hooks,
     )
 )
@@ -707,28 +863,38 @@ def check_pip_install( context, index_url = '', version = None ):
 
 
 @task
-def check_pypi_integrity( context, index_url = '' ):
-    ''' Checks integrity of current package uploads on PyPI. '''
-    index_url = index_url or 'https://pypi.org'
-    project_url = f"{index_url}/pypi/{project_name}/json"
-    project_version = parse_project_version( )
-    request = HttpRequest(
-        project_url, headers = { 'Accept': 'application/json', } )
-    attempts_count_max = 2
-    for attempts_count in range( attempts_count_max + 1 ):
-        try:
-            with urlopen( request ) as http_reader:
-                packages_info = json_load(
-                    http_reader )[ 'releases' ][ project_version ]
-        except ( KeyError, UrlError, ):
-            if attempts_count_max == attempts_count: raise
-            sleep( 2 ** attempts_count )
-        else: break
-    for package_info in packages_info:
+def check_pypi_integrity( context, version = None, index_url = '' ):
+    ''' Checks integrity of project packages on PyPI.
+        If no version is provided, the current project version is used.
+
+        This task requires Internet access and may take some time. '''
+    version = version or parse_project_version( )
+    eprint( _render_boxed_title(
+        f"Verify: Python Package Integrity ({version})" ) )
+    release_info = retrieve_pypi_release_information(
+        project_name, version, index_url = index_url )
+    for package_info in release_info:
         url = package_info[ 'url' ]
         if not package_info.get( 'has_sig', False ):
             raise Exit( f"No signature found for: {url}" )
         check_pypi_package( context, url )
+
+
+def retrieve_pypi_release_information( name, version, index_url = '' ): # pylint: disable=inconsistent-return-statements
+    ''' Retrieves information about specific release on PyPI. '''
+    index_url = index_url or 'https://pypi.org'
+    # https://warehouse.pypa.io/api-reference/json.html#release
+    request = HttpRequest(
+        f"{index_url}/pypi/{name}/json",
+        headers = { 'Accept': 'application/json', } )
+    attempts_count_max = 2
+    for attempts_count in range( attempts_count_max + 1 ):
+        try:
+            with urlopen( request ) as http_reader:
+                return load_json( http_reader )[ 'releases' ][ version ]
+        except ( KeyError, UrlError, ):
+            if attempts_count_max == attempts_count: raise
+            sleep( 2 ** attempts_count )
 
 
 def check_pypi_package( context, package_url ):
