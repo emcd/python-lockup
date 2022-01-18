@@ -17,12 +17,14 @@ lint = [
   'pre-commit',
   # Pylint relies on 'typed_ast', which does not build under PyPy. (As of 2021-12-23.)
   'pylint; implementation_name != "pypy"',
+  'safety',
   'semgrep',
 ]
 management = [
   'bump2version',
   'invoke',
   'tomli',
+  'tomli-w',
   'twine',
 ]
 test = [

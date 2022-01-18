@@ -86,6 +86,7 @@ def _calculate_configuration_paths( paths_ ):
         mypy = configuration_path / 'mypy.ini',
         pre_commit = configuration_path / 'pre-commit.yaml',
         pypackages = configuration_path / 'pypackages.toml',
+        pypackages_fixtures = configuration_path / 'pypackages.fixtures.toml',
         pyproject = paths_.project / 'pyproject.toml',
         # TODO: Remove setuptools configuration once migration is finished.
         setuptools = paths_.project / 'setup.cfg',
@@ -147,12 +148,21 @@ def collapse_multilevel_dictionary( dictionary ):
         for value in dictionary.values( ) ) )
 
 
-def indicate_python_package_dependencies( ):
-    ''' Returns dictionary of Python package dependencies. '''
+def indicate_python_packages( identifier = None ):
+    ''' Returns lists of Python package dependencies.
+
+        First is raw list of dependencies.
+        Second is list of dependency fixtures (fixed on digest). '''
     ensure_python_package( 'tomli' )
     from tomli import load
+    fixtures_path = paths.configuration.pypackages_fixtures
+    if identifier and fixtures_path.exists( ):
+        with fixtures_path.open( 'rb' ) as file:
+            fixtures = load( file ).get( identifier, [ ] )
+    else: fixtures = [ ]
     with paths.configuration.pypackages.open( 'rb' ) as file:
-        return load( file )
+        simples = load( file )
+    return simples, fixtures
 
 
 def ensure_python_package( package_name ):
@@ -161,7 +171,7 @@ def ensure_python_package( package_name ):
     # which should have already ensured packages from 'build-requires'.
     try: import pip # pylint: disable=unused-import
     except ImportError: return
-    abi_label = calculate_abi_label( )
+    abi_label = identify_python( 'bdist-compatibility' )
     cache_path = ensure_directory( paths.caches.packages.python3 / abi_label )
     if cache_path not in python_search_paths:
         python_search_paths.insert( 0, str( cache_path ) )
@@ -170,13 +180,13 @@ def ensure_python_package( package_name ):
           cache_path, package_name ) )
 
 
-def calculate_abi_label( python_path = active_python_path ):
-    ''' Returns ABI label for Python at specified path.
+def identify_python( mode, python_path = active_python_path ):
+    ''' Reports compatibility identifier for Python at given path.
 
         If no path is provided, then calculates from Python in current use. '''
-    abi_detector_path = paths.scripts.d.python3 / 'report-abi.py'
+    detector_path = paths.scripts.d.python3 / 'identify-python.py'
     return standard_execute_external(
-        ( python_path, abi_detector_path ) ).stdout.strip( )
+        ( python_path, detector_path, '--mode', mode ) ).stdout.strip( )
 
 
 def ensure_directory( path ):
