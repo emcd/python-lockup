@@ -23,14 +23,11 @@
 
 from our_base import (
     collapse_multilevel_dictionary,
-    indicate_python_package_dependencies,
+    indicate_python_packages,
 )
 
 
-def generate_installation_requirements( folio = None ):
-    ''' Generates setuptools install requirements from packages folio.
-
-        Uses the complete folio from local configuration by default. '''
-    # TODO: Handle structured entries.
-    return collapse_multilevel_dictionary( (
-        folio or indicate_python_package_dependencies( ) )[ 'installation' ] )
+def generate_installation_requirements( ):
+    ''' Generates setuptools install requirements from local configuration. '''
+    simples, _ = indicate_python_packages( )
+    return collapse_multilevel_dictionary( simples[ 'installation' ] )

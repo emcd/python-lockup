@@ -29,14 +29,15 @@ from pathlib import Path
 from pprint import pprint
 from shlex import split as split_command
 from sys import path as python_search_paths, stderr
+from types import SimpleNamespace
 
 project_path = Path( __file__ ).parent.parent
 python_search_paths.insert(
     0, str( project_path / '.local' / 'sources' / 'python3' ) )
 from our_base import (
-    calculate_abi_label,
     collapse_multilevel_dictionary,
-    indicate_python_package_dependencies,
+    identify_python,
+    indicate_python_packages,
     paths,
     standard_execute_external,
 )
@@ -74,7 +75,8 @@ def derive_venv_path( version = None, python_path = None ):
             venv_path = Path( psenv[ 'VIRTUAL_ENV' ] )
             if venv_path.name == psenv[ 'OUR_VENV_NAME' ]: return venv_path
     if None is python_path: python_path = detect_vmgr_python_path( )
-    abi_label = calculate_abi_label( python_path )
+    abi_label = identify_python(
+        'bdist-compatibility', python_path = python_path )
     return paths.environments / abi_label
 
 
@@ -111,11 +113,25 @@ def indicate_python_versions_support( ):
         return regex.match( file.read( ) )[ 1 ].split( )
 
 
-def generate_pip_requirements( folio = None ):
-    ''' Generates Pip requirements list from packages folio.
+def generate_pip_requirements_text( identifier = None ):
+    ''' Generates Pip requirements lists from local configuration.
 
-        Uses the complete folio from local configuration by default. '''
-    folio = collapse_multilevel_dictionary(
-        folio or indicate_python_package_dependencies( ) )
-    # TODO: Handle structured entries.
-    return '\n'.join( folio )
+        First list is unfrozen requirements.
+        Second list is frozen requirements. '''
+    # https://pip.pypa.io/en/stable/reference/requirements-file-format/
+    # https://pip.pypa.io/en/stable/topics/repeatable-installs/
+    simples, fixtures = indicate_python_packages( identifier = identifier )
+    # Pip cannot currently mix frozen and unfrozen requirements,
+    # so we must split them out. (As of 2022-02-06.)
+    # https://github.com/pypa/pip/issues/6469
+    raw, frozen, unpublished = [ ], [ ], [ ]
+    for fixture in map( lambda d: SimpleNamespace( **d ), fixtures ):
+        name = fixture.name
+        if hasattr( fixture, 'url' ):
+            unpublished.append( f"{name}@ {fixture.url}" )
+        elif hasattr( fixture, 'digests' ):
+            options = ' \\\n    '.join(
+                f"--hash {digest}" for digest in fixture.digests )
+            frozen.append( "{name}=={fixture.version} \\\n    {options}" )
+    raw.extend( collapse_multilevel_dictionary( simples ) )
+    return '\n'.join( raw ), '\n'.join( frozen ), '\n'.join( unpublished )
