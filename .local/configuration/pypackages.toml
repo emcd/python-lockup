@@ -1,8 +1,7 @@
 [development]
 format = [
-  # Latest release of YAPF is missing full support for 'yapf-diff'
-  # and hence a Git commit hash is used instead. (As of 2021-12-23.)
-  'yapf @ git+https://github.com/google/yapf.git@9d6808a3d9b9a0ea40efea0c7cc3247464dbc291',
+  # YAPF 0.31 is missing full support for 'yapf-diff'.
+  'yapf >= 0.32',
 ]
 documentation = [
   'furo',
