@@ -552,11 +552,14 @@ def lint_pylint( context, targets, checks ):
 def lint_semgrep( context ):
     ''' Lints the source code with Semgrep. '''
     eprint( _render_boxed_title( 'Lint: Semgrep' ) )
+    context_options = derive_venv_context_options( )
+    if not which( 'semgrep', path = context_options[ 'env' ][ 'PATH' ] ):
+        eprint( 'Semgrep not available on this platform. Skipping.' )
+        return
     sgconfig_path = paths.scm_modules / 'semgrep-rules' / 'python' / 'lang'
     context.run(
         f"semgrep --config {sgconfig_path} --use-git-ignore "
-        f"{paths.sources.p.python3}",
-        pty = on_tty, **derive_venv_context_options( ) )
+        f"{paths.sources.p.python3}", pty = on_tty, **context_options )
 
 
 @task( pre = (
