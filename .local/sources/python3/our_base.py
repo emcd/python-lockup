@@ -75,6 +75,7 @@ def _calculate_caches_paths( paths_ ):
             python3 = packages_path / 'python3',
         ),
         sphinx = caches_path / 'sphinx',
+        setuptools = caches_path / 'setuptools',
     )
 
 
@@ -146,6 +147,17 @@ def collapse_multilevel_dictionary( dictionary ):
         (   collapse_multilevel_dictionary( value )
             if isinstance( value, AbstractDictionary ) else value )
         for value in dictionary.values( ) ) )
+
+
+def discover_project_information( ):
+    ''' Discovers information about project from local configuration. '''
+    ensure_python_package( 'tomli' )
+    from tomli import load
+    with paths.configuration.pyproject.open( 'rb' ) as file:
+        tables = load( file )
+    information = tables[ 'project' ]
+    information.update( tables[ 'tool' ][ 'SELF' ] )
+    return information
 
 
 def indicate_python_packages( identifier = None ):

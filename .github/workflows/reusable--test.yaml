@@ -32,6 +32,6 @@ jobs:
       - name: Import Package
         run: |
           set -eu
-          package_name="$(grep --extended-regexp '^name\s+=.*$' setup.cfg | sed --regexp-extended 's;name\s+=\s+;;')"
+          package_name="$(grep --extended-regexp '^name\s+=.*$' --max-count 1 pyproject.toml | sed --regexp-extended 's;name\s+=\s+;;' | tr --delete \')"
           invoke run "python -c 'import ${package_name}'"
         shell: bash

@@ -7,34 +7,31 @@
         https://jareddillard.com/blog/common-ways-to-customize-sphinx-themes.html
 """
 
-# -- Path setup --------------------------------------------------------------
-
-from pathlib import Path
-_top_path = Path( __file__ ).parent.parent.parent
+def _setup_python_search_paths( ):
+    from pathlib import Path
+    from sys import path as python_search_paths
+    project_path = Path( __file__ ).parent.parent.parent
+    python_search_paths.insert(
+        0, str( project_path / '.local' / 'sources' / 'python3' ) )
+_setup_python_search_paths( )
 
 
 # -- Project information -----------------------------------------------------
 
-_setup_cfg_path = _top_path / "setup.cfg"
-if _setup_cfg_path.is_file( ):
-    from configparser import ConfigParser
-    _config = ConfigParser( )
-    _config.read( _setup_cfg_path )
-    _metadata = _config[ 'metadata' ]
-    project = _metadata[ 'name' ]
-    release = _metadata[ 'version' ]
-    try: author = _metadata[ 'author' ]
-    except KeyError: author = _metadata[ 'maintainer' ]
-    _license = _metadata[ 'license' ]
-# TODO: Also look in 'pyproject.toml' once PEP 621 is implemented.
-else: raise Exception( 'Cannot find suitable source of project metadata.' )
-from datetime import datetime as DateTime
-_first_year = 2021
-_now_year = DateTime.utcnow( ).year
-if _first_year < _now_year:
-    _copyright_year_range = f"{_first_year}-{_now_year}"
-else: _copyright_year_range = str( _first_year )
-copyright = f"{_copyright_year_range}, {author}" # pylint: disable=redefined-builtin
+def _calculate_copyright_notice( information, author_ ):
+    from datetime import datetime as DateTime
+    first_year = information[ 'year-of-origin' ]
+    now_year = DateTime.utcnow( ).year
+    if first_year < now_year: year_range = f"{first_year}-{now_year}"
+    else: year_range = str( first_year )
+    return f"{year_range}, {author_}"
+
+from our_base import discover_project_information
+_information = discover_project_information( )
+project = _information[ 'name' ]
+release = _information[ 'version' ]
+author = _information[ 'author' ][ 'name' ]
+project_copyright = _calculate_copyright_notice( _information, author )
 
 
 # -- General configuration ---------------------------------------------------

@@ -113,9 +113,9 @@ We use this to run unit tests and doctests.  In general, we prefer to write
 test functions rather than heavyweight `unittest
 <https://docs.python.org/3/library/unittest.html>`_ classes.  Also, we make
 extensive use of `parametrized tests
-<https://docs.pytest.org/en/stable/parametrize.html#parametrize-basics>`_ and
-`property-based testing <https://hypothesis.readthedocs.io/en/latest/>`_.  To
-run the test suite in a relevant virtual environment, you can execute::
+<https://docs.pytest.org/en/stable/how-to/parametrize.html#parametrize-basics>`_
+and `property-based testing <https://hypothesis.readthedocs.io/en/latest/>`_.
+To run the test suite in a relevant virtual environment, you can execute::
 
     invoke test
 
