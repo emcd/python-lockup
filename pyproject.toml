@@ -1,12 +1,51 @@
-# https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html
-# TODO: Add PEP 621 'metadata' tables once decent support exists.
-#       The 'ppsetuptools' wrapper is one possibility.
-#       The 'whey' build backend as a replacement for 'setuptools' is another.
-
 [build-system]
 requires = ["packaging", "setuptools>=40.9.0", "tomli", "tomli-w", "wheel"]
 # Explicit build backend, in case we use frontend other than Pip or Pip default changes.
 build-backend = "setuptools.build_meta"
+
+# https://www.python.org/dev/peps/pep-0621
+# https://packaging.python.org/en/latest/specifications/core-metadata
+# https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html
+[project]
+name = 'lockup'
+# TODO: 'version' should be dynamic
+version = '2.0a202112310633'
+description = 'Immutable and concealed attributes for classes, modules, and namespaces.'
+license = { text = 'Apache-2.0' }
+keywords = [ 'api', 'attribute', 'concealment', 'immutability', 'namespace' ]
+# https://pypi.org/classifiers
+classifiers = [
+  'Development Status :: 5 - Production/Stable',
+  'Intended Audience :: Developers',
+  'License :: OSI Approved :: Apache Software License',
+  'Programming Language :: Python :: 3 :: Only',
+  'Programming Language :: Python :: 3.7',
+  'Programming Language :: Python :: 3.8',
+  'Programming Language :: Python :: 3.9',
+  'Programming Language :: Python :: 3.10',
+  'Programming Language :: Python :: Implementation :: CPython',
+  'Programming Language :: Python :: Implementation :: PyPy',
+  'Topic :: Software Development',
+]
+requires-python = '>= 3.7'
+[project.urls]
+'Documentation' = 'https://emcd.github.io/python-lockup'
+'Source Code' = 'https://github.com/emcd/python-lockup'
+'Issue Tracker' = 'https://github.com/emcd/python-lockup/issues'
+'Google Group' = 'https://groups.google.com/g/python-lockup'
+[tool.SELF]
+home-url = 'https://github.com/emcd/python-lockup'
+#download-url =
+year-of-origin = 2021
+[tool.SELF.author]
+name = 'Eric McDonald'
+email = 'python-lockup@googlegroups.com'
+[tool.SELF.long-description]
+files = [ 'README.rst', 'CHANGELOG.rst' ]
+content-type = 'text/x-rst'
+#[tool.SELF.maintainer]
+#name =
+#email =
 
 [tool.coverage.run]
 branch = true
