@@ -63,6 +63,7 @@ from .base import (
     paths,
 )
 from our_base import (
+    discover_project_information,
     ensure_directory,
     ensure_python_package,
     identify_python,
@@ -71,31 +72,16 @@ from our_base import (
 )
 
 
+project_name = discover_project_information( )[ 'name' ]
 # https://www.sphinx-doc.org/en/master/man/sphinx-build.html
 sphinx_options = f"-j auto -d {paths.caches.sphinx} -n -T"
+# https://github.com/pypa/wheel/issues/306#issuecomment-522529825
+setuptools_build_command = f"build --build-base {paths.caches.setuptools}"
 
-
-def parse_project_name( ):
-    ''' Returns project name, as parsed from configuration. '''
-    return parse_project_information( )[ 'name' ]
 
 def parse_project_version( ):
     ''' Returns project version, as parsed from configuration. '''
-    return parse_project_information( )[ 'version' ]
-
-def parse_project_information( ):
-    ''' Returns project information, as parsed from configuration. '''
-    path = paths.configuration.setuptools
-    if path.is_file( ):
-        from configparser import ConfigParser
-        config = ConfigParser( )
-        config.read( path )
-        return config[ 'metadata' ]
-    # TODO: Look in 'pyproject.toml' if PEP 621 is implemented for setuptools.
-    #       https://www.python.org/dev/peps/pep-0621/
-    raise Exception( 'Cannot find suitable source of project metadata.' )
-
-project_name = parse_project_name( )
+    return discover_project_information( )[ 'version' ]
 
 
 def _assert_gpg_tty( ):
@@ -630,7 +616,10 @@ def make_sdist( context ):
     eprint( _render_boxed_title( 'Artifact: Source Distribution' ) )
     _assert_gpg_tty( )
     path = _get_sdist_path( )
-    context.run( 'python3 setup.py sdist', **derive_venv_context_options( ) )
+    context.run(
+        f"python3 setup.py {setuptools_build_command} "
+            f"sdist --dist-dir {paths.artifacts.sdists}",
+        **derive_venv_context_options( ) )
     context.run( f"gpg --detach-sign --armor {path}", pty = True )
 
 
@@ -647,7 +636,9 @@ def make_wheel( context ):
     _assert_gpg_tty( )
     path = _get_wheel_path( )
     context.run(
-        'python3 setup.py bdist_wheel', **derive_venv_context_options( ) )
+        f"python3 setup.py {setuptools_build_command} "
+            f"bdist_wheel --dist-dir {paths.artifacts.wheels}",
+        **derive_venv_context_options( ) )
     context.run( f"gpg --detach-sign --armor {path}", pty = True )
 
 
