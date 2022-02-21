@@ -616,6 +616,7 @@ def make_sdist( context ):
     eprint( _render_boxed_title( 'Artifact: Source Distribution' ) )
     _assert_gpg_tty( )
     path = _get_sdist_path( )
+    # https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html
     context.run(
         f"python3 setup.py {setuptools_build_command} "
             f"sdist --dist-dir {paths.artifacts.sdists}",
@@ -635,6 +636,7 @@ def make_wheel( context ):
     eprint( _render_boxed_title( 'Artifact: Python Wheel' ) )
     _assert_gpg_tty( )
     path = _get_wheel_path( )
+    # https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html
     context.run(
         f"python3 setup.py {setuptools_build_command} "
             f"bdist_wheel --dist-dir {paths.artifacts.wheels}",
