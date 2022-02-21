@@ -155,4 +155,4 @@ def convert_project_information( ):
 def generate_installation_requirements( ):
     ''' Generates installation requirements from local configuration. '''
     simples, _ = indicate_python_packages( )
-    return simples[ 'installation' ]
+    return simples.get( 'installation', [ ] )
