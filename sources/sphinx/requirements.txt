@@ -1,5 +1,0 @@
-# NOTE: This hack needed until we switch from Pipenv+Setuptools to Poetry or similar.
-#       For details, see: https://github.com/readthedocs/readthedocs.org/issues/3181
-furo
-sphinx-copybutton
-sphinx-inline-tabs
