@@ -5,7 +5,6 @@ build-backend = "setuptools.build_meta"
 
 # https://www.python.org/dev/peps/pep-0621
 # https://packaging.python.org/en/latest/specifications/core-metadata
-# https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html
 [project]
 name = 'lockup'
 # TODO: 'version' should be dynamic
