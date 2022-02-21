@@ -1,3 +1,7 @@
+installation = [ ]
+
+[optional-installation]
+
 [development]
 format = [
   # YAPF 0.31 is missing full support for 'yapf-diff'.
@@ -33,7 +37,3 @@ test = [
   'hypothesis',
   'pytest',
 ]
-
-[installation]
-
-[optional-installation]
