@@ -16,6 +16,29 @@ def _setup_python_search_paths( ):
 _setup_python_search_paths( )
 
 
+def _install_prerequisite_packages( ):
+    # Hack to install documentation requirements for ReadTheDocs builder.
+    # (Better than maintaining a separate 'requirements.txt'.)
+    from os import environ as psenv
+    from shlex import split as split_command
+    from our_base import (
+        indicate_python_packages,
+        paths,
+        standard_execute_external,
+    )
+    if 'True' != psenv.get( 'READTHEDOCS', 'False' ): return
+    simples, _ = indicate_python_packages( )
+    manifest = tuple(
+        package_name for package_name
+        in simples[ 'development' ].get( 'documentation', [ ] )
+        if 'sphinx' != package_name )
+    standard_execute_external(
+        ( *split_command( 'pip install --upgrade' ), *manifest ) )
+    from sys import path as python_search_paths
+    python_search_paths.insert( 0, str( paths.sources.p.python3 ) )
+_install_prerequisite_packages( )
+
+
 # -- Project information -----------------------------------------------------
 
 def _calculate_copyright_notice( information, author_ ):

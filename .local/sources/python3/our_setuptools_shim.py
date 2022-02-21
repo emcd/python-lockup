@@ -30,7 +30,6 @@ from types import MappingProxyType as DictionaryProxy
 from setuptools import find_packages
 
 from our_base import (
-    collapse_multilevel_dictionary,
     discover_project_information,
     indicate_python_packages,
     paths,
@@ -156,4 +155,4 @@ def convert_project_information( ):
 def generate_installation_requirements( ):
     ''' Generates installation requirements from local configuration. '''
     simples, _ = indicate_python_packages( )
-    return collapse_multilevel_dictionary( simples[ 'installation' ] )
+    return simples[ 'installation' ]
