@@ -18,11 +18,7 @@
 #============================================================================#
 
 
-''' Shim layer for TOML configurations into setuptools. '''
-
-# https://docs.python.org/3/distutils/setupscript.html#writing-the-setup-script
-# https://setuptools.pypa.io/en/latest/userguide/declarative_config.html
-# https://setuptools.readthedocs.io/en/latest/references/keywords.html
+''' Shim layer for TOML configurations into Setuptools. '''
 
 
 from collections.abc import (
@@ -93,7 +89,11 @@ mime_types = DictionaryProxy( {
 } )
 
 
+# https://www.python.org/dev/peps/pep-0621
+# https://packaging.python.org/en/latest/specifications/core-metadata
 # https://packaging.python.org/guides/distributing-packages-using-setuptools/#setup-args
+# https://setuptools.pypa.io/en/latest/userguide/declarative_config.html
+# https://setuptools.readthedocs.io/en/latest/references/keywords.html
 # https://github.com/pypa/setuptools/blob/00fbad0f93ffdba0a4d5c3f2012fd7c3de9af04d/setuptools/dist.py#L163-L221
 # Some inspiration taken from PyProject Setuptools:
 #   https://github.com/TheCleric/ppsetuptools/blob/main/ppsetuptools/ppsetuptools.py
