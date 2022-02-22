@@ -31,6 +31,8 @@ from shlex import split as split_command
 from sys import path as python_search_paths, stderr
 from types import SimpleNamespace
 
+from invoke import Exit
+
 project_path = Path( __file__ ).parent.parent
 python_search_paths.insert(
     0, str( project_path / '.local' / 'sources' / 'python3' ) )
@@ -114,10 +116,7 @@ def indicate_python_versions_support( ):
 
 
 def generate_pip_requirements_text( identifier = None ):
-    ''' Generates Pip requirements lists from local configuration.
-
-        First list is unfrozen requirements.
-        Second list is frozen requirements. '''
+    ''' Generates Pip requirements lists from local configuration. '''
     # https://pip.pypa.io/en/stable/reference/requirements-file-format/
     # https://pip.pypa.io/en/stable/topics/repeatable-installs/
     simples, fixtures = indicate_python_packages( identifier = identifier )
@@ -135,3 +134,33 @@ def generate_pip_requirements_text( identifier = None ):
             frozen.append( f"{name}=={fixture.version} \\\n    {options}" )
     raw.extend( collapse_multilevel_dictionary( simples ) )
     return '\n'.join( raw ), '\n'.join( frozen ), '\n'.join( unpublished )
+
+
+def render_boxed_title( title ):
+    ''' Renders box around title. '''
+    columns_count = int( psenv.get( 'COLUMNS', 79 ) )
+    icolumns_count = columns_count - 2
+    content_template = (
+        '\N{BOX DRAWINGS DOUBLE VERTICAL}{fill}'
+        '\N{BOX DRAWINGS DOUBLE VERTICAL}' )
+    return '\n'.join( (
+        '',
+        '\N{BOX DRAWINGS DOUBLE DOWN AND RIGHT}{fill}'
+        '\N{BOX DRAWINGS DOUBLE DOWN AND LEFT}'.format(
+            fill = '\N{BOX DRAWINGS DOUBLE HORIZONTAL}' * icolumns_count ),
+        content_template.format( fill = ' ' * icolumns_count ),
+        content_template.format( fill = title.center( icolumns_count ) ),
+        content_template.format( fill = ' ' * icolumns_count ),
+        '\N{BOX DRAWINGS DOUBLE UP AND RIGHT}{fill}'
+        '\N{BOX DRAWINGS DOUBLE UP AND LEFT}'.format(
+            fill = '\N{BOX DRAWINGS DOUBLE HORIZONTAL}' * icolumns_count ),
+        '', ) )
+
+
+# TODO: Check for cached passphrase as an alternative.
+def assert_gpg_tty( ):
+    ''' Ensures the the 'GPG_TTY' environment variable is set. '''
+    if 'GPG_TTY' in psenv: return
+    raise Exit(
+        "ERROR: Environment variable 'GPG_TTY' is not set. "
+        "Task cannot prompt for GPG secret key passphrase." )

@@ -17,9 +17,6 @@
 #                                                                            #
 #============================================================================#
 
-# TODO: Refactor module.
-# pylint: disable=too-many-lines
-
 ''' Project maintenance tasks, executed via :command:`invoke`.
 
     `Invoke Documentation <http://docs.pyinvoke.org/en/stable/index.html>`_
@@ -53,6 +50,7 @@ from venv import create as create_venv
 from invoke import Context, Exit, Failure, call, task
 
 from .base import (
+    assert_gpg_tty,
     derive_venv_context_options,
     derive_venv_path,
     detect_vmgr_python_path,
@@ -61,34 +59,23 @@ from .base import (
     indicate_python_versions_support,
     on_tty,
     paths,
+    render_boxed_title,
 )
 from our_base import (
-    discover_project_information,
+    discover_project_version,
     ensure_directory,
     ensure_python_package,
     identify_python,
     indicate_python_packages,
+    project_name,
     standard_execute_external,
 )
 
 
-project_name = discover_project_information( )[ 'name' ]
 # https://www.sphinx-doc.org/en/master/man/sphinx-build.html
 sphinx_options = f"-j auto -d {paths.caches.sphinx} -n -T"
 # https://github.com/pypa/wheel/issues/306#issuecomment-522529825
 setuptools_build_command = f"build --build-base {paths.caches.setuptools}"
-
-
-def parse_project_version( ):
-    ''' Returns project version, as parsed from configuration. '''
-    return discover_project_information( )[ 'version' ]
-
-
-def _assert_gpg_tty( ):
-    if 'GPG_TTY' not in psenv:
-        raise Exit(
-            "ERROR: Environment variable 'GPG_TTY' is not set. "
-            "Task cannot prompt for GPG secret key passphrase." )
 
 
 # TODO? Replace with 'shutil.rmtree'.
@@ -108,31 +95,10 @@ def _unlink_recursively( path ):
     path.rmdir( )
 
 
-def _render_boxed_title( title ):
-    ''' Renders box around title. '''
-    columns_count = int( psenv.get( 'COLUMNS', 79 ) )
-    icolumns_count = columns_count - 2
-    content_template = (
-        '\N{BOX DRAWINGS DOUBLE VERTICAL}{fill}'
-        '\N{BOX DRAWINGS DOUBLE VERTICAL}' )
-    return '\n'.join( (
-        '',
-        '\N{BOX DRAWINGS DOUBLE DOWN AND RIGHT}{fill}'
-        '\N{BOX DRAWINGS DOUBLE DOWN AND LEFT}'.format(
-            fill = '\N{BOX DRAWINGS DOUBLE HORIZONTAL}' * icolumns_count ),
-        content_template.format( fill = ' ' * icolumns_count ),
-        content_template.format( fill = title.center( icolumns_count ) ),
-        content_template.format( fill = ' ' * icolumns_count ),
-        '\N{BOX DRAWINGS DOUBLE UP AND RIGHT}{fill}'
-        '\N{BOX DRAWINGS DOUBLE UP AND LEFT}'.format(
-            fill = '\N{BOX DRAWINGS DOUBLE HORIZONTAL}' * icolumns_count ),
-        '', ) )
-
-
 @task
 def install_git_hooks( context ):
     ''' Installs hooks to check goodness of code changes before commit. '''
-    eprint( _render_boxed_title( 'Install: Git Pre-Commit Hooks' ) )
+    eprint( render_boxed_title( 'Install: Git Pre-Commit Hooks' ) )
     context.run(
         f"pre-commit install --config {paths.configuration.pre_commit} "
         f"--install-hooks", pty = True, **derive_venv_context_options( ) )
@@ -143,7 +109,7 @@ def install_pythons( context ):
     ''' Installs each supported Python version.
 
         This task requires Internet access and may take some time. '''
-    eprint( _render_boxed_title( 'Install: Python Releases' ) )
+    eprint( render_boxed_title( 'Install: Python Releases' ) )
     context.run( 'asdf install python', pty = True )
 
 
@@ -157,7 +123,7 @@ def build_python_venvs( context ):
 @task
 def build_python_venv( context, version, overwrite = False ):
     ''' Creates virtual environment for requested Python version. '''
-    eprint( _render_boxed_title(
+    eprint( render_boxed_title(
         f"Build: Python Virtual Environment ({version})" ) )
     python_path = detect_vmgr_python_path( version )
     venv_path = ensure_directory( derive_venv_path( version, python_path ) )
@@ -184,7 +150,7 @@ def bootstrap( context ): # pylint: disable=unused-argument
 @task
 def clean_pycaches( context ): # pylint: disable=unused-argument
     ''' Removes all caches of compiled CPython bytecode. '''
-    eprint( _render_boxed_title( 'Clean: Python Caches' ) )
+    eprint( render_boxed_title( 'Clean: Python Caches' ) )
     anchors = ( paths.sources.p.python3, paths.tests.p.python3, )
     # TODO? Use 'shutil.rmtree' instead.
     for path in chain.from_iterable( map(
@@ -198,7 +164,7 @@ def clean_pycaches( context ): # pylint: disable=unused-argument
 @task
 def clean_tool_caches( context ): # pylint: disable=unused-argument
     ''' Clears the caches used by code generation and testing utilities. '''
-    eprint( _render_boxed_title( 'Clean: Tool Caches' ) )
+    eprint( render_boxed_title( 'Clean: Tool Caches' ) )
     # TODO? Simplify by using a single .gitignore in paths.caches.
     anchors = paths.caches.SELF.glob( '*' )
     gitignore_paths = set( paths.caches.SELF.glob( '*/.gitignore' ) )
@@ -226,8 +192,8 @@ def clean_pythons_packages( context ):
 def clean_python_packages( context, version = None ):
     ''' Removes unused Python packages in virtual environment. '''
     base_title = 'Clean: Unused Python Packages'
-    if None is version: eprint( _render_boxed_title( base_title ) )
-    else: eprint( _render_boxed_title( f"{base_title} ({version})" ) )
+    if None is version: eprint( render_boxed_title( base_title ) )
+    else: eprint( render_boxed_title( f"{base_title} ({version})" ) )
     context_options = derive_venv_context_options( version = version )
     identifier = identify_python(
         'pep508-environment',
@@ -278,8 +244,8 @@ def check_python_packages_security( context, version = None ):
 
         This task requires Internet access and may take some time. '''
     base_title = 'Lint: Package Security'
-    if None is version: eprint( _render_boxed_title( base_title ) )
-    else: eprint( _render_boxed_title( f"{base_title} ({version})" ) )
+    if None is version: eprint( render_boxed_title( base_title ) )
+    else: eprint( render_boxed_title( f"{base_title} ({version})" ) )
     context_options = derive_venv_context_options( version = version )
     context.run( f"safety check", pty = on_tty, **context_options )
 
@@ -289,7 +255,7 @@ def freshen_asdf( context ):
     ''' Asks Asdf to update itself.
 
         This task requires Internet access and may take some time. '''
-    eprint( _render_boxed_title( 'Freshen: Version Manager' ) )
+    eprint( render_boxed_title( 'Freshen: Version Manager' ) )
     context.run( 'asdf update', pty = on_tty )
     context.run( 'asdf plugin update python', pty = on_tty )
 
@@ -299,7 +265,7 @@ def freshen_pythons( context ):
     ''' Updates each supported Python minor version to latest patch.
 
         This task requires Internet access and may take some time. '''
-    eprint( _render_boxed_title( 'Freshen: Python Versions' ) )
+    eprint( render_boxed_title( 'Freshen: Python Versions' ) )
     minors_regex = re.compile(
         r'''^(?P<prefix>\w+(?:\d+\.\d+)?-)?(?P<minor>\d+\.\d+)\..*$''' )
     latest_versions = [ ]
@@ -329,8 +295,8 @@ def freshen_pythons_packages( context ):
 def freshen_python_packages( context, version = None ):
     ''' Updates Python packages in virtual environment. '''
     base_title = 'Freshen: Python Package Versions'
-    if None is version: eprint( _render_boxed_title( base_title ) )
-    else: eprint( _render_boxed_title( f"{base_title} ({version})" ) )
+    if None is version: eprint( render_boxed_title( base_title ) )
+    else: eprint( render_boxed_title( f"{base_title} ({version})" ) )
     context_options = derive_venv_context_options( version = version )
     identifier = identify_python(
         'pep508-environment',
@@ -448,7 +414,7 @@ def freshen_git_modules( context ):
 
         Initializes SCM modules as needed.
         This task requires Internet access and may take some time. '''
-    eprint( _render_boxed_title( 'Freshen: SCM Modules' ) )
+    eprint( render_boxed_title( 'Freshen: SCM Modules' ) )
     context.run(
         'git submodule update --init --recursive --remote', pty = True )
 
@@ -458,7 +424,7 @@ def freshen_git_hooks( context ):
     ''' Updates Git hooks to latest tagged release.
 
         This task requires Internet access and may take some time. '''
-    eprint( _render_boxed_title( 'Freshen: SCM Hooks' ) )
+    eprint( render_boxed_title( 'Freshen: SCM Hooks' ) )
     context.run(
         f"pre-commit autoupdate --config {paths.configuration.pre_commit}",
         pty = True, **derive_venv_context_options( ) )
@@ -480,7 +446,7 @@ def freshen( context ): # pylint: disable=unused-argument
 @task
 def lint_bandit( context ):
     ''' Security checks the source code with Bandit. '''
-    eprint( _render_boxed_title( 'Lint: Bandit' ) )
+    eprint( render_boxed_title( 'Lint: Bandit' ) )
     context.run(
         f"bandit --recursive --verbose {paths.sources.p.python3}",
         pty = True, **derive_venv_context_options( ) )
@@ -489,7 +455,7 @@ def lint_bandit( context ):
 @task( iterable = ( 'packages', 'modules', 'files', ) )
 def lint_mypy( context, packages, modules, files ):
     ''' Lints the source code with Mypy. '''
-    eprint( _render_boxed_title( 'Lint: MyPy' ) )
+    eprint( render_boxed_title( 'Lint: MyPy' ) )
     context_options = derive_venv_context_options( )
     if not which( 'mypy', path = context_options[ 'env' ][ 'PATH' ] ):
         eprint( 'Mypy not available on this platform. Skipping.' )
@@ -512,7 +478,7 @@ def lint_mypy( context, packages, modules, files ):
 @task( iterable = ( 'targets', 'checks', ) )
 def lint_pylint( context, targets, checks ):
     ''' Lints the source code with Pylint. '''
-    eprint( _render_boxed_title( 'Lint: Pylint' ) )
+    eprint( render_boxed_title( 'Lint: Pylint' ) )
     context_options = derive_venv_context_options( )
     if not which( 'pylint', path = context_options[ 'env' ][ 'PATH' ] ):
         eprint( 'Pylint not available on this platform. Skipping.' )
@@ -537,7 +503,7 @@ def lint_pylint( context, targets, checks ):
 @task
 def lint_semgrep( context ):
     ''' Lints the source code with Semgrep. '''
-    eprint( _render_boxed_title( 'Lint: Semgrep' ) )
+    eprint( render_boxed_title( 'Lint: Semgrep' ) )
     context_options = derive_venv_context_options( )
     if not which( 'semgrep', path = context_options[ 'env' ][ 'PATH' ] ):
         eprint( 'Semgrep not available on this platform. Skipping.' )
@@ -561,7 +527,7 @@ def lint( context ): # pylint: disable=unused-argument
 @task
 def report_coverage( context ):
     ''' Combines multiple code coverage results into a single report. '''
-    eprint( _render_boxed_title( 'Artifact: Code Coverage Report' ) )
+    eprint( render_boxed_title( 'Artifact: Code Coverage Report' ) )
     context_options = derive_venv_context_options( )
     context.run( 'coverage combine', pty = True, **context_options )
     context.run( 'coverage report', pty = True, **context_options )
@@ -573,8 +539,8 @@ def report_coverage( context ):
 def test( context, version = None ):
     ''' Runs the test suite with current or specified Python version. '''
     base_title = 'Test: Unit + Code Coverage'
-    if None is version: eprint( _render_boxed_title( base_title ) )
-    else: eprint( _render_boxed_title( f"{base_title} ({version})" ) )
+    if None is version: eprint( render_boxed_title( base_title ) )
+    else: eprint( render_boxed_title( f"{base_title} ({version})" ) )
     context_options = derive_venv_context_options( version = version )
     context_options[ 'env' ].update( dict(
         HYPOTHESIS_STORAGE_DIRECTORY = paths.caches.hypothesis,
@@ -594,7 +560,7 @@ def test_all_versions( context ):
 @task
 def check_urls( context ):
     ''' Checks the HTTP URLs in the documentation for liveness. '''
-    eprint( _render_boxed_title( 'Test: Documentation URLs' ) )
+    eprint( render_boxed_title( 'Test: Documentation URLs' ) )
     context.run(
         f"sphinx-build -b linkcheck {sphinx_options} "
         f"{paths.sources.p.sphinx} {paths.artifacts.sphinx_linkcheck}",
@@ -604,7 +570,7 @@ def check_urls( context ):
 @task
 def check_readme( context ):
     ''' Checks that the README will render correctly on PyPI. '''
-    eprint( _render_boxed_title( 'Test: README Render' ) )
+    eprint( render_boxed_title( 'Test: README Render' ) )
     path = _get_sdist_path( )
     context.run(
         f"twine check {path}", pty = on_tty, **derive_venv_context_options( ) )
@@ -613,8 +579,8 @@ def check_readme( context ):
 @task( pre = ( test, check_urls, ), post = ( check_readme, ) )
 def make_sdist( context ):
     ''' Packages the Python sources for release. '''
-    eprint( _render_boxed_title( 'Artifact: Source Distribution' ) )
-    _assert_gpg_tty( )
+    eprint( render_boxed_title( 'Artifact: Source Distribution' ) )
+    assert_gpg_tty( )
     path = _get_sdist_path( )
     # https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html
     context.run(
@@ -625,7 +591,7 @@ def make_sdist( context ):
 
 
 def _get_sdist_path( ):
-    project_version = parse_project_version( )
+    project_version = discover_project_version( )
     name = f"{project_name}-{project_version}.tar.gz"
     return paths.artifacts.sdists / name
 
@@ -633,8 +599,8 @@ def _get_sdist_path( ):
 @task( pre = ( make_sdist, ) )
 def make_wheel( context ):
     ''' Packages a Python wheel for release. '''
-    eprint( _render_boxed_title( 'Artifact: Python Wheel' ) )
-    _assert_gpg_tty( )
+    eprint( render_boxed_title( 'Artifact: Python Wheel' ) )
+    assert_gpg_tty( )
     path = _get_wheel_path( )
     # https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html
     context.run(
@@ -645,7 +611,7 @@ def make_wheel( context ):
 
 
 def _get_wheel_path( ):
-    project_version = parse_project_version( )
+    project_version = discover_project_version( )
     name = f"{project_name}-{project_version}-py3-none-any.whl"
     return paths.artifacts.wheels / name
 
@@ -653,7 +619,7 @@ def _get_wheel_path( ):
 @task( pre = ( check_urls, ) )
 def make_html( context ):
     ''' Generates documentation as HTML artifacts. '''
-    eprint( _render_boxed_title( 'Artifact: Documentation' ) )
+    eprint( render_boxed_title( 'Artifact: Documentation' ) )
     _unlink_recursively( paths.artifacts.sphinx_html )
     context.run(
         f"sphinx-build -b html {sphinx_options} "
@@ -750,10 +716,10 @@ def _ensure_clean_workspace( context ):
 @task
 def bump( context, piece ):
     ''' Bumps a piece of the current version. '''
-    eprint( _render_boxed_title( f"Version: Adjust" ) )
+    eprint( render_boxed_title( f"Version: Adjust" ) )
     _ensure_clean_workspace( context )
-    _assert_gpg_tty( )
-    project_version = parse_project_version( )
+    assert_gpg_tty( )
+    project_version = discover_project_version( )
     current_version = Version.from_string( project_version )
     new_version = current_version.as_bumped( piece )
     if 'stage' == piece: part = 'release_class'
@@ -782,7 +748,7 @@ def bump_stage( context ): # pylint: disable=unused-argument
 def branch_release( context, remote = 'origin' ):
     ''' Makes a new branch for development torwards a release. '''
     _ensure_clean_workspace( context )
-    project_version = parse_project_version( )
+    project_version = discover_project_version( )
     mainline_regex = re.compile(
         r'''^\s+HEAD branch:\s+(.*)$''', re.MULTILINE )
     mainline_branch = mainline_regex.search( context.run(
@@ -813,9 +779,9 @@ def check_code_style( context, write_changes = False ):
 @task( pre = ( test, ) )
 def push( context, remote = 'origin' ):
     ''' Pushes commits on current branch, plus all tags. '''
-    eprint( _render_boxed_title( 'SCM: Push Branch with Tags' ) )
+    eprint( render_boxed_title( 'SCM: Push Branch with Tags' ) )
     _ensure_clean_workspace( context )
-    project_version = parse_project_version( )
+    project_version = discover_project_version( )
     true_branch = context.run(
         'git branch --show-current', hide = 'stdout' ).stdout.strip( )
     this_version = Version.from_string( project_version )
@@ -830,8 +796,8 @@ def push( context, remote = 'origin' ):
 @task
 def check_pip_install( context, index_url = '', version = None ):
     ''' Checks import of current package after installation via Pip. '''
-    version = version or parse_project_version( )
-    eprint( _render_boxed_title(
+    version = version or discover_project_version( )
+    eprint( render_boxed_title(
         f"Verify: Python Package Installation ({version})" ) )
     with TemporaryDirectory( ) as venv_path:
         venv_path = Path( venv_path )
@@ -864,8 +830,8 @@ def check_pypi_integrity( context, version = None, index_url = '' ):
         If no version is provided, the current project version is used.
 
         This task requires Internet access and may take some time. '''
-    version = version or parse_project_version( )
-    eprint( _render_boxed_title(
+    version = version or discover_project_version( )
+    eprint( render_boxed_title(
         f"Verify: Python Package Integrity ({version})" ) )
     release_info = retrieve_pypi_release_information(
         project_name, version, index_url = index_url )
@@ -895,7 +861,7 @@ def retrieve_pypi_release_information( name, version, index_url = '' ): # pylint
 
 def check_pypi_package( context, package_url ):
     ''' Verifies signature on package. '''
-    _assert_gpg_tty( )
+    assert_gpg_tty( )
     package_filename = urlparse( package_url ).path.split( '/' )[ -1 ]
     with TemporaryDirectory( ) as cache_path_raw:
         cache_path = Path( cache_path_raw )
@@ -944,7 +910,7 @@ def _upload_pypi( context, repository_name = '' ):
     if repository_name:
         repository_option = f"--repository {repository_name}"
         task_name_suffix = f" ({repository_name})"
-    eprint( _render_boxed_title( f"Publication: PyPI{task_name_suffix}" ) )
+    eprint( render_boxed_title( f"Publication: PyPI{task_name_suffix}" ) )
     artifacts = _get_pypi_artifacts( )
     context_options = derive_venv_context_options( )
     context_options.update( _get_pypi_credentials( repository_name ) )
@@ -973,7 +939,7 @@ def _get_pypi_credentials( repository_name ):
 @task( pre = ( test, make_html, ) )
 def upload_github_pages( context ):
     ''' Publishes Sphinx HTML output to Github Pages for project. '''
-    eprint( _render_boxed_title( 'Publication: Github Pages' ) )
+    eprint( render_boxed_title( 'Publication: Github Pages' ) )
     # Use relative path, since 'git subtree' needs it.
     html_path = paths.artifacts.sphinx_html.relative_to( paths.project )
     nojekyll_path = html_path / '.nojekyll'
