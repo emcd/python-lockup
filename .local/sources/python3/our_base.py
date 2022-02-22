@@ -89,8 +89,6 @@ def _calculate_configuration_paths( paths_ ):
         pypackages = configuration_path / 'pypackages.toml',
         pypackages_fixtures = configuration_path / 'pypackages.fixtures.toml',
         pyproject = paths_.project / 'pyproject.toml',
-        # TODO: Remove setuptools configuration once migration is finished.
-        setuptools = paths_.project / 'setup.cfg',
     )
 
 
@@ -149,17 +147,6 @@ def collapse_multilevel_dictionary( dictionary ):
         for value in dictionary.values( ) ) )
 
 
-def discover_project_information( ):
-    ''' Discovers information about project from local configuration. '''
-    ensure_python_package( 'tomli' )
-    from tomli import load
-    with paths.configuration.pyproject.open( 'rb' ) as file:
-        tables = load( file )
-    information = tables[ 'project' ]
-    information.update( tables[ 'tool' ][ 'SELF' ] )
-    return information
-
-
 def indicate_python_packages( identifier = None ):
     ''' Returns lists of Python package dependencies.
 
@@ -205,3 +192,21 @@ def ensure_directory( path ):
     ''' Ensures existence of directory, creating if necessary. '''
     path.mkdir( parents = True, exist_ok = True )
     return path
+
+
+def discover_project_version( ):
+    ''' Returns project version, as parsed from local configuration. '''
+    return discover_project_information( )[ 'version' ]
+
+
+def discover_project_information( ):
+    ''' Discovers information about project from local configuration. '''
+    ensure_python_package( 'tomli' )
+    from tomli import load
+    with paths.configuration.pyproject.open( 'rb' ) as file:
+        tables = load( file )
+    information = tables[ 'project' ]
+    information.update( tables[ 'tool' ][ 'SELF' ] )
+    return information
+
+project_name = discover_project_information( )[ 'name' ]

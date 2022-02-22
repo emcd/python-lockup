@@ -24,3 +24,11 @@ Windows Development Support
   development environment is not a virtualized Linux, such as WSL.
 
 * Create ``develop.py`` script and manage Pythons on all platforms via that.
+
+Remove Dependency on ``bump2version``
+===============================================================================
+
+* Can work directly with ``__version__`` for package and set ``version`` in
+  :file:`pyproject.toml` to ``dynamic``.
+
+* Will need to modify Setuptools shim to support the ``dynamic`` field.
