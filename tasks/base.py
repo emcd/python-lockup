@@ -136,8 +136,15 @@ def generate_pip_requirements_text( identifier = None ):
     return '\n'.join( raw ), '\n'.join( frozen ), '\n'.join( unpublished )
 
 
-def render_boxed_title( title ):
-    ''' Renders box around title. '''
+def render_boxed_title( title, supplement = None ):
+    ''' Renders box around title to diagnostic stream. '''
+    if None is supplement: specific_title = title
+    else: specific_title = f"{title} ({supplement})"
+    eprint( format_boxed_title( specific_title ) )
+
+
+def format_boxed_title( title ):
+    ''' Formats box around title as string. '''
     columns_count = int( psenv.get( 'COLUMNS', 79 ) )
     icolumns_count = columns_count - 2
     content_template = (
@@ -164,3 +171,23 @@ def assert_gpg_tty( ):
     raise Exit(
         "ERROR: Environment variable 'GPG_TTY' is not set. "
         "Task cannot prompt for GPG secret key passphrase." )
+
+
+def unlink_recursively( path ):
+    ''' Pure Python implementation of ``rm -rf``, essentially.
+
+        Different than :py:func:`shutil.rmtree` in that it will also
+        delete a regular file or symlink as the top-level target
+        and it will silently succeed if the top-level target is missing. '''
+    if not path.exists( ): return
+    if not path.is_dir( ):
+        path.unlink( )
+        return
+    dirs_stack = [ ]
+    for child_path in path.rglob( '*' ):
+        if child_path.is_dir( ) and not child_path.is_symlink( ):
+            dirs_stack.append( child_path )
+            continue
+        child_path.unlink( )
+    while dirs_stack: dirs_stack.pop( ).rmdir( )
+    path.rmdir( )
