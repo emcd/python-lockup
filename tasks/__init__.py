@@ -165,14 +165,16 @@ def clean_tool_caches( context ): # pylint: disable=unused-argument
 
 
 @task
-def clean_pythons_packages( context ):
-    ''' Removes unused Python packages in all virtual environments. '''
-    for version in indicate_python_versions_support( ):
-        clean_python_packages( context, version )
-
-
-@task
 def clean_python_packages( context, version = None ):
+    ''' Removes unused Python packages.
+
+        If version is 'ALL', then all virtual environments are targeted. '''
+    if 'ALL' == version: versions = indicate_python_versions_support( )
+    else: versions = ( version, )
+    for version_ in versions: _clean_python_packages( context, version_ )
+
+
+def _clean_python_packages( context, version = None ):
     ''' Removes unused Python packages in virtual environment. '''
     render_boxed_title( 'Clean: Unused Python Packages', supplement = version )
     context_options = derive_venv_context_options( version = version )
@@ -214,13 +216,19 @@ def execute_pip_with_requirements(
 
 
 
-@task( pre = ( clean_pythons_packages, clean_pycaches, clean_tool_caches, ) )
+@task(
+    pre = (
+        call( clean_python_packages, version = 'ALL' ),
+        call( clean_pycaches ),
+        call( clean_tool_caches ),
+    )
+)
 def clean( context ): # pylint: disable=unused-argument
     ''' Cleans all caches. '''
 
 
 @task
-def check_python_packages_security( context, version = None ):
+def check_security_issues( context, version = None ):
     ''' Checks for security issues in utilized packages and tools.
 
         This task requires Internet access and may take some time. '''
@@ -264,14 +272,16 @@ def freshen_pythons( context ):
 
 
 @task
-def freshen_pythons_packages( context ):
-    ''' Updates Python packages in all virtual environments. '''
-    for version in indicate_python_versions_support( ):
-        freshen_python_packages( context, version )
-
-
-@task
 def freshen_python_packages( context, version = None ):
+    ''' Updates declared Python packages.
+
+        If version is 'ALL', then all virtual environments are targeted. '''
+    if 'ALL' == version: versions = indicate_python_versions_support( )
+    else: versions = ( version, )
+    for version_ in versions: _freshen_python_packages( context, version_ )
+
+
+def _freshen_python_packages( context, version = None ):
     ''' Updates Python packages in virtual environment. '''
     render_boxed_title(
         'Freshen: Python Package Versions', supplement = version )
@@ -283,7 +293,7 @@ def freshen_python_packages( context, version = None ):
     install_python_packages( context, context_options )
     fixtures = calculate_python_packages_fixtures( context_options )
     record_python_packages_fixtures( identifier, fixtures )
-    check_python_packages_security( context, version = version )
+    check_security_issues( context, version = version )
     test( context, version = version )
 
 
@@ -410,9 +420,11 @@ def freshen_git_hooks( context ):
 
 @task(
     pre = (
-        clean,
-        freshen_pythons, freshen_pythons_packages,
-        freshen_git_modules, freshen_git_hooks,
+        call( clean ),
+        call( freshen_pythons ),
+        call( freshen_python_packages, version = 'ALL' ),
+        call( freshen_git_modules ),
+        call( freshen_git_hooks ),
     )
 )
 def freshen( context ): # pylint: disable=unused-argument
@@ -492,12 +504,14 @@ def lint_semgrep( context ):
         f"{paths.sources.p.python3}", pty = on_tty, **context_options )
 
 
-@task( pre = (
-    call( lint_pylint, targets = ( ), checks = ( ) ),
-    call( lint_semgrep ),
-    call( lint_mypy, packages = ( ), modules = ( ), files = ( ) ),
-    call( lint_bandit ),
-) )
+@task(
+    pre = (
+        call( lint_pylint, targets = ( ), checks = ( ) ),
+        call( lint_semgrep ),
+        call( lint_mypy, packages = ( ), modules = ( ), files = ( ) ),
+        call( lint_bandit ),
+    )
+)
 def lint( context ): # pylint: disable=unused-argument
     ''' Lints the source code. '''
 
