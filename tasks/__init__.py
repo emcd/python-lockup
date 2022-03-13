@@ -171,7 +171,8 @@ def clean_python_packages( context, version = None ):
         If version is 'ALL', then all virtual environments are targeted. '''
     if 'ALL' == version: versions = indicate_python_versions_support( )
     else: versions = ( version, )
-    for version_ in versions: _clean_python_packages( context, version_ )
+    for version_ in versions:
+        _clean_python_packages( context, version = version_ )
 
 
 def _clean_python_packages( context, version = None ):
@@ -216,15 +217,13 @@ def execute_pip_with_requirements(
 
 
 
-@task(
-    pre = (
-        call( clean_python_packages, version = 'ALL' ),
-        call( clean_pycaches ),
-        call( clean_tool_caches ),
-    )
-)
-def clean( context ): # pylint: disable=unused-argument
+@task
+def clean( context, version = None ):
     ''' Cleans all caches. '''
+    clean_python_packages( context, version = version )
+    clean_pycaches( context )
+    clean_tool_caches( context )
+
 
 
 @task
@@ -434,19 +433,19 @@ def freshen( context ): # pylint: disable=unused-argument
 
 
 @task
-def lint_bandit( context ):
+def lint_bandit( context, version = None ):
     ''' Security checks the source code with Bandit. '''
-    render_boxed_title( 'Lint: Bandit' )
+    render_boxed_title( 'Lint: Bandit', supplement = version )
     context.run(
         f"bandit --recursive --verbose {paths.sources.p.python3}",
-        pty = True, **derive_venv_context_options( ) )
+        pty = True, **derive_venv_context_options( version = version ) )
 
 
 @task( iterable = ( 'packages', 'modules', 'files', ) )
-def lint_mypy( context, packages, modules, files ):
+def lint_mypy( context, packages, modules, files, version = None ):
     ''' Lints the source code with Mypy. '''
-    render_boxed_title( 'Lint: MyPy' )
-    context_options = derive_venv_context_options( )
+    render_boxed_title( 'Lint: MyPy', supplement = version )
+    context_options = derive_venv_context_options( version = version )
     if not which( 'mypy', path = context_options[ 'env' ][ 'PATH' ] ):
         eprint( 'Mypy not available on this platform. Skipping.' )
         return
@@ -466,10 +465,10 @@ def lint_mypy( context, packages, modules, files ):
 
 
 @task( iterable = ( 'targets', 'checks', ) )
-def lint_pylint( context, targets, checks ):
+def lint_pylint( context, targets, checks, version = None ):
     ''' Lints the source code with Pylint. '''
-    render_boxed_title( 'Lint: Pylint' )
-    context_options = derive_venv_context_options( )
+    render_boxed_title( 'Lint: Pylint', supplement = version )
+    context_options = derive_venv_context_options( version = version )
     if not which( 'pylint', path = context_options[ 'env' ][ 'PATH' ] ):
         eprint( 'Pylint not available on this platform. Skipping.' )
         return
@@ -491,10 +490,10 @@ def lint_pylint( context, targets, checks ):
 
 
 @task
-def lint_semgrep( context ):
+def lint_semgrep( context, version = None ):
     ''' Lints the source code with Semgrep. '''
-    render_boxed_title( 'Lint: Semgrep' )
-    context_options = derive_venv_context_options( )
+    render_boxed_title( 'Lint: Semgrep', supplement = version )
+    context_options = derive_venv_context_options( version = version )
     if not which( 'semgrep', path = context_options[ 'env' ][ 'PATH' ] ):
         eprint( 'Semgrep not available on this platform. Skipping.' )
         return
@@ -504,16 +503,14 @@ def lint_semgrep( context ):
         f"{paths.sources.p.python3}", pty = on_tty, **context_options )
 
 
-@task(
-    pre = (
-        call( lint_pylint, targets = ( ), checks = ( ) ),
-        call( lint_semgrep ),
-        call( lint_mypy, packages = ( ), modules = ( ), files = ( ) ),
-        call( lint_bandit ),
-    )
-)
-def lint( context ): # pylint: disable=unused-argument
+@task
+def lint( context, version = None ):
     ''' Lints the source code. '''
+    lint_pylint( context, targets = ( ), checks = ( ), version = version )
+    lint_semgrep( context, version = version )
+    lint_mypy( context,
+        packages = ( ), modules = ( ), files = ( ), version = version )
+    lint_bandit( context, version = version )
 
 
 @task
@@ -527,9 +524,20 @@ def report_coverage( context ):
     context.run( 'coverage xml', pty = True, **context_options )
 
 
-@task( pre = ( lint, ) )
+@task
 def test( context, version = None ):
-    ''' Runs the test suite with current or specified Python version. '''
+    ''' Runs the test suite.
+
+        If version is 'ALL', then all virtual environments are targeted. '''
+    if 'ALL' == version: versions = indicate_python_versions_support( )
+    else: versions = ( version, )
+    for version_ in versions: _test( context, version_ )
+
+
+def _test( context, version = None ):
+    ''' Runs the test suite in virtual environment. '''
+    clean( context, version = version )
+    lint( context, version = version )
     render_boxed_title( 'Test: Unit + Code Coverage', supplement = version )
     context_options = derive_venv_context_options( version = version )
     context_options[ 'env' ].update( dict(
@@ -538,13 +546,6 @@ def test( context, version = None ):
     context.run(
         f"coverage run --source {project_name}",
         pty = True, **context_options )
-
-
-@task( pre = ( lint, ), post = ( report_coverage, ) )
-def test_all_versions( context ):
-    ''' Runs the test suite across multiple, isolated Python versions. '''
-    for version in indicate_python_versions_support( ):
-        test( context, version )
 
 
 @task
@@ -884,7 +885,10 @@ def upload_test_pypi( context ):
 
 
 @task(
-    pre = ( upload_test_pypi, test_all_versions, ),
+    pre = (
+        call( upload_test_pypi ),
+        call( test, version = 'ALL' ),
+    ),
     post = ( check_pypi_integrity, check_pip_install, )
 )
 def upload_pypi( context ):
