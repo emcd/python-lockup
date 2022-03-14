@@ -59,11 +59,17 @@ else:
 on_tty = stderr.isatty( )
 
 
+def pep508_identify_python( version = None ):
+    ''' Calculates PEP 508 identifier for Python version. '''
+    python_path = detect_vmgr_python_path( version = version )
+    return identify_python( 'pep508-environment', python_path = python_path )
+
+
 def derive_venv_context_options(
     venv_path = None, version = None, variables = None
 ):
     ''' Derives flags for Python virtual environment in execution context. '''
-    venv_path = venv_path or derive_venv_path( version )
+    venv_path = venv_path or derive_venv_path( version = version )
     return dict(
         env = derive_venv_variables( venv_path, variables = variables ),
         replace_env = True )
@@ -72,7 +78,7 @@ def derive_venv_context_options(
 def derive_venv_path( version = None, python_path = None ):
     ''' Derives Python virtual environment path from version handle. '''
     if None is python_path:
-        if version: python_path = detect_vmgr_python_path( version )
+        if version: python_path = detect_vmgr_python_path( version = version )
         elif 'VIRTUAL_ENV' in psenv and 'OUR_VENV_NAME' in psenv:
             venv_path = Path( psenv[ 'VIRTUAL_ENV' ] )
             if venv_path.name == psenv[ 'OUR_VENV_NAME' ]: return venv_path
