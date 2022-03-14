@@ -59,6 +59,7 @@ from .base import (
     indicate_python_versions_support,
     on_tty,
     paths,
+    pep508_identify_python,
     render_boxed_title,
     unlink_recursively,
 )
@@ -66,7 +67,6 @@ from our_base import (
     discover_project_version,
     ensure_directory,
     ensure_python_package,
-    identify_python,
     indicate_python_packages,
     project_name,
     standard_execute_external,
@@ -118,10 +118,7 @@ def build_python_venv( context, version, overwrite = False ):
     context_options = derive_venv_context_options( venv_path )
     install_python_packages( context, context_options )
     fixtures = calculate_python_packages_fixtures( context_options )
-    identifier = identify_python(
-        'pep508-environment',
-        python_path = which(
-            'python', path = context_options[ 'env' ][ 'PATH' ] ) )
+    identifier = pep508_identify_python( version = version )
     record_python_packages_fixtures( identifier, fixtures )
 
 
@@ -179,10 +176,7 @@ def _clean_python_packages( context, version = None ):
     ''' Removes unused Python packages in virtual environment. '''
     render_boxed_title( 'Clean: Unused Python Packages', supplement = version )
     context_options = derive_venv_context_options( version = version )
-    identifier = identify_python(
-        'pep508-environment',
-        python_path = which(
-            'python', path = context_options[ 'env' ][ 'PATH' ] ) )
+    identifier = pep508_identify_python( version = version )
     _, fixtures = indicate_python_packages( identifier = identifier )
     requested = frozenset( fixture[ 'name' ] for fixture in fixtures )
     installed = frozenset(
@@ -254,8 +248,12 @@ def freshen_pythons( context ):
     render_boxed_title( 'Freshen: Python Versions' )
     minors_regex = re.compile(
         r'''^(?P<prefix>\w+(?:\d+\.\d+)?-)?(?P<minor>\d+\.\d+)\..*$''' )
+    old_versions = {
+        version: pep508_identify_python( version = version )
+        for version in indicate_python_versions_support( )
+    }
     latest_versions = [ ]
-    for version in indicate_python_versions_support( ):
+    for version, identifier in old_versions.items( ):
         groups = minors_regex.match( version ).groupdict( )
         minor_version = "{prefix}{minor}".format(
             prefix = groups.get( 'prefix' ) or '',
@@ -265,9 +263,25 @@ def freshen_pythons( context ):
             hide = 'stdout' ).stdout.strip( )
         context.run( f"asdf install python {latest_version}", pty = True )
         latest_versions.append( latest_version )
+        if version != latest_version:
+            delete_python_packages_fixtures( identifier )
     # Can only update local versions after they are installed.
     context.run( "asdf local python {versions}".format(
         versions = ' '.join( latest_versions ) ), pty = True )
+
+
+def delete_python_packages_fixtures( identifier ):
+    ''' Deletes table of Python packages fixtures. '''
+    ensure_python_package( 'tomli' )
+    from tomli import load
+    ensure_python_package( 'tomli-w' )
+    from tomli_w import dump
+    fixtures_path = paths.configuration.pypackages_fixtures
+    if not fixtures_path.exists( ): return
+    with fixtures_path.open( 'rb' ) as file: document = load( file )
+    if not identifier in document: return
+    del document[ identifier ]
+    with fixtures_path.open( 'wb' ) as file: dump( document, file )
 
 
 @task
@@ -285,10 +299,7 @@ def _freshen_python_packages( context, version = None ):
     render_boxed_title(
         'Freshen: Python Package Versions', supplement = version )
     context_options = derive_venv_context_options( version = version )
-    identifier = identify_python(
-        'pep508-environment',
-        python_path = which(
-            'python', path = context_options[ 'env' ][ 'PATH' ] ) )
+    identifier = pep508_identify_python( version = version )
     install_python_packages( context, context_options )
     fixtures = calculate_python_packages_fixtures( context_options )
     record_python_packages_fixtures( identifier, fixtures )
