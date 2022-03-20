@@ -49,3 +49,15 @@ Remove Dependency on ``invoke``
 * Surfacing parameters from subtasks.
 
 * Handle via ``develop.py``.
+
+Provide In-Tree PEP 517 Build Backend
+===============================================================================
+
+* Proxy to Setuptools 'build_meta' backend, once it supports the 'build_base'
+  option.
+
+* https://peps.python.org/pep-0517/#build-backend-interface
+
+* https://setuptools.pypa.io/en/latest/build_meta.html#dynamic-build-dependencies-and-other-build-meta-tweaks
+
+* https://github.com/pypa/setuptools/blob/main/setuptools/build_meta.py
