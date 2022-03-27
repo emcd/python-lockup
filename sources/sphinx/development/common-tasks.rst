@@ -90,7 +90,7 @@ and increases the chance of misapplied syntax.
 Linting
 ===============================================================================
 
-Our primary Python linter is `Pylint <https://www.pylint.org/>`_.
+Our primary Python linter is `Pylint <https://pylint.pycqa.org/en/latest/>`_.
 Note that we use this as an actual static analysis tool
 and not merely a style checker. You can lint the sources by::
 
