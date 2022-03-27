@@ -38,6 +38,7 @@ from shlex import (
     quote as shell_quote,
 )
 from shutil import which
+from subprocess import CalledProcessError as ProcessInvocationError
 from sys import stderr
 from tempfile import NamedTemporaryFile, TemporaryDirectory
 from time import sleep
@@ -251,26 +252,31 @@ def freshen_pythons( context ):
     render_boxed_title( 'Freshen: Python Versions' )
     minors_regex = re.compile(
         r'''^(?P<prefix>\w+(?:\d+\.\d+)?-)?(?P<minor>\d+\.\d+)\..*$''' )
-    old_versions = {
-        version: pep508_identify_python( version = version )
-        for version in indicate_python_versions_support( )
-    }
-    latest_versions = [ ]
-    for version, identifier in old_versions.items( ):
+    successor_versions = [ ]
+    obsolete_identifiers = set( )
+    for version in indicate_python_versions_support( ):
         groups = minors_regex.match( version ).groupdict( )
         minor_version = "{prefix}{minor}".format(
             prefix = groups.get( 'prefix' ) or '',
             minor = groups[ 'minor' ] )
-        latest_version = context.run(
-            f"asdf latest python {minor_version}",
-            hide = 'stdout' ).stdout.strip( )
-        context.run( f"asdf install python {latest_version}", pty = True )
-        latest_versions.append( latest_version )
-        if version != latest_version:
-            delete_python_packages_fixtures( identifier )
+        successor_version = standard_execute_external(
+            ( *split_command( 'asdf latest python' ), minor_version )
+        ).stdout.strip( )
+        try: identifier = pep508_identify_python( version = version )
+        # Version may not be installed.
+        except ProcessInvocationError: pass
+        else: obsolete_identifiers.add( identifier )
+        context.run( f"asdf install python {successor_version}", pty = True )
+        # Do not erase packages fixtures for extant versions.
+        obsolete_identifiers.discard( pep508_identify_python(
+            version = successor_version ) )
+        successor_versions.append( successor_version )
     # Can only update local versions after they are installed.
     context.run( "asdf local python {versions}".format(
-        versions = ' '.join( latest_versions ) ), pty = True )
+        versions = ' '.join( successor_versions ) ), pty = True )
+    # Remove packages fixtures for out-of-date versions.
+    for identifier in obsolete_identifiers:
+        delete_python_packages_fixtures( identifier )
 
 
 def delete_python_packages_fixtures( identifier ):
