@@ -34,6 +34,7 @@ class __:
     from urllib.request import ( Request as HttpRequest, urlopen, )
 
     from .base import (
+        eprint, epprint,
         generate_pip_requirements_text,
         on_tty,
         paths,
@@ -135,7 +136,9 @@ def install_python_packages( context, context_options, identifier = None ):
         pty = __.on_tty, **context_options )
     if not identifier or not frozen:
         pip_options = [ ]
-        if not identifier: pip_options.append( '--upgrade' )
+        if not identifier:
+            pip_options.append( '--upgrade' )
+            pip_options.append( '--upgrade-strategy eager' )
         execute_pip_with_requirements(
             context, context_options, 'install', raw,
             pip_options = pip_options )
