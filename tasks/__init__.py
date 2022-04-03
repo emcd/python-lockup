@@ -58,7 +58,7 @@ from .base import (
     render_boxed_title,
     unlink_recursively,
 )
-from .version import (
+from .versions import (
     Version,
 )
 from our_base import (
