@@ -32,9 +32,7 @@ from contextlib import ExitStack as CMStack
 from itertools import chain
 from os import environ as psenv
 from pathlib import Path
-from shlex import split as split_command
 from shutil import which
-from subprocess import CalledProcessError as ProcessInvocationError
 from sys import stderr
 from tempfile import TemporaryDirectory
 from time import sleep
@@ -66,12 +64,14 @@ from our_base import (
     ensure_directory,
     indicate_python_packages,
     project_name,
-    standard_execute_external,
 )
 
 
 class __:
 
+    from .base import (
+        detect_vmgr_python_version,
+    )
     from .packages import (
         calculate_python_packages_fixtures,
         delete_python_packages_fixtures,
@@ -80,6 +80,9 @@ class __:
         install_python_packages,
         record_python_packages_fixtures,
         retrieve_pypi_release_information,
+    )
+    from .platforms import (
+        freshen_python,
     )
 
 
@@ -230,38 +233,29 @@ def freshen_asdf( context ):
 
 
 @task( pre = ( freshen_asdf, ) )
-def freshen_pythons( context ):
-    ''' Updates each supported Python minor version to latest patch.
+def freshen_python( context, version = None ):
+    ''' Updates supported Python minor version to latest patch.
+
+        If version is 'ALL', then all supported Pythons are targeted.
 
         This task requires Internet access and may take some time. '''
-    render_boxed_title( 'Freshen: Python Versions' )
-    minors_regex = re.compile(
-        r'''^(?P<prefix>\w+(?:\d+\.\d+)?-)?(?P<minor>\d+\.\d+)\..*$''' )
-    successor_versions = [ ]
+    original_versions = indicate_python_versions_support( )
+    if 'ALL' == version: versions = original_versions
+    else: versions = ( version or __.detect_vmgr_python_version( ), )
     obsolete_identifiers = set( )
-    for version in indicate_python_versions_support( ):
-        groups = minors_regex.match( version ).groupdict( )
-        minor_version = "{prefix}{minor}".format(
-            prefix = groups.get( 'prefix' ) or '',
-            minor = groups[ 'minor' ] )
-        successor_version = standard_execute_external(
-            ( *split_command( 'asdf latest python' ), minor_version )
-        ).stdout.strip( )
-        try: identifier = pep508_identify_python( version = version )
-        # Version may not be installed.
-        except ProcessInvocationError: pass
-        else: obsolete_identifiers.add( identifier )
-        context.run( f"asdf install python {successor_version}", pty = True )
-        # Do not erase packages fixtures for extant versions.
-        obsolete_identifiers.discard( pep508_identify_python(
-            version = successor_version ) )
-        successor_versions.append( successor_version )
-    # Can only update local versions after they are installed.
+    version_replacements = { }
+    for version_ in versions:
+        replacement, identifier = __.freshen_python( context, version_ )
+        version_replacements.update( replacement )
+        if None is not identifier: obsolete_identifiers.add( identifier )
+    # Can only update record of local versions after they are installed.
+    successor_versions = [
+        version_replacements.get( version_, version_ )
+        for version_ in original_versions ]
     context.run( "asdf local python {versions}".format(
         versions = ' '.join( successor_versions ) ), pty = True )
-    # Remove packages fixtures for out-of-date versions.
-    for identifier in obsolete_identifiers:
-        __.delete_python_packages_fixtures( identifier )
+    # Erase packages fixtures for versions which are no longer extant.
+    __.delete_python_packages_fixtures( obsolete_identifiers )
 
 
 @task
@@ -313,7 +307,7 @@ def freshen_git_hooks( context ):
 @task(
     pre = (
         call( clean ),
-        call( freshen_pythons ),
+        call( freshen_python, version = 'ALL' ),
         call( freshen_python_packages, version = 'ALL' ),
         call( freshen_git_modules ),
         call( freshen_git_hooks ),

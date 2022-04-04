@@ -109,6 +109,7 @@ def detect_vmgr_python_path( version = None ):
 
 def detect_vmgr_python_version( ):
     ''' Detects Python handle selected by version manager. '''
+    # TODO: If in venv, then get active Python version.
     return next( iter( indicate_python_versions_support( ) ) )
 
 
