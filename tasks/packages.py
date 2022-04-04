@@ -81,8 +81,8 @@ def record_python_packages_fixtures( identifier, fixtures ):
     with fixtures_path.open( 'wb' ) as file: dump( document, file )
 
 
-def delete_python_packages_fixtures( identifier ):
-    ''' Deletes table of Python packages fixtures. '''
+def delete_python_packages_fixtures( identifiers ):
+    ''' Deletes tables of Python packages fixtures. '''
     __.ensure_python_package( 'tomli' )
     from tomli import load
     __.ensure_python_package( 'tomli-w' )
@@ -90,8 +90,9 @@ def delete_python_packages_fixtures( identifier ):
     fixtures_path = __.paths.configuration.pypackages_fixtures
     if not fixtures_path.exists( ): return
     with fixtures_path.open( 'rb' ) as file: document = load( file )
-    if not identifier in document: return
-    del document[ identifier ]
+    for identifier in identifiers:
+        if identifier not in document: continue
+        document.pop( identifier )
     with fixtures_path.open( 'wb' ) as file: dump( document, file )
 
 
