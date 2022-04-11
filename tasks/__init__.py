@@ -46,8 +46,6 @@ from invoke import Context, Exit, Failure, call, task
 from .base import (
     assert_gpg_tty,
     derive_venv_context_options,
-    derive_venv_path,
-    detect_vmgr_python_path,
     eprint, epprint,
     indicate_python_versions_support,
     on_tty,
@@ -61,7 +59,6 @@ from .versions import (
 )
 from our_base import (
     discover_project_version,
-    ensure_directory,
     indicate_python_packages,
     project_name,
 )
@@ -71,6 +68,9 @@ class __:
 
     from .base import (
         detect_vmgr_python_version,
+    )
+    from .environments import (
+        build_python_venv,
     )
     from .packages import (
         calculate_python_packages_fixtures,
@@ -111,32 +111,20 @@ def install_pythons( context ):
 
 
 @task( pre = ( install_pythons, ) )
-def build_python_venvs( context ):
-    ''' Creates virtual environment for each supported Python version. '''
-    for version in indicate_python_versions_support( ):
-        build_python_venv( context, version )
-
-
-@task
 def build_python_venv( context, version, overwrite = False ):
     ''' Creates virtual environment for requested Python version. '''
-    render_boxed_title( f"Build: Python Virtual Environment ({version})" )
-    python_path = detect_vmgr_python_path( version )
-    venv_path = ensure_directory( derive_venv_path( version, python_path ) )
-    venv_options = [ ]
-    if overwrite: venv_options.append( '--clear' )
-    venv_options_str = ' '.join( venv_options )
-    context.run(
-        f"{python_path} -m venv {venv_options_str} {venv_path}", pty = True )
-    context_options = derive_venv_context_options( venv_path )
-    __.install_python_packages( context, context_options )
-    fixtures = __.calculate_python_packages_fixtures(
-        context_options[ 'env' ] )
-    identifier = pep508_identify_python( version = version )
-    __.record_python_packages_fixtures( identifier, fixtures )
+    if 'ALL' == version: versions = indicate_python_versions_support( )
+    else: versions = ( version, )
+    for version_ in versions:
+        __.build_python_venv( context, version_, overwrite = overwrite )
 
 
-@task( pre = ( build_python_venvs, install_git_hooks, ) )
+@task(
+    pre = (
+        call( build_python_venv, version = 'ALL' ),
+        call( install_git_hooks ),
+    )
+)
 def bootstrap( context ): # pylint: disable=unused-argument
     ''' Bootstraps the development environment and utilities. '''
 
