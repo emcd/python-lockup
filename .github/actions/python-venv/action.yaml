@@ -42,6 +42,6 @@ runs:
     - name: Create Virtual Environments
       run: |
         set -eu
-        invoke build-python-venvs
+        invoke build-python-venv --version ALL
         asdf reshim python
       shell: bash
