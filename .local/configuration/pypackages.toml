@@ -21,8 +21,7 @@ lint = [
   # Pylint relies on 'typed_ast', which does not build under PyPy. (As of 2021-12-23.)
   'pylint; implementation_name != "pypy"',
   'safety',
-  # Semgrep crashing on Github Actions PyPy. (As of 2022-02-13.)
-  'semgrep; implementation_name != "pypy"',
+  'semgrep',
 ]
 management = [
   'bump2version',
