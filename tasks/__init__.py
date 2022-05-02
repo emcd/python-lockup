@@ -30,7 +30,6 @@ import re
 
 from contextlib import ExitStack as CMStack
 from itertools import chain
-from os import environ as psenv
 from pathlib import Path
 from shutil import which
 from sys import stderr
@@ -83,6 +82,7 @@ class __:
     )
     from .platforms import (
         freshen_python,
+        install_python_builder,
     )
 
 
@@ -218,6 +218,8 @@ def freshen_asdf( context ):
     render_boxed_title( 'Freshen: Version Manager' )
     context.run( 'asdf update', pty = on_tty )
     context.run( 'asdf plugin update python', pty = on_tty )
+    # TODO: Preserve this call after 'freshen_asdf' has been removed.
+    __.install_python_builder( )
 
 
 @task( pre = ( freshen_asdf, ) )
@@ -295,9 +297,9 @@ def freshen_git_hooks( context ):
 @task(
     pre = (
         call( clean ),
+        call( freshen_git_modules ),
         call( freshen_python, version = 'ALL' ),
         call( freshen_python_packages, version = 'ALL' ),
-        call( freshen_git_modules ),
         call( freshen_git_hooks ),
     )
 )

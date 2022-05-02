@@ -66,6 +66,8 @@ def _calculate_artifacts_paths( paths_ ):
 def _calculate_caches_paths( paths_ ):
     caches_path = paths_.local / 'caches'
     packages_path = caches_path / 'packages'
+    platforms_path = caches_path / 'platforms'
+    utilities_path = caches_path / 'utilities'
     return SimpleNamespace(
         SELF = caches_path,
         # Note: 'setuptools' hardcodes the eggs path.
@@ -74,8 +76,14 @@ def _calculate_caches_paths( paths_ ):
         packages = SimpleNamespace(
             python3 = packages_path / 'python3',
         ),
-        sphinx = caches_path / 'sphinx',
+        platforms = SimpleNamespace(
+            python3 = platforms_path / 'python3',
+        ),
         setuptools = caches_path / 'setuptools',
+        sphinx = caches_path / 'sphinx',
+        utilities = SimpleNamespace(
+            python_build = utilities_path / 'python-build',
+        ),
     )
 
 

@@ -17,6 +17,7 @@
 #                                                                            #
 #============================================================================#
 
+
 ''' Management of development platforms. '''
 
 
@@ -24,6 +25,10 @@ class __:
 
     import re
 
+    from os import (
+        environ as active_process_environment,
+        name as os_class,
+    )
     from shlex import split as split_command
     from subprocess import CalledProcessError as ProcessInvocationError
 
@@ -32,8 +37,26 @@ class __:
         render_boxed_title,
     )
     from our_base import (
+        paths,
         standard_execute_external,
     )
+
+
+def install_python_builder( ):
+    ''' Install Python builder utility for platform, if one exists. '''
+    if 'posix' == __.os_class: install_python_builder_posix( )
+
+
+def install_python_builder_posix( ):
+    ''' Installs 'python-build' utility. '''
+    environment = __.active_process_environment.copy( )
+    environment.update( dict(
+        PREFIX = __.paths.caches.utilities.python_build,
+    ) )
+    __.standard_execute_external(
+        str( __.paths.scm_modules.joinpath(
+            'pyenv', 'plugins', 'python-build', 'install.sh' ) ),
+        env = environment )
 
 
 def freshen_python( context, original_version ):
