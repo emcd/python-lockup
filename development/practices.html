@@ -1,0 +1,365 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="License" href="../license.html" /><link rel="prev" title="Internal API Documentation" href="internal-api.html" />
+
+    <meta name="generator" content="sphinx-5.0.2, furo 2022.06.21"/>
+        <title>Recommended Practices - lockup 2.0a202112310633 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/tabs.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">lockup 2.0a202112310633 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Documentation</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../contribution.html">Contribution</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="environment.html">Environment and Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="requirements.html">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="common-tasks.html">Common Tasks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="internal-api.html">Internal API Documentation</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Recommended Practices</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CHANGELOG.html">Changelog</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="recommended-practices">
+<h1>Recommended Practices<a class="headerlink" href="#recommended-practices" title="Permalink to this heading">#</a></h1>
+<section id="assertions-and-exceptions">
+<h2>Assertions and Exceptions<a class="headerlink" href="#assertions-and-exceptions" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Do not use <code class="docutils literal notranslate"><span class="pre">assert</span></code> statements except in unit tests.
+Assertions are not triggered in optimized compilations. Raise a
+<a class="reference internal" href="internal-api.html#lockup.base.InvalidState" title="lockup.exceptions.InvalidState"><code class="xref py py-exc docutils literal notranslate"><span class="pre">InvalidState</span></code></a> exception to report invalid internal state.</p></li>
+<li><p>Do not report incorrect invocations or invalid argument data
+as invalid internal state. I.e., raise an exception in the
+<a class="reference internal" href="internal-api.html#lockup.base.InvalidOperation" title="lockup.exceptions.InvalidOperation"><code class="xref py py-exc docutils literal notranslate"><span class="pre">InvalidOperation</span></code></a> family rather than an exception in the
+<a class="reference internal" href="internal-api.html#lockup.base.InvalidState" title="lockup.exceptions.InvalidState"><code class="xref py py-exc docutils literal notranslate"><span class="pre">InvalidState</span></code></a> family.</p></li>
+<li><p>Never raise a non-package exception from inside the package.
+Part of the API contract is that only exceptions in the
+<a class="reference internal" href="internal-api.html#lockup.base.InvalidOperation" title="lockup.exceptions.InvalidOperation"><code class="xref py py-exc docutils literal notranslate"><span class="pre">InvalidOperation</span></code></a> and <a class="reference internal" href="internal-api.html#lockup.base.InvalidState" title="lockup.exceptions.InvalidState"><code class="xref py py-exc docutils literal notranslate"><span class="pre">InvalidState</span></code></a> families are permitted
+to cross the API boundary.</p></li>
+<li><p>Always consider whether an invocation can leak Python built-in
+exceptions across the API boundary and explicitly manage those which can.</p></li>
+</ul>
+</section>
+<section id="code-style-and-legibility">
+<h2>Code Style and Legibility<a class="headerlink" href="#code-style-and-legibility" title="Permalink to this heading">#</a></h2>
+<p>Code style can be a surprisingly contentious issue. This project <em>does not</em> run
+any style checker or code reformatter, such as <a class="reference external" href="https://pypi.org/project/autopep8/">autopep8</a> or <a class="reference external" href="https://pypi.org/project/black/">black</a>. However, it is expected that patches will
+follow a style similar to what is already present. Some basic guidance is
+enforced via <a class="reference external" href="https://editorconfig.org">EditorConfig</a>, but mostly it is up to the patch submitter to try
+to match the existing style. Though it is not perfect and good judgment will
+still need to be exercised, you can execute the following on an uncommitted
+patch to receive additional hints:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pipenv</span> <span class="n">run</span> <span class="n">invoke</span> <span class="n">check</span><span class="o">-</span><span class="n">code</span><span class="o">-</span><span class="n">style</span>
+</pre></div>
+</div>
+<p>Unwitting “offenses” in new code can be readily forgiven, but patches which
+contain reformatting noise against existing code will almost certainly be
+rejected. Please digest this <a class="reference external" href="https://softwareengineering.stackexchange.com/questions/226440/is-it-okay-to-make-coding-style-changes-on-an-open-source-project-that-doesnt-f">Stack Exchange discussion on reformatting</a>.</p>
+<p>Some tips:</p>
+<ul class="simple">
+<li><p>Horizontal space surrounding identifiers and literals improves legibility.
+Prior to the introduction of spaces between words around fourteen centuries
+ago, readers had to either parse words from <a class="reference external" href="https://en.wikipedia.org/wiki/Scriptio_continua">scriptio continua</a> or with the use of a
+<a class="reference external" href="https://en.wikipedia.org/wiki/Word_divider">word divider</a> symbol, such as
+the <a class="reference external" href="https://en.wikipedia.org/wiki/Interpunct">interpunct</a>. Reading
+identifiers from code, which are separated only by delimiters, is equivalent
+to reading words separated by interpuncts, except that the syntactic noise is
+even higher due to the variety of delimiters (parentheses, commas, colons,
+etc…). Using horizontal space, an innovation from nearly 1.5 millennia ago,
+can reduce the cognitive load of filtering noise from syntactic markers.</p></li>
+<li><p>Try to keep function bodies under twenty (20) lines, no more than thirty
+(30) lines maximum. Long functions are probably doing too much and they
+are also difficult for the reader to comprehend. Bugs in them will be more
+likely to occur and possibly harder to track down.</p></li>
+<li><p>Related to the previous bullets is the principle of maintaining a vertically
+compact visual presentation for more related code on screen at the same time.
+To this end, single line conditional statements are not only accepted but
+encouraged. Examples include <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">&lt;condition&gt;:</span> <span class="pre">break</span></code>, <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">&lt;condition&gt;:</span>
+<span class="pre">continue</span></code>, <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">&lt;condition&gt;:</span> <span class="pre">return</span> <span class="pre">&lt;data&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">else:</span> <span class="pre">return</span> <span class="pre">&lt;data&gt;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">except</span> <span class="pre">&lt;exception-list&gt;</span> <span class="pre">as</span> <span class="pre">exc:</span> <span class="pre">pass</span></code>, etc….</p></li>
+<li><p>Please avoid excessive indentation. For example, using <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">not</span> <span class="pre">&lt;condition&gt;:</span>
+<span class="pre">continue</span></code> inside a loop body is generally preferable to using <code class="docutils literal notranslate"><span class="pre">if</span>
+<span class="pre">&lt;condition&gt;:</span></code> followed by indented lines inside that body. Excessive
+indentation tends to cause code to become smushed against the right margin,
+which reduces legibility.</p></li>
+<li><p>Please do not use lower camel case (<code class="docutils literal notranslate"><span class="pre">camelCase</span></code>) for anything. In addition
+to increasing the chance for typographic errors from not pressing or
+releasing the shift key on time, it suffers from legibility issues. Upper
+camel case (aka., Pascal case) (<code class="docutils literal notranslate"><span class="pre">CamelCase</span></code>) can be used for the names of
+types, but not for anything else. Aside from that, please use an underscore
+(<code class="docutils literal notranslate"><span class="pre">_</span></code>) to separate words within an identifier. Since Python does not support
+hyphens in identifiers, underscores can serve as reasonable visual separators
+instead, although they can also suffer typographic errors from incorrect
+shift key timing. I.e., prefer <code class="docutils literal notranslate"><span class="pre">is_function</span></code> to <code class="docutils literal notranslate"><span class="pre">isfunction</span></code> and
+<code class="docutils literal notranslate"><span class="pre">starts_with</span></code> to <code class="docutils literal notranslate"><span class="pre">startswith</span></code>, in spite of seeing the unseparated words
+convention in use on standard Python types and in the Python standard
+library. The convenience of legibility outweighs the inconvenience of
+mistyping underscores or letters around them, as code should be read more
+than it is written.</p></li>
+</ul>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../license.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">License</div>
+              </div>
+              <svg><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="internal-api.html">
+              <svg><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Internal API Documentation</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2021-2022, Eric McDonald
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Recommended Practices</a><ul>
+<li><a class="reference internal" href="#assertions-and-exceptions">Assertions and Exceptions</a></li>
+<li><a class="reference internal" href="#code-style-and-legibility">Code Style and Legibility</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/scripts/furo.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/tabs.js"></script>
+    </body>
+</html>
