@@ -326,16 +326,16 @@ def lint_mypy( context, packages, modules, files, version = None ):
     if not which( 'mypy', path = context_options[ 'env' ][ 'PATH' ] ):
         eprint( 'Mypy not available on this platform. Skipping.' )
         return
-    environment_str = f"MYPYPATH={paths.project}:{paths.sources.p.python3}"
     configuration_str = f"--config-file {paths.configuration.mypy}"
-    if not packages and not modules and not files: packages = ( project_name, )
+    if not packages and not modules and not files:
+        #files = ( paths.sources.p.python3, paths.project / 'tasks' )
+        files = ( paths.sources.p.python3, )
     packages_str = ' '.join( map(
         lambda package: f"--package {package}", packages ) )
     modules_str = ' '.join( map(
         lambda module: f"--module {module}", modules ) )
     files_str = ' '.join( map( str, files ) )
     context.run(
-        f"{environment_str} "
         f"mypy {configuration_str} "
         f"{packages_str} {modules_str} {files_str}",
         pty = True, **context_options )
