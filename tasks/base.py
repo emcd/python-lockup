@@ -205,11 +205,10 @@ def unlink_recursively( path ):
     if not path.is_dir( ):
         path.unlink( )
         return
-    dirs_stack = [ ]
+    dirs_stack = [ path ]
     for child_path in path.rglob( '*' ):
         if child_path.is_dir( ) and not child_path.is_symlink( ):
             dirs_stack.append( child_path )
             continue
         child_path.unlink( )
     while dirs_stack: dirs_stack.pop( ).rmdir( )
-    path.rmdir( )
