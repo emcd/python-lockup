@@ -31,7 +31,6 @@ import re
 from contextlib import ExitStack as CMStack
 from itertools import chain
 from pathlib import Path
-from shutil import which
 from sys import stderr
 from tempfile import TemporaryDirectory
 from time import sleep
@@ -67,6 +66,7 @@ class __:
 
     from .base import (
         detect_vmgr_python_version,
+        is_executable_in_venv,
     )
     from .environments import (
         build_python_venv,
@@ -323,7 +323,9 @@ def lint_mypy( context, packages, modules, files, version = None ):
     ''' Lints the source code with Mypy. '''
     render_boxed_title( 'Lint: MyPy', supplement = version )
     context_options = derive_venv_context_options( version = version )
-    if not which( 'mypy', path = context_options[ 'env' ][ 'PATH' ] ):
+    if not __.is_executable_in_venv(
+        'mypy', venv_path = context_options[ 'env' ][ 'VIRTUAL_ENV' ]
+    ):
         eprint( 'Mypy not available on this platform. Skipping.' )
         return
     configuration_str = f"--config-file {paths.configuration.mypy}"
@@ -346,7 +348,9 @@ def lint_pylint( context, targets, checks, version = None ):
     ''' Lints the source code with Pylint. '''
     render_boxed_title( 'Lint: Pylint', supplement = version )
     context_options = derive_venv_context_options( version = version )
-    if not which( 'pylint', path = context_options[ 'env' ][ 'PATH' ] ):
+    if not __.is_executable_in_venv(
+        'pylint', venv_path = context_options[ 'env' ][ 'VIRTUAL_ENV' ]
+    ):
         eprint( 'Pylint not available on this platform. Skipping.' )
         return
     reports_str = '--reports=no --score=no' if targets or checks else ''
@@ -371,7 +375,9 @@ def lint_semgrep( context, version = None ):
     ''' Lints the source code with Semgrep. '''
     render_boxed_title( 'Lint: Semgrep', supplement = version )
     context_options = derive_venv_context_options( version = version )
-    if not which( 'semgrep', path = context_options[ 'env' ][ 'PATH' ] ):
+    if not __.is_executable_in_venv(
+        'semgrep', venv_path = context_options[ 'env' ][ 'VIRTUAL_ENV' ]
+    ):
         eprint( 'Semgrep not available on this platform. Skipping.' )
         return
     sgconfig_path = paths.scm_modules / 'semgrep-rules' / 'python' / 'lang'
