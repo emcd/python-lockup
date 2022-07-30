@@ -133,14 +133,14 @@ def bootstrap( context ): # pylint: disable=unused-argument
 def clean_pycaches( context ): # pylint: disable=unused-argument
     ''' Removes all caches of compiled CPython bytecode. '''
     render_boxed_title( 'Clean: Python Caches' )
-    anchors = ( paths.sources.p.python3, paths.tests.p.python3, )
-    # TODO? Use 'shutil.rmtree' instead.
-    for path in chain.from_iterable( map(
-        lambda anchor: anchor.rglob( '__pycache__/*' ), anchors
-    ) ): path.unlink( )
+    anchors = (
+        paths.sources.d.python3, paths.sources.p.python3,
+        paths.sources.p.sphinx,
+        paths.tests.p.python3,
+    )
     for path in chain.from_iterable( map(
         lambda anchor: anchor.rglob( '__pycache__' ), anchors
-    ) ): path.rmdir( )
+    ) ): unlink_recursively( path )
 
 
 @task
@@ -148,8 +148,9 @@ def clean_tool_caches( context ): # pylint: disable=unused-argument
     ''' Clears the caches used by code generation and testing utilities. '''
     render_boxed_title( 'Clean: Tool Caches' )
     # TODO? Simplify by using a single .gitignore in paths.caches.
+    #       Will need to ensure cache directories when they are expected.
     anchors = paths.caches.SELF.glob( '*' )
-    gitignore_paths = set( paths.caches.SELF.glob( '*/.gitignore' ) )
+    gitignore_paths = frozenset( paths.caches.SELF.glob( '*/.gitignore' ) )
     dirs_stack = [ ]
     for path in chain.from_iterable( map(
         lambda anchor: anchor.rglob( '*' ), anchors
