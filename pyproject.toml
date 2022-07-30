@@ -63,13 +63,25 @@ ignore = []
 # Warning: Parallelizing causes diagnostic output to be interleaved
 #          and also messes with similarities detection and dependency grouping.
 jobs = 1
+load-plugins = [
+  "pylint.extensions.check_elif",
+  # "pylint.extensions.consider_ternary_expression",
+  "pylint.extensions.eq_without_hash",
+  "pylint.extensions.for_any_all",
+  "pylint.extensions.mccabe",
+  "pylint.extensions.no_self_use",
+  "pylint.extensions.overlapping_exceptions",
+  "pylint.extensions.private_import",
+  "pylint.extensions.redefined_loop_name",
+  # "pylint.extensions.set_membership",
+  # "pylint.extensions.while_used",
+]
 [tool.pylint.'MESSAGES CONTROL']
 disable = [
   "consider-using-f-string",
   "fixme",
   "f-string-without-interpolation",
   "import-outside-toplevel",
-  "misplaced-comparison-constant",
   "multiple-statements",
   "reimported",
   "too-few-public-methods",
@@ -87,7 +99,6 @@ ignore-mixin-members = false
 good-names = [ "_", "__" ]
 include-naming-hint = true
 const-rgx = '([A-Za-z_][A-Za-z0-9_]{2,30}|(__.*__))$'
-const-name-hint = '([A-Za-z_][A-Za-z0-9_]{2,30}|(__.*__))$'
 [tool.pylint.FORMAT]
 max-line-length = 79
 ignore-long-lines = '^(\s*(#\s*)?<?https?://\S+>?|.*\s+#\s*.*)$'

@@ -170,11 +170,12 @@ def indicate_current_python_packages( environment ):
         if line.startswith( '-e' ):
             entry.flags.append( 'editable' )
             # Replace '-e' with '{package_name}@'.
-            line = ' '.join( (
+            requirement = ' '.join( (
                 line.rsplit( '=', maxsplit = 1 )[ -1 ] + '@',
                 line.split( ' ', maxsplit = 1 )[ 1 ]
             ) )
-        entry.requirement = Requirement( line )
+        else: requirement = line
+        entry.requirement = Requirement( requirement )
         entries.append( entry )
     return entries
 
