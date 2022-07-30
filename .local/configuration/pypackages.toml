@@ -1,3 +1,7 @@
+# References:
+#   PEP 508 ("Dependency specification for Python Software Packages"):
+#     https://peps.python.org/pep-0508/
+
 installation = [ ]
 
 [optional-installation]
@@ -15,11 +19,13 @@ documentation = [
 ]
 lint = [
   'bandit',
-  # Mypy relies on 'typed_ast', which does not build under PyPy. (As of 2021-12-23.)
-  'mypy; implementation_name != "pypy"',
+  # Mypy relies on 'typed_ast', which does not build under PyPy 3.7.
+  #   https://github.com/python/typed_ast/issues/111
+  'mypy; implementation_name != "pypy" or python_version >= "3.8"',
   'pre-commit',
-  # Pylint relies on 'typed_ast', which does not build under PyPy. (As of 2021-12-23.)
-  'pylint; implementation_name != "pypy"',
+  # Pylint relies on 'typed_ast', which does not build under PyPy 3.7.
+  #   https://github.com/python/typed_ast/issues/111
+  'pylint; implementation_name != "pypy" or python_version >= "3.8"',
   'safety',
   # Semgrep crashing on Github Actions PyPy. (As of 2022-02-13.)
   'semgrep; implementation_name != "pypy"',
