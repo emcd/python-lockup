@@ -24,7 +24,10 @@
 import re
 
 from functools import partial as partial_function
-from os import environ as psenv, pathsep
+from os import (
+    F_OK, R_OK, X_OK,
+    access as test_fs_access, environ as psenv, pathsep,
+)
 from pathlib import Path
 from pprint import pprint
 from shlex import split as split_command
@@ -65,11 +68,23 @@ def pep508_identify_python( version = None ):
     return identify_python( 'pep508-environment', python_path = python_path )
 
 
+def is_executable_in_venv( name, venv_path = None, version = None ):
+    ''' Checks if file is executable from virtual environment.
+
+        Preferable over :py:func:`shutil.which` since it will not erroneously
+        pick up shims, such as Asdf uses. '''
+    venv_path = Path( venv_path or derive_venv_path( version = version ) )
+    for path in ( venv_path / 'bin' ).iterdir( ):
+        if name != path.name: continue
+        if test_fs_access( path, F_OK | R_OK | X_OK ): return True
+    return False
+
+
 def derive_venv_context_options(
     venv_path = None, version = None, variables = None
 ):
     ''' Derives flags for Python virtual environment in execution context. '''
-    venv_path = venv_path or derive_venv_path( version = version )
+    venv_path = Path( venv_path or derive_venv_path( version = version ) )
     return dict(
         env = derive_venv_variables( venv_path, variables = variables ),
         replace_env = True )
