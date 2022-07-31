@@ -40,7 +40,6 @@ class __:
         paths,
     )
     from our_base import (
-        ensure_python_package,
         standard_execute_external,
     )
 
@@ -69,9 +68,7 @@ def calculate_python_packages_fixtures( environment ):
 
 def record_python_packages_fixtures( identifier, fixtures ):
     ''' Records table of Python packages fixtures. '''
-    __.ensure_python_package( 'tomli' )
     from tomli import load
-    __.ensure_python_package( 'tomli-w' )
     from tomli_w import dump
     fixtures_path = __.paths.configuration.pypackages_fixtures
     if fixtures_path.exists( ):
@@ -83,9 +80,7 @@ def record_python_packages_fixtures( identifier, fixtures ):
 
 def delete_python_packages_fixtures( identifiers ):
     ''' Deletes tables of Python packages fixtures. '''
-    __.ensure_python_package( 'tomli' )
     from tomli import load
-    __.ensure_python_package( 'tomli-w' )
     from tomli_w import dump
     fixtures_path = __.paths.configuration.pypackages_fixtures
     if not fixtures_path.exists( ): return
@@ -160,7 +155,6 @@ def install_python_packages( context, context_options, identifier = None ):
 
 def indicate_current_python_packages( environment ):
     ''' Returns currently-installed Python packages. '''
-    __.ensure_python_package( 'packaging' )
     from packaging.requirements import Requirement
     entries = [ ]
     for line in __.standard_execute_external(
