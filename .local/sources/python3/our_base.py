@@ -23,8 +23,8 @@
 
 from collections.abc import Mapping as AbstractDictionary
 from functools import partial as partial_function
-from importlib.util import find_spec as find_python_package_spec
 from itertools import chain
+from os import environ as psenv
 from pathlib import Path
 from shlex import split as split_command
 from subprocess import run
@@ -165,21 +165,28 @@ standard_execute_external = partial_function(
 current_python_abi_label = identify_python( 'bdist-compatibility' )
 
 
-# TODO? Handle multiple packages at once for better dependency resolution.
+# TODO: Handle multiple packages at once for better dependency resolution.
 def ensure_python_package( package_name ):
     ''' Ensures local availability of Python package. '''
+    # Ignore if in an appropriate virtual environment.
+    if current_python_abi_label == psenv.get( 'OUR_VENV_NAME' ): return
     # If 'pip' module is not available, then assume PEP 517 build in progress,
     # which should have already ensured packages from 'build-requires'.
     try: import pip # pylint: disable=unused-import
     except ImportError: return
     # Maybe trying to use package from this project?
+    # TODO: Install project packages from PyPI rather than use local source.
+    #       Otherwise, development infrastructure packages which rely
+    #       on older project package interfaces may be broken.
     if package_name in _our_project_packages: return
-    cache_path = str( ensure_directory(
-        paths.caches.packages.python3 / current_python_abi_label ) )
-    if cache_path not in python_search_paths:
-        python_search_paths.insert( 0, cache_path )
-    # Maybe package has already been imported into cache?
-    if find_python_package_spec( package_name, ( cache_path, ) ): return
+    cache_path = ensure_directory(
+        paths.caches.packages.python3 / current_python_abi_label )
+    cache_path_str = str( cache_path )
+    if cache_path_str not in python_search_paths:
+        python_search_paths.insert( 0, cache_path_str )
+    # Is package already in cache?
+    for path in cache_path.glob( '*' ):
+        if package_name == path.name: return
     standard_execute_external(
         ( *split_command( 'pip install --upgrade --target' ),
           cache_path, package_name ) )
@@ -191,8 +198,15 @@ def ensure_directory( path ):
     return path
 
 
-ensure_python_package( 'lockup' )
-ensure_python_package( 'tomli' )
+def ensure_python_support_packages( ):
+    ''' Ensures availability of development support Python packages. '''
+    # TODO: Read from 'pyproject.toml' build requirements.
+    #       Will need to ensure 'tomli' prior to doing so.
+    ensure_python_package( 'lockup' )
+    ensure_python_package( 'tomli' )
+
+
+ensure_python_support_packages( )
 
 
 def collapse_multilevel_dictionary( dictionary ):
@@ -208,7 +222,6 @@ def indicate_python_packages( identifier = None ):
 
         First is raw list of dependencies.
         Second is list of dependency fixtures (fixed on digest). '''
-    ensure_python_package( 'tomli' )
     from tomli import load
     fixtures_path = paths.configuration.pypackages_fixtures
     if identifier and fixtures_path.exists( ):
@@ -227,7 +240,6 @@ def discover_project_version( ):
 
 def discover_project_information( ):
     ''' Discovers information about project from local configuration. '''
-    ensure_python_package( 'tomli' )
     from tomli import load
     with paths.configuration.pyproject.open( 'rb' ) as file:
         tables = load( file )

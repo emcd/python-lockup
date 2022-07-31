@@ -84,6 +84,10 @@ class __:
         freshen_python,
         install_python_builder,
     )
+    from our_base import (
+        current_python_abi_label,
+        ensure_python_support_packages,
+    )
 
 
 # https://www.sphinx-doc.org/en/master/man/sphinx-build.html
@@ -144,24 +148,30 @@ def clean_pycaches( context ): # pylint: disable=unused-argument
 
 
 @task
-def clean_tool_caches( context ): # pylint: disable=unused-argument
+def clean_tool_caches( context, include_development_support = False ): # pylint: disable=unused-argument
     ''' Clears the caches used by code generation and testing utilities. '''
     render_boxed_title( 'Clean: Tool Caches' )
-    # TODO? Simplify by using a single .gitignore in paths.caches.
-    #       Will need to ensure cache directories when they are expected.
     anchors = paths.caches.SELF.glob( '*' )
-    gitignore_paths = frozenset( paths.caches.SELF.glob( '*/.gitignore' ) )
+    ignorable_paths = set( paths.caches.SELF.glob( '*/.gitignore' ) )
+    if not include_development_support:
+        ds_path = paths.caches.packages.python3 / __.current_python_abi_label
+        ignorable_paths.add( paths.caches.packages.python3 )
+        ignorable_paths.add( ds_path )
+        ignorable_paths.update( ds_path.rglob( '*' ) )
     dirs_stack = [ ]
     for path in chain.from_iterable( map(
         lambda anchor: anchor.rglob( '*' ), anchors
     ) ):
-        if path in gitignore_paths: continue
+        if path in ignorable_paths: continue
         if path.is_dir( ) and not path.is_symlink( ):
             dirs_stack.append( path )
             continue
         path.unlink( )
     while dirs_stack: dirs_stack.pop( ).rmdir( )
+    # Setuptools hardcodes the eggs path to different location.
     unlink_recursively( paths.caches.eggs )
+    # Regnerate development support packages cache, if necessary.
+    if include_development_support: __.ensure_python_support_packages( )
 
 
 @task
