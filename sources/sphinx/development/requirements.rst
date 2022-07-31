@@ -36,13 +36,13 @@ topics:
 * `GPG Key Generation
   <https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key>`_
 * `GPG Key Registration on Github
-  <https://docs.github.com/en/authentication/managing-commit-signature-verification/adding-a-new-gpg-key-to-your-github-account>`_
+  <https://docs.github.com/en/authentication/managing-commit-signature-verification/adding-a-gpg-key-to-your-github-account>`_
 * `Git Client Configuration for Commit Signatures
   <https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key>`_
 
 If you do not wish to expose a personal email address in association with a
 signing key, you can use the `no-reply email address
-<https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-user-account/managing-email-preferences/setting-your-commit-email-address>`_
+<https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/setting-your-commit-email-address>`_
 associated with your Github account instead.
 
 In addition to registering the signature verification public key, which
