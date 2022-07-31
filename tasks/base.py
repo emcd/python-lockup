@@ -37,6 +37,7 @@ from types import SimpleNamespace
 from invoke import Exit
 
 project_path = Path( __file__ ).parent.parent
+python_search_paths.insert( 0, str( project_path / 'sources' / 'python3' ) )
 python_search_paths.insert(
     0, str( project_path / '.local' / 'sources' / 'python3' ) )
 from our_base import (

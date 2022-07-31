@@ -23,6 +23,7 @@
 
 from collections.abc import Mapping as AbstractDictionary
 from functools import partial as partial_function
+from importlib.util import find_spec as find_python_package_spec
 from itertools import chain
 from pathlib import Path
 from shlex import split as split_command
@@ -143,8 +144,55 @@ def _calculate_tests_paths( paths_ ):
 paths = _calculate_paths( )
 
 
+_our_project_packages = frozenset(
+    path for path in paths.sources.p.python3.glob( '*' )
+    if path.is_dir( ) and path.suffix not in ( '.egg-info', )
+)
+
+
+def identify_python( mode, python_path = active_python_path ):
+    ''' Reports compatibility identifier for Python at given path.
+
+        If no path is provided, then calculates from Python in current use. '''
+    detector_path = paths.scripts.d.python3 / 'identify-python.py'
+    return standard_execute_external(
+        ( python_path, detector_path, '--mode', mode ) ).stdout.strip( )
+
+
 standard_execute_external = partial_function(
     run, check = True, capture_output = True, text = True )
+
+current_python_abi_label = identify_python( 'bdist-compatibility' )
+
+
+# TODO? Handle multiple packages at once for better dependency resolution.
+def ensure_python_package( package_name ):
+    ''' Ensures local availability of Python package. '''
+    # If 'pip' module is not available, then assume PEP 517 build in progress,
+    # which should have already ensured packages from 'build-requires'.
+    try: import pip # pylint: disable=unused-import
+    except ImportError: return
+    # Maybe trying to use package from this project?
+    if package_name in _our_project_packages: return
+    cache_path = str( ensure_directory(
+        paths.caches.packages.python3 / current_python_abi_label ) )
+    if cache_path not in python_search_paths:
+        python_search_paths.insert( 0, cache_path )
+    # Maybe package has already been imported into cache?
+    if find_python_package_spec( package_name, ( cache_path, ) ): return
+    standard_execute_external(
+        ( *split_command( 'pip install --upgrade --target' ),
+          cache_path, package_name ) )
+
+
+def ensure_directory( path ):
+    ''' Ensures existence of directory, creating if necessary. '''
+    path.mkdir( parents = True, exist_ok = True )
+    return path
+
+
+ensure_python_package( 'lockup' )
+ensure_python_package( 'tomli' )
 
 
 def collapse_multilevel_dictionary( dictionary ):
@@ -170,36 +218,6 @@ def indicate_python_packages( identifier = None ):
     with paths.configuration.pypackages.open( 'rb' ) as file:
         simples = load( file )
     return simples, fixtures
-
-
-def ensure_python_package( package_name ):
-    ''' Ensures local availability of Python package. '''
-    # If 'pip' module is not available, then assume PEP 517 build in progress,
-    # which should have already ensured packages from 'build-requires'.
-    try: import pip # pylint: disable=unused-import
-    except ImportError: return
-    abi_label = identify_python( 'bdist-compatibility' )
-    cache_path = ensure_directory( paths.caches.packages.python3 / abi_label )
-    if cache_path not in python_search_paths:
-        python_search_paths.insert( 0, str( cache_path ) )
-    standard_execute_external(
-        ( *split_command( 'pip install --upgrade --target' ),
-          cache_path, package_name ) )
-
-
-def identify_python( mode, python_path = active_python_path ):
-    ''' Reports compatibility identifier for Python at given path.
-
-        If no path is provided, then calculates from Python in current use. '''
-    detector_path = paths.scripts.d.python3 / 'identify-python.py'
-    return standard_execute_external(
-        ( python_path, detector_path, '--mode', mode ) ).stdout.strip( )
-
-
-def ensure_directory( path ):
-    ''' Ensures existence of directory, creating if necessary. '''
-    path.mkdir( parents = True, exist_ok = True )
-    return path
 
 
 def discover_project_version( ):
