@@ -322,7 +322,7 @@ def lint_bandit( context, version = None ):
 @task( iterable = ( 'packages', 'modules', 'files', ) )
 def lint_mypy( context, packages, modules, files, version = None ):
     ''' Lints the source code with Mypy. '''
-    render_boxed_title( 'Lint: MyPy', supplement = version )
+    render_boxed_title( 'Lint: Mypy', supplement = version )
     context_options = derive_venv_context_options( version = version )
     if not __.is_executable_in_venv(
         'mypy', venv_path = context_options[ 'env' ][ 'VIRTUAL_ENV' ]
