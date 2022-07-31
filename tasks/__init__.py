@@ -85,7 +85,7 @@ class __:
         install_python_builder,
     )
     from our_base import (
-        current_python_abi_label,
+        active_python_abi_label,
         ensure_python_support_packages,
     )
 
@@ -154,7 +154,7 @@ def clean_tool_caches( context, include_development_support = False ): # pylint:
     anchors = paths.caches.SELF.glob( '*' )
     ignorable_paths = set( paths.caches.SELF.glob( '*/.gitignore' ) )
     if not include_development_support:
-        ds_path = paths.caches.packages.python3 / __.current_python_abi_label
+        ds_path = paths.caches.packages.python3 / __.active_python_abi_label
         ignorable_paths.add( paths.caches.packages.python3 )
         ignorable_paths.add( ds_path )
         ignorable_paths.update( ds_path.rglob( '*' ) )

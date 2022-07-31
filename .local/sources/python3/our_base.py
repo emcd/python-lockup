@@ -26,6 +26,7 @@ from functools import partial as partial_function
 from itertools import chain
 from os import environ as psenv
 from pathlib import Path
+from re import match as regex_match
 from shlex import split as split_command
 from subprocess import run
 from sys import (
@@ -144,12 +145,6 @@ def _calculate_tests_paths( paths_ ):
 paths = _calculate_paths( )
 
 
-_our_project_packages = frozenset(
-    path for path in paths.sources.p.python3.glob( '*' )
-    if path.is_dir( ) and path.suffix not in ( '.egg-info', )
-)
-
-
 def identify_python( mode, python_path = active_python_path ):
     ''' Reports compatibility identifier for Python at given path.
 
@@ -162,48 +157,57 @@ def identify_python( mode, python_path = active_python_path ):
 standard_execute_external = partial_function(
     run, check = True, capture_output = True, text = True )
 
-current_python_abi_label = identify_python( 'bdist-compatibility' )
+active_python_abi_label = identify_python( 'bdist-compatibility' )
 
 
-# TODO: Handle multiple packages at once for better dependency resolution.
-def ensure_python_package( package_name ):
-    ''' Ensures local availability of Python package. '''
+def ensure_python_support_packages( ):
+    ''' Ensures availability of support packages to active Python. '''
+    # Ensure Tomli so that 'pyproject.toml' can be read.
+    # TODO: Remove this dependency once Python 3.11 is baseline.
+    _ensure_python_packages( ( 'tomli', ) )
+    # For now, we filter 'setuptools' and 'wheel'.
+    ignorable_package_names = ( 'setuptools', 'wheel', )
+    from tomli import load
+    with paths.configuration.pyproject.open( 'rb' ) as file:
+        requirements = tuple(
+            requirement
+            for requirement in load( file )[ 'build-system' ][ 'requires' ]
+            if not requirement.startswith( ignorable_package_names )
+        )
+    _ensure_python_packages( requirements )
+
+def _ensure_python_packages( requirements ):
+    ''' Ensures availability of packages to active Python. '''
     # Ignore if in an appropriate virtual environment.
-    if current_python_abi_label == psenv.get( 'OUR_VENV_NAME' ): return
+    if active_python_abi_label == psenv.get( 'OUR_VENV_NAME' ): return
     # If 'pip' module is not available, then assume PEP 517 build in progress,
     # which should have already ensured packages from 'build-requires'.
     try: import pip # pylint: disable=unused-import
     except ImportError: return
-    # Maybe trying to use package from this project?
-    # TODO: Install project packages from PyPI rather than use local source.
-    #       Otherwise, development infrastructure packages which rely
-    #       on older project package interfaces may be broken.
-    if package_name in _our_project_packages: return
     cache_path = ensure_directory(
-        paths.caches.packages.python3 / current_python_abi_label )
-    cache_path_str = str( cache_path )
-    if cache_path_str not in python_search_paths:
-        python_search_paths.insert( 0, cache_path_str )
-    # Is package already in cache?
-    for path in cache_path.glob( '*' ):
-        if package_name == path.name: return
-    standard_execute_external(
-        ( *split_command( 'pip install --upgrade --target' ),
-          cache_path, package_name ) )
+        paths.caches.packages.python3 / active_python_abi_label )
+    cache_path_ = str( cache_path )
+    if cache_path_ not in python_search_paths:
+        python_search_paths.insert( 0, cache_path_ )
+    # Ignore packages which are already cached.
+    in_cache_packages = frozenset(
+        path.name for path in cache_path.glob( '*' )
+        if path.suffix not in ( '.dist-info', ) )
+    def requirement_to_name( requirement ):
+        return regex_match( r'^([\w\-]+)(.*)$', requirement ).group( 1 )
+    installable_requirements = tuple(
+        requirement for requirement in requirements
+        if requirement_to_name( requirement ) not in in_cache_packages )
+    if installable_requirements:
+        standard_execute_external(
+            ( *split_command( 'pip install --upgrade --target' ),
+              cache_path_, *installable_requirements ) )
 
 
 def ensure_directory( path ):
     ''' Ensures existence of directory, creating if necessary. '''
     path.mkdir( parents = True, exist_ok = True )
     return path
-
-
-def ensure_python_support_packages( ):
-    ''' Ensures availability of development support Python packages. '''
-    # TODO: Read from 'pyproject.toml' build requirements.
-    #       Will need to ensure 'tomli' prior to doing so.
-    ensure_python_package( 'lockup' )
-    ensure_python_package( 'tomli' )
 
 
 ensure_python_support_packages( )
