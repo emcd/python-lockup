@@ -53,7 +53,7 @@ from our_base import discover_project_information
 _information = discover_project_information( )
 project = _information[ 'name' ]
 release = _information[ 'version' ]
-author = _information[ 'author' ][ 'name' ]
+author = _information[ 'authors' ][ 0 ][ 'name' ]
 project_copyright = _calculate_copyright_notice( _information, author )
 
 
