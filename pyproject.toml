@@ -1,9 +1,9 @@
 [build-system]
 requires = [
-  'lockup',   # Package from PyPI is for development support.
+  'lockup',  # Package from PyPI is for development support.
   'packaging',
-  'setuptools>=40.9.0',
-  'tomli',    # TODO: Use standard library 'tomllib' once Python 3.11 is baseline.
+  'setuptools>=61.0.0',  # Has 'pyproject.toml' support!
+  'tomli',  # TODO: Use standard library 'tomllib' once Python 3.11 is baseline.
   'tomli-w',
   'wheel',
 ]
@@ -12,7 +12,9 @@ build-backend = 'setuptools.build_meta'
 
 # https://www.python.org/dev/peps/pep-0621
 # https://packaging.python.org/en/latest/specifications/core-metadata
+# https://packaging.python.org/en/latest/specifications/declaring-project-metadata
 [project]
+dynamic = [ 'readme' ]
 name = 'lockup'
 # TODO: 'version' should be dynamic
 version = '2.0a202112310633'
@@ -34,24 +36,31 @@ classifiers = [
   'Topic :: Software Development',
 ]
 requires-python = '>= 3.7'
-[project.urls]
-'Documentation' = 'https://emcd.github.io/python-lockup'
-'Source Code' = 'https://github.com/emcd/python-lockup'
-'Issue Tracker' = 'https://github.com/emcd/python-lockup/issues'
-'Google Group' = 'https://groups.google.com/g/python-lockup'
-[tool.SELF]
-home-url = 'https://github.com/emcd/python-lockup'
-#download-url =
-year-of-origin = 2021
-[tool.SELF.author]
+[[project.authors]]
 name = 'Eric McDonald'
 email = 'python-lockup@googlegroups.com'
-[tool.SELF.long-description]
-files = [ 'README.rst', 'CHANGELOG.rst' ]
+# 'url' -> 'Homepage' and 'download-url' -> 'Download'
+#   https://github.com/pypi/warehouse/blob/a3d6221d4c692569e2290f6d75a75b4db747335b/tests/unit/packaging/test_models.py#L185-L327
+#   https://discuss.python.org/t/help-testing-experimental-features-in-setuptools/13821/16
+[project.urls]
+'Homepage' = 'https://github.com/emcd/python-lockup'
+'Documentation' = 'https://emcd.github.io/python-lockup'
+'Source Code' = 'https://github.com/emcd/python-lockup'
+'Download' = 'https://pypi.org/project/lockup/#files'
+'Issue Tracker' = 'https://github.com/emcd/python-lockup/issues'
+'Google Group' = 'https://groups.google.com/g/python-lockup'
+# https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
+# https://setuptools.pypa.io/en/latest/references/keywords.html
+[tool.setuptools.dynamic.readme]
+file = [ 'README.rst', 'CHANGELOG.rst' ]
 content-type = 'text/x-rst'
-#[tool.SELF.maintainer]
-#name =
-#email =
+# https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+[tool.setuptools.packages.find]
+where = [ 'sources/python3' ]
+[tool.setuptools.package-dir]
+'' = 'sources/python3'
+[tool.SELF]
+year-of-origin = 2021
 
 [tool.coverage.run]
 branch = true
