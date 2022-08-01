@@ -248,6 +248,7 @@ def discover_project_information( ):
     with paths.configuration.pyproject.open( 'rb' ) as file:
         tables = load( file )
     information = tables[ 'project' ]
+    information.update( tables[ 'tool' ][ 'setuptools' ] )
     information.update( tables[ 'tool' ][ 'SELF' ] )
     return information
 
