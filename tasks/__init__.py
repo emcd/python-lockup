@@ -228,7 +228,8 @@ def freshen_asdf( context ):
         This task requires Internet access and may take some time. '''
     render_boxed_title( 'Freshen: Version Manager' )
     context.run( 'asdf update', pty = on_tty )
-    context.run( 'asdf plugin update python', pty = on_tty )
+    # https://github.com/danhper/asdf-python/issues/140
+    #context.run( 'asdf plugin update python', pty = on_tty )
     # TODO: Preserve this call after 'freshen_asdf' has been removed.
     __.install_python_builder( )
 
