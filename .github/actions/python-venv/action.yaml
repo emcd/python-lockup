@@ -15,8 +15,25 @@ runs:
       uses: actions/checkout@v2
       with:
         submodules: recursive
-    - name: Install Asdf Core and Plugins
-      uses: asdf-vm/actions/plugins-add@v1
+#    - name: Install Asdf Core and Plugins
+#      uses: asdf-vm/actions/plugins-add@v1
+    - name: Install Asdf Core
+      run: |
+        set -eu
+        asdf_install_path="${HOME}/.asdf"
+        git clone --depth 1 --branch master https://github.com/asdf-vm/asdf.git "${asdf_install_path}"
+        echo "ASDF_DIR=${asdf_install_path}" >>${GITHUB_ENV}
+        echo "${asdf_install_path}/bin" >>${GITHUB_PATH}
+        echo "${asdf_install_path}/shims" >>${GITHUB_PATH}
+      shell: bash
+    - name: Install Asdf Python Plugin
+      run: |
+        set -eu
+        asdf plugin add python
+        # Workaround for https://github.com/danhper/asdf-python/issues/140
+        cd ${ASDF_DIR}/plugins/python
+        git checkout dcba495647619956c48914dc2e96710f398ec24a
+      shell: bash
     - name: Select Python Version (if requested)
       if: "${{ 'all' != inputs.python-version }}"
       run: |

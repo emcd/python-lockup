@@ -4,4 +4,5 @@ on:
     branches: ['*']
 jobs:
   test:
-    uses: emcd/python-lockup/.github/workflows/reusable--test.yaml@master
+    #uses: emcd/python-lockup/.github/workflows/reusable--test.yaml@master
+    uses: emcd/python-lockup/.github/workflows/reusable--test.yaml@asdf-python-workaround
