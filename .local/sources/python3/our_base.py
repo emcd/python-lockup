@@ -211,6 +211,10 @@ def ensure_directory( path ):
 ensure_python_support_packages( )
 
 
+def assert_sanity( ):
+    ''' Assert that operational environment is sane. '''
+
+
 def identify_python( mode, python_path ):
     ''' Reports compatibility identifier for Python at given path. '''
     detector_path = paths.scripts.d.python3 / 'identify-python.py'
