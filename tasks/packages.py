@@ -37,9 +37,9 @@ class __:
         eprint, epprint,
         generate_pip_requirements_text,
         on_tty,
-        paths,
     )
     from our_base import (
+        paths,
         standard_execute_external,
     )
 

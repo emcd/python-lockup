@@ -56,7 +56,6 @@ class __( metaclass = _NamespaceClass ):
         indicate_python_versions_support,
         is_executable_in_venv,
         on_tty,
-        paths,
         pep508_identify_python,
         render_boxed_title,
         unlink_recursively,
@@ -85,15 +84,17 @@ class __( metaclass = _NamespaceClass ):
         discover_project_version,
         ensure_python_support_packages,
         indicate_python_packages,
+        paths,
         project_name,
     )
 
     # https://www.sphinx-doc.org/en/master/man/sphinx-build.html
     sphinx_options = f"-j auto -d {paths.caches.sphinx} -n -T"
-    # https://github.com/pypa/wheel/issues/306#issuecomment-522529825
     setuptools_build_command = ' '.join( (
+        # https://github.com/pypa/setuptools/issues/1347#issuecomment-707979218
         'egg_info',
         f"--egg-base {paths.caches.setuptools}",
+        # https://github.com/pypa/wheel/issues/306#issuecomment-522529825
         'build',
         f"--build-base {paths.caches.setuptools}",
     ) )

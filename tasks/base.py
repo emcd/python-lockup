@@ -21,46 +21,60 @@
 ''' Constants and utilities for project maintenance tasks. '''
 
 
-import re
+def _setup_python_search_paths( ):
+    from pathlib import Path
+    from sys import path as python_search_paths
+    project_path = Path( __file__ ).parent.parent
+    python_search_paths.insert(
+        0, str( project_path / '.local' / 'sources' / 'python3' ) )
 
-from functools import partial as partial_function
-from os import (
-    F_OK, R_OK, X_OK,
-    access as test_fs_access, environ as psenv, pathsep,
-)
-from pathlib import Path
-from pprint import pprint
-from shlex import split as split_command
-from sys import path as python_search_paths, stderr
-from types import SimpleNamespace
+_setup_python_search_paths( )
 
-from invoke import Exit
 
-project_path = Path( __file__ ).parent.parent
-python_search_paths.insert( 0, str( project_path / 'sources' / 'python3' ) )
-python_search_paths.insert(
-    0, str( project_path / '.local' / 'sources' / 'python3' ) )
-from our_base import (
-    collapse_multilevel_dictionary,
-    identify_python,
-    indicate_python_packages,
-    paths,
-    standard_execute_external,
-)
+from our_base import assert_sanity as _assert_sanity
+_assert_sanity( )
+
+
+from lockup import NamespaceClass as _NamespaceClass
+class __( metaclass = _NamespaceClass ):
+
+    import re
+
+    from functools import partial as partial_function
+    from os import (
+        F_OK, R_OK, X_OK,
+        access as test_fs_access, environ as psenv, pathsep,
+    )
+    from pathlib import Path
+    from pprint import pprint
+    from shlex import split as split_command
+    from sys import stderr
+
+    from invoke import Exit
+
+    from our_base import (
+        collapse_multilevel_dictionary,
+        identify_python,
+        indicate_python_packages,
+        paths,
+        standard_execute_external,
+    )
+
+    from lockup import create_namespace, reclassify_module
 
 
 # If running in a Github Workflow,
 # then use 'stdout' for properly interleaved output.
-if 'CI' in psenv:
+if 'CI' in __.psenv:
     eprint = print
-    epprint = pprint
+    epprint = __.pprint
 else:
-    eprint = partial_function( print, file = stderr )
-    epprint = partial_function( pprint, stream = stderr )
+    eprint = __.partial_function( print, file = __.stderr )
+    epprint = __.partial_function( __.pprint, stream = __.stderr )
 
 # Flag if streams are attached to a TTY.
 # Can use flag to suppress ANSI SGR codes for some programs.
-on_tty = stderr.isatty( )
+on_tty = __.stderr.isatty( )
 
 
 def assert_sanity( ):
@@ -70,7 +84,8 @@ def assert_sanity( ):
 def pep508_identify_python( version = None ):
     ''' Calculates PEP 508 identifier for Python version. '''
     python_path = detect_vmgr_python_path( version = version )
-    return identify_python( 'pep508-environment', python_path = python_path )
+    return __.identify_python(
+        'pep508-environment', python_path = python_path )
 
 
 def is_executable_in_venv( name, venv_path = None, version = None ):
@@ -78,10 +93,10 @@ def is_executable_in_venv( name, venv_path = None, version = None ):
 
         Preferable over :py:func:`shutil.which` since it will not erroneously
         pick up shims, such as Asdf uses. '''
-    venv_path = Path( venv_path or derive_venv_path( version = version ) )
+    venv_path = __.Path( venv_path or derive_venv_path( version = version ) )
     for path in ( venv_path / 'bin' ).iterdir( ):
         if name != path.name: continue
-        if test_fs_access( path, F_OK | R_OK | X_OK ): return True
+        if __.test_fs_access( path, __.F_OK | __.R_OK | __.X_OK ): return True
     return False
 
 
@@ -89,7 +104,7 @@ def derive_venv_context_options(
     venv_path = None, version = None, variables = None
 ):
     ''' Derives flags for Python virtual environment in execution context. '''
-    venv_path = Path( venv_path or derive_venv_path( version = version ) )
+    venv_path = __.Path( venv_path or derive_venv_path( version = version ) )
     return dict(
         env = derive_venv_variables( venv_path, variables = variables ),
         replace_env = True )
@@ -99,20 +114,20 @@ def derive_venv_path( version = None, python_path = None ):
     ''' Derives Python virtual environment path from version handle. '''
     if None is python_path:
         if version: python_path = detect_vmgr_python_path( version = version )
-        elif 'VIRTUAL_ENV' in psenv and 'OUR_VENV_NAME' in psenv:
-            venv_path = Path( psenv[ 'VIRTUAL_ENV' ] )
-            if venv_path.name == psenv[ 'OUR_VENV_NAME' ]: return venv_path
+        elif 'VIRTUAL_ENV' in __.psenv and 'OUR_VENV_NAME' in __.psenv:
+            venv_path = __.Path( __.psenv[ 'VIRTUAL_ENV' ] )
+            if venv_path.name == __.psenv[ 'OUR_VENV_NAME' ]: return venv_path
     if None is python_path: python_path = detect_vmgr_python_path( )
-    abi_label = identify_python(
+    abi_label = __.identify_python(
         'bdist-compatibility', python_path = python_path )
-    return paths.environments / abi_label
+    return __.paths.environments / abi_label
 
 
 def derive_venv_variables( venv_path, variables = None ):
     ''' Derives environment variables from Python virtual environment path. '''
-    variables = ( variables or psenv ).copy( )
+    variables = ( variables or __.psenv ).copy( )
     variables.pop( 'PYTHONHOME', None )
-    variables[ 'PATH' ] = pathsep.join( (
+    variables[ 'PATH' ] = __.pathsep.join( (
         str( venv_path / 'bin' ), variables[ 'PATH' ] ) )
     variables[ 'VIRTUAL_ENV' ] = str( venv_path )
     variables[ 'OUR_VENV_NAME' ] = venv_path.name
@@ -122,8 +137,9 @@ def derive_venv_variables( venv_path, variables = None ):
 def detect_vmgr_python_path( version = None ):
     ''' Detects Python path using handle from version manager. '''
     version = version or detect_vmgr_python_version( )
-    installation_path = Path( standard_execute_external(
-        ( *split_command( 'asdf where python' ), version ) ).stdout.strip( ) )
+    installation_path = __.Path( __.standard_execute_external(
+        ( *__.split_command( 'asdf where python' ), version )
+    ).stdout.strip( ) )
     return installation_path / 'bin' / 'python'
 
 
@@ -135,10 +151,10 @@ def detect_vmgr_python_version( ):
 
 def indicate_python_versions_support( ):
     ''' Returns supported Python versions. '''
-    version = psenv.get( 'ASDF_PYTHON_VERSION' )
+    version = __.psenv.get( 'ASDF_PYTHON_VERSION' )
     if None is not version: return ( version, )
-    regex = re.compile( r'''^python\s+(.*)$''', re.MULTILINE )
-    with paths.configuration.asdf.open( ) as file:
+    regex = __.re.compile( r'''^python\s+(.*)$''', __.re.MULTILINE )
+    with __.paths.configuration.asdf.open( ) as file:
         return regex.match( file.read( ) )[ 1 ].split( )
 
 
@@ -146,12 +162,12 @@ def generate_pip_requirements_text( identifier = None ):
     ''' Generates Pip requirements lists from local configuration. '''
     # https://pip.pypa.io/en/stable/reference/requirements-file-format/
     # https://pip.pypa.io/en/stable/topics/repeatable-installs/
-    simples, fixtures = indicate_python_packages( identifier = identifier )
+    simples, fixtures = __.indicate_python_packages( identifier = identifier )
     # Pip cannot currently mix frozen and unfrozen requirements,
     # so we must split them out. (As of 2022-02-06.)
     # https://github.com/pypa/pip/issues/6469
     raw, frozen, unpublished = [ ], [ ], [ ]
-    for fixture in map( lambda d: SimpleNamespace( **d ), fixtures ):
+    for fixture in map( lambda d: __.create_namespace( **d ), fixtures ):
         name = fixture.name
         if hasattr( fixture, 'url' ):
             unpublished.append( f"{name}@ {fixture.url}" )
@@ -159,7 +175,7 @@ def generate_pip_requirements_text( identifier = None ):
             options = ' \\\n    '.join(
                 f"--hash {digest}" for digest in fixture.digests )
             frozen.append( f"{name}=={fixture.version} \\\n    {options}" )
-    raw.extend( collapse_multilevel_dictionary( simples ) )
+    raw.extend( __.collapse_multilevel_dictionary( simples ) )
     return '\n'.join( raw ), '\n'.join( frozen ), '\n'.join( unpublished )
 
 
@@ -172,7 +188,7 @@ def render_boxed_title( title, supplement = None ):
 
 def format_boxed_title( title ):
     ''' Formats box around title as string. '''
-    columns_count = int( psenv.get( 'COLUMNS', 79 ) )
+    columns_count = int( __.psenv.get( 'COLUMNS', 79 ) )
     icolumns_count = columns_count - 2
     content_template = (
         '\N{BOX DRAWINGS DOUBLE VERTICAL}{fill}'
@@ -194,8 +210,8 @@ def format_boxed_title( title ):
 # TODO: Check for cached passphrase as an alternative.
 def assert_gpg_tty( ):
     ''' Ensures the the 'GPG_TTY' environment variable is set. '''
-    if 'GPG_TTY' in psenv: return
-    raise Exit(
+    if 'GPG_TTY' in __.psenv: return
+    raise __.Exit(
         "ERROR: Environment variable 'GPG_TTY' is not set. "
         "Task cannot prompt for GPG secret key passphrase." )
 
@@ -217,3 +233,6 @@ def unlink_recursively( path ):
             continue
         child_path.unlink( )
     while dirs_stack: dirs_stack.pop( ).rmdir( )
+
+
+__.reclassify_module( __name__ )
