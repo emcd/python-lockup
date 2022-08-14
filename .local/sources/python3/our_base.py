@@ -145,6 +145,7 @@ def _calculate_tests_paths( paths_ ):
 paths = _calculate_paths( )
 
 
+# TODO: Load module and invoke function directly in case of active Python.
 def identify_python( mode, python_path = active_python_path ):
     ''' Reports compatibility identifier for Python at given path.
 
