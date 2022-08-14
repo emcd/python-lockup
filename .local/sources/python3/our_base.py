@@ -30,7 +30,6 @@ from re import match as regex_match
 from shlex import split as split_command
 from subprocess import run
 from sys import (
-    executable as active_python_path,
     path as python_search_paths,
 )
 from types import SimpleNamespace
@@ -145,20 +144,17 @@ def _calculate_tests_paths( paths_ ):
 paths = _calculate_paths( )
 
 
-# TODO: Load module and invoke function directly in case of active Python.
-def identify_python( mode, python_path = active_python_path ):
-    ''' Reports compatibility identifier for Python at given path.
+def identify_active_python( mode ):
+    ''' Reports compatibility identifier for active Python. '''
+    from devshim__python_identity import dispatch_table
+    return dispatch_table[ mode ]( )
 
-        If no path is provided, then calculates from Python in current use. '''
-    detector_path = paths.scripts.d.python3 / 'identify-python.py'
-    return standard_execute_external(
-        ( python_path, detector_path, '--mode', mode ) ).stdout.strip( )
+
+active_python_abi_label = identify_active_python( 'bdist-compatibility' )
 
 
 standard_execute_external = partial_function(
     run, check = True, capture_output = True, text = True )
-
-active_python_abi_label = identify_python( 'bdist-compatibility' )
 
 
 def ensure_python_support_packages( ):
@@ -195,7 +191,8 @@ def _ensure_python_packages( requirements ):
         path.name for path in cache_path.glob( '*' )
         if path.suffix not in ( '.dist-info', ) )
     def requirement_to_name( requirement ):
-        return regex_match( r'^([\w\-]+)(.*)$', requirement ).group( 1 )
+        return regex_match(
+            r'^([\w\-]+)(.*)$', requirement ).group( 1 ).replace( '-', '_' )
     installable_requirements = tuple(
         requirement for requirement in requirements
         if requirement_to_name( requirement ) not in in_cache_packages )
@@ -212,6 +209,13 @@ def ensure_directory( path ):
 
 
 ensure_python_support_packages( )
+
+
+def identify_python( mode, python_path ):
+    ''' Reports compatibility identifier for Python at given path. '''
+    detector_path = paths.scripts.d.python3 / 'identify-python.py'
+    return standard_execute_external(
+        ( python_path, detector_path, '--mode', mode ) ).stdout.strip( )
 
 
 def collapse_multilevel_dictionary( dictionary ):
