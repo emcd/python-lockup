@@ -31,7 +31,7 @@ Remove Dependency on ``bump2version``
 * Can work directly with ``__version__`` for package and set ``version`` in
   :file:`pyproject.toml` to ``dynamic``.
 
-* Will need to modify Setuptools shim to support the ``dynamic`` field.
+* Will need to modify project version reader to support the ``dynamic`` field.
 
 Remove Dependency on ``invoke``
 ===============================================================================

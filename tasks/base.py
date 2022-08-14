@@ -63,6 +63,10 @@ else:
 on_tty = stderr.isatty( )
 
 
+def assert_sanity( ):
+    ''' Assert that operational environment is sane. '''
+
+
 def pep508_identify_python( version = None ):
     ''' Calculates PEP 508 identifier for Python version. '''
     python_path = detect_vmgr_python_path( version = version )
