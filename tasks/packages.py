@@ -20,7 +20,8 @@
 ''' Project package management. '''
 
 
-class __:
+from lockup import NamespaceClass as _NamespaceClass
+class __( metaclass = _NamespaceClass ):
 
     from json import load as load_json
     from shlex import (
@@ -42,6 +43,8 @@ class __:
         paths,
         standard_execute_external,
     )
+
+    from lockup import reclassify_module
 
 
 def calculate_python_packages_fixtures( environment ):
@@ -191,3 +194,6 @@ def execute_pip_with_requirements(
                 options = ' '.join( pip_options ),
                 requirements_file = __.shell_quote( requirements_file.name ) ),
             pty = __.on_tty, **context_options )
+
+
+__.reclassify_module( __name__ )

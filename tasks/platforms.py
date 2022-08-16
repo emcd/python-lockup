@@ -21,7 +21,8 @@
 ''' Management of development platforms. '''
 
 
-class __:
+from lockup import NamespaceClass as _NamespaceClass
+class __( metaclass = _NamespaceClass ):
 
     import re
 
@@ -40,6 +41,8 @@ class __:
         paths,
         standard_execute_external,
     )
+
+    from lockup import reclassify_module
 
 
 def install_python_builder( ):
@@ -85,3 +88,6 @@ def freshen_python( context, original_version ):
         version = successor_version )
     if original_identifier == successor_identifier: original_identifier = None
     return { original_version: successor_version }, original_identifier
+
+
+__.reclassify_module( __name__ )

@@ -20,9 +20,13 @@
 ''' Project version management. '''
 
 
-from datetime import datetime as DateTime
+from lockup import NamespaceClass as _NamespaceClass
+class __( metaclass = _NamespaceClass ):
 
-from invoke import Exit
+    from datetime import datetime as DateTime
+
+    from invoke import Exit
+    from lockup import reclassify_module
 
 
 class Version:
@@ -38,8 +42,7 @@ class Version:
         ``a{{timestamp:yyyymmddHHMM}}``.
         Release candidates extend the core format by appending
         ``rc{{candidate}}``, where ``candidate`` starts at ``1`` and increases
-        by one upon each increment.
-    '''
+        by one upon each increment. '''
 
     @classmethod
     def from_string( kind, version ):
@@ -62,7 +65,7 @@ class Version:
 
     def __init__( self, stage, major, minor, patch ):
         if stage not in ( 'a', 'rc', 'f' ):
-            raise Exit( f"Bad stage: {stage}" )
+            raise __.Exit( f"Bad stage: {stage}" )
         self.stage = stage
         self.major = int( major )
         self.minor = int( minor )
@@ -77,16 +80,15 @@ class Version:
 
     def as_bumped( self, piece ):
         ''' Returns a derivative of the version,
-            altered according to current state and desired modification.
-        '''
+            altered according to current state and desired modification. '''
         Version_ = type( self )
         stage, major, minor, patch = (
             self.stage, self.major, self.minor, self.patch )
         if 'stage' == piece:
             if 'a' == stage: return Version_( 'rc', major, minor, 1 )
             if 'rc' == stage: return Version_( 'f', major, minor, 0 )
-            raise Exit( 'Cannot bump last stage.' )
-        timestamp = DateTime.utcnow( ).strftime( '%Y%m%d%H%M' )
+            raise __.Exit( 'Cannot bump last stage.' )
+        timestamp = __.DateTime.utcnow( ).strftime( '%Y%m%d%H%M' )
         if 'patch' == piece:
             if 'a' == stage:
                 return Version_( 'a', major, minor, timestamp )
@@ -95,4 +97,7 @@ class Version:
             return Version_( 'a', major + 1, 0, timestamp )
         if 'minor' == piece:
             return Version_( 'a', major, minor + 1, timestamp )
-        raise Exit( f"Unknown kind of piece: {piece}" )
+        raise __.Exit( f"Unknown kind of piece: {piece}" )
+
+
+__.reclassify_module( __name__ )
