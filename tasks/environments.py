@@ -20,7 +20,8 @@
 ''' Management of virtual environments. '''
 
 
-class __:
+from lockup import NamespaceClass as _NamespaceClass
+class __( metaclass = _NamespaceClass ):
 
     from .base import (
         derive_venv_context_options,
@@ -37,6 +38,8 @@ class __:
     from our_base import (
         ensure_directory,
     )
+
+    from lockup import reclassify_module
 
 
 def build_python_venv( context, version, overwrite = False ):
@@ -56,3 +59,6 @@ def build_python_venv( context, version, overwrite = False ):
         context_options[ 'env' ] )
     identifier = __.pep508_identify_python( version = version )
     __.record_python_packages_fixtures( identifier, fixtures )
+
+
+__.reclassify_module( __name__ )
