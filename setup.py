@@ -48,5 +48,5 @@ _setup_python_search_paths( )
 
 # https://docs.python.org/3/distutils/setupscript.html#writing-the-setup-script
 from setuptools import setup
-from our_setuptools_shim import generate_nominative_arguments
+from devshim__setuptools_helper import generate_nominative_arguments
 setup( **generate_nominative_arguments( ) )

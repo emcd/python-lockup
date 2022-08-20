@@ -31,7 +31,7 @@ def _setup_python_search_paths( ):
 _setup_python_search_paths( )
 
 
-from our_base import assert_sanity as _assert_sanity
+from devshim__base import assert_sanity as _assert_sanity
 _assert_sanity( )
 
 
@@ -52,7 +52,7 @@ class __( metaclass = _NamespaceClass ):
 
     from invoke import Exit
 
-    from our_base import (
+    from devshim__base import (
         collapse_multilevel_dictionary,
         identify_python,
         indicate_python_packages,
