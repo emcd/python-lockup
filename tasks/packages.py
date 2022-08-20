@@ -39,7 +39,7 @@ class __( metaclass = _NamespaceClass ):
         generate_pip_requirements_text,
         on_tty,
     )
-    from our_base import (
+    from devshim__base import (
         paths,
         standard_execute_external,
     )

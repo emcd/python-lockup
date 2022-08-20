@@ -35,7 +35,7 @@ class __( metaclass = _NamespaceClass ):
         install_python_packages,
         record_python_packages_fixtures,
     )
-    from our_base import (
+    from devshim__base import (
         ensure_directory,
     )
 

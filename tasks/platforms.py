@@ -37,7 +37,7 @@ class __( metaclass = _NamespaceClass ):
         pep508_identify_python,
         render_boxed_title,
     )
-    from our_base import (
+    from devshim__base import (
         paths,
         standard_execute_external,
     )

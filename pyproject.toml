@@ -10,19 +10,17 @@ requires = [
 # Explicit build backend, in case we use frontend other than Pip or Pip default changes.
 build-backend = 'setuptools.build_meta'
 
+[project]
 # https://www.python.org/dev/peps/pep-0621
 # https://packaging.python.org/en/latest/specifications/core-metadata
 # https://packaging.python.org/en/latest/specifications/declaring-project-metadata
-[project]
 dynamic = [ 'readme' ]
 name = 'lockup'
-# TODO: 'version' should be dynamic
-version = '2.0a202112310633'
+version = '2.0a202112310633' # TODO: should be dynamic
 description = 'Immutable and concealed attributes for classes, modules, and namespaces.'
 license = { text = 'Apache-2.0' }
 keywords = [ 'api', 'attribute', 'concealment', 'immutability', 'namespace' ]
-# https://pypi.org/classifiers
-classifiers = [
+classifiers = [ # https://pypi.org/classifiers
   'Development Status :: 5 - Production/Stable',
   'Intended Audience :: Developers',
   'License :: OSI Approved :: Apache Software License',
@@ -39,10 +37,10 @@ requires-python = '>= 3.7'
 [[project.authors]]
 name = 'Eric McDonald'
 email = 'python-lockup@googlegroups.com'
+[project.urls]
 # 'url' -> 'Homepage' and 'download-url' -> 'Download'
 #   https://github.com/pypi/warehouse/blob/a3d6221d4c692569e2290f6d75a75b4db747335b/tests/unit/packaging/test_models.py#L185-L327
 #   https://discuss.python.org/t/help-testing-experimental-features-in-setuptools/13821/16
-[project.urls]
 'Homepage' = 'https://github.com/emcd/python-lockup'
 'Documentation' = 'https://emcd.github.io/python-lockup'
 'Source Code' = 'https://github.com/emcd/python-lockup'
