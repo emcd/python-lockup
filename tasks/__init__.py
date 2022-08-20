@@ -79,7 +79,7 @@ class __( metaclass = _NamespaceClass ):
     from .versions import (
         Version,
     )
-    from our_base import (
+    from devshim__base import (
         active_python_abi_label,
         discover_project_version,
         ensure_python_support_packages,

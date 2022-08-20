@@ -21,7 +21,7 @@ def _install_prerequisite_packages( ):
     # (Better than maintaining a separate 'requirements.txt'.)
     from os import environ as psenv
     from shlex import split as split_command
-    from our_base import (
+    from devshim__base import (
         indicate_python_packages,
         paths,
         standard_execute_external,
@@ -49,7 +49,7 @@ def _calculate_copyright_notice( information, author_ ):
     else: year_range = str( first_year )
     return f"{year_range}, {author_}"
 
-from our_base import discover_project_information
+from devshim__base import discover_project_information
 _information = discover_project_information( )
 project = _information[ 'name' ]
 release = _information[ 'version' ]

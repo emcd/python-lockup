@@ -13,8 +13,20 @@ Tasks Interface Refinement
 Testing Improvements
 ===============================================================================
 
-* Build sdist and wheels as part of ``push`` command. Do not require sign them
-  during a test run.
+* Build sdist and wheels as part of ``push`` command. Do not require to sign
+  them during a test run.
+
+Move Invoke Tasks to Development Sources
+===============================================================================
+
+* Call via ``develop.py``.
+
+* Bootstrap ``invoke`` as a local development dependency.
+
+Prefer Prebuilt Python Executables
+===============================================================================
+
+* Pull from https://github.com/indygreg/python-build-standalone/releases/latest
 
 Windows Development Support
 ===============================================================================
@@ -23,7 +35,7 @@ Windows Development Support
   If viable, then recommend its installation instead of ``asdf`` if the
   development environment is not a virtualized Linux, such as WSL.
 
-* Create ``develop.py`` and manage Pythons on all platforms via that.
+* Or, create ``develop.py`` and manage Pythons on all platforms via that.
 
 Remove Dependency on ``bump2version``
 ===============================================================================
@@ -54,10 +66,21 @@ Provide In-Tree PEP 517 Build Backend
 ===============================================================================
 
 * Proxy to Setuptools 'build_meta' backend, once it supports the 'build_base'
-  option.
+  and 'egg_base' options.
+
+* Or proxy to `Enscons <https://pypi.org/project/enscons/>`_.
+
+* Or write our own, borrowing sdist- and wheel-building logic from something
+  like Flit or Whey.
 
 * https://peps.python.org/pep-0517/#build-backend-interface
 
 * https://setuptools.pypa.io/en/latest/build_meta.html#dynamic-build-dependencies-and-other-build-meta-tweaks
 
 * https://github.com/pypa/setuptools/blob/main/setuptools/build_meta.py
+
+Remove Dependency on ``pip``
+===============================================================================
+
+* Formula for resolving dependencies and installing packages:
+  https://github.com/brettcannon/mousebender

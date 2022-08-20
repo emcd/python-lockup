@@ -21,7 +21,7 @@
 ''' Shim layer for TOML configurations into Setuptools. '''
 
 
-from our_base import (
+from devshim__base import (
     indicate_python_packages,
 )
 
