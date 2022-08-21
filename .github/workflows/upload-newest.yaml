@@ -22,4 +22,4 @@ jobs:
           git config user.name 'Github Actions Robot'
           git config user.email '${{ github.repository_owner }}@users.noreply.github.com'
       - name: Upload Github Pages
-        run: invoke upload-github-pages
+        run: python3 develop.py upload-github-pages
