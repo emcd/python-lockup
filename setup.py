@@ -17,22 +17,6 @@
 ###############################################################################
 
 
-# Assert minimum Python version without using tool-specific machinery.
-# Checking the Python version must be done in a backwards-compatible manner,
-# so as to not trigger syntax exceptions in the checking logic.
-# (Compatibility of this logic has been tested back to Python 2.6.)
-required_version = 3, 7
-error_message = 'Python {0}.{1} or higher required.'.format(
-    required_version[ 0 ], required_version[ 1 ] )
-from sys import version_info
-from os import EX_UNAVAILABLE
-version = version_info[ 0 ], version_info[ 1 ]
-if required_version > version:
-    print( error_message )
-    raise SystemExit( EX_UNAVAILABLE )
-del required_version, version, error_message, version_info
-
-
 #from os import environ as psenv
 #psenv[ 'DISTUTILS_DEBUG' ] = 'True'
 
