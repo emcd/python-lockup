@@ -160,18 +160,16 @@ standard_execute_external = partial_function(
 def ensure_python_support_packages( ):
     ''' Ensures availability of support packages to active Python. '''
     # Ensure Tomli so that 'pyproject.toml' can be read.
-    # TODO: Remove this dependency once Python 3.11 is baseline.
+    # TODO: Remove this explicit dependency once Python 3.11 is baseline.
     _ensure_python_packages( ( 'tomli', ) )
-    # For now, we filter 'setuptools' and 'wheel'.
-    ignorable_package_names = ( 'setuptools', 'wheel', )
     from tomli import load
+    base_requirements = (
+        indicate_python_packages( )[ 0 ][ 'development' ].get( 'base', [ ] ) )
     with paths.configuration.pyproject.open( 'rb' ) as file:
-        requirements = tuple(
-            requirement
-            for requirement in load( file )[ 'build-system' ][ 'requires' ]
-            if not requirement.startswith( ignorable_package_names )
-        )
-    _ensure_python_packages( requirements )
+        construction_requirements = (
+            load( file )[ 'build-system' ][ 'requires' ] )
+    _ensure_python_packages( frozenset(
+        ( *base_requirements, *construction_requirements ) ) )
 
 def _ensure_python_packages( requirements ):
     ''' Ensures availability of packages to active Python. '''
@@ -202,6 +200,22 @@ def _ensure_python_packages( requirements ):
               cache_path_, *installable_requirements ) )
 
 
+def indicate_python_packages( identifier = None ):
+    ''' Returns lists of Python package dependencies.
+
+        First is raw list of dependencies.
+        Second is list of dependency fixtures (fixed on digest). '''
+    from tomli import load
+    fixtures_path = paths.configuration.pypackages_fixtures
+    if identifier and fixtures_path.exists( ):
+        with fixtures_path.open( 'rb' ) as file:
+            fixtures = load( file ).get( identifier, [ ] )
+    else: fixtures = [ ]
+    with paths.configuration.pypackages.open( 'rb' ) as file:
+        simples = load( file )
+    return simples, fixtures
+
+
 def ensure_directory( path ):
     ''' Ensures existence of directory, creating if necessary. '''
     path.mkdir( parents = True, exist_ok = True )
@@ -224,26 +238,12 @@ def identify_python( mode, python_path ):
 
 def collapse_multilevel_dictionary( dictionary ):
     ''' Collapses a hierarchical dictionary into a list. '''
+    # TODO: Need to handle format version number.
+    #       Probably replace this function with something more specific.
     return tuple( chain.from_iterable(
         (   collapse_multilevel_dictionary( value )
             if isinstance( value, AbstractDictionary ) else value )
         for value in dictionary.values( ) ) )
-
-
-def indicate_python_packages( identifier = None ):
-    ''' Returns lists of Python package dependencies.
-
-        First is raw list of dependencies.
-        Second is list of dependency fixtures (fixed on digest). '''
-    from tomli import load
-    fixtures_path = paths.configuration.pypackages_fixtures
-    if identifier and fixtures_path.exists( ):
-        with fixtures_path.open( 'rb' ) as file:
-            fixtures = load( file ).get( identifier, [ ] )
-    else: fixtures = [ ]
-    with paths.configuration.pypackages.open( 'rb' ) as file:
-        simples = load( file )
-    return simples, fixtures
 
 
 def discover_project_version( ):

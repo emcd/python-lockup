@@ -1,3 +1,6 @@
+# TODO: Rework parser to support format version.
+#format-version = 1
+
 # References:
 #   PEP 508 ("Dependency specification for Python Software Packages"):
 #     https://peps.python.org/pep-0508/
@@ -7,6 +10,11 @@ installation = [ ]
 [optional-installation]
 
 [development]
+base = [
+  'invoke',
+  'tomli',
+  'tomli-w',
+]
 format = [
   # YAPF 0.31 is missing full support for 'yapf-diff'.
   'yapf >= 0.32',
@@ -29,11 +37,8 @@ lint = [
   'safety',
   'semgrep',
 ]
-management = [
+publication = [
   'bump2version',
-  'invoke',
-  'tomli',
-  'tomli-w',
   'twine',
 ]
 test = [
