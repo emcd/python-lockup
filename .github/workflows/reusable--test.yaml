@@ -12,7 +12,7 @@ jobs:
         with:
           python-version: '${{ matrix.python-version }}'
       - name: Test
-        run: invoke test
+        run: python3 develop.py test
       - name: Preserve Coverage Results
         uses: actions/upload-artifact@v2
         with:
@@ -33,5 +33,5 @@ jobs:
         run: |
           set -eu
           package_name="$(grep --extended-regexp '^name\s+=.*$' --max-count 1 pyproject.toml | sed --regexp-extended 's;name\s+=\s+;;' | tr --delete \')"
-          invoke run "python -c 'import ${package_name}'"
+          python3 develop.py run "python -c 'import ${package_name}'"
         shell: bash

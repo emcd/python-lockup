@@ -74,32 +74,23 @@ generalized version manager, such as asdf_, can be reused consistently across
 all projects, regardless of their implementation language, whereas pyenv_
 cannot.
 
-`pipx <https://github.com/pypa/pipx>`_
-===============================================================================
-
-Pipx is a tool for running Python applications in isolated environments. It can
-be installed non-intrusively onto a system, such that it does not require
-administrative privileges and minimizes "pollution" to an existing Python
-installation. With pipx_ installed, you can easily make additional Python tools
-available for use without disrupting an existing Python installation.
-
 `invoke <https://www.pyinvoke.org>`_
 ===============================================================================
 
 Many common development tasks, such as running tests, pushing new commit tags,
 uploading a new release, etc... can be automated. We use invoke_ to run such
 automations. It has various nice features, such as the ability to tee standard
-output streams, run commands in a pseudo-TTY, manage dependencies between
-tasks - to name a few. The :file:`tasks` directory contains the various task
-definitions available for use within the project. If you do not already have
-invoke_ installed, then the recommended method of installation is::
+output streams, run commands in a pseudo-TTY, manage dependencies between tasks
+... to name a few. The :file:`.local/sources/python3/devshim__tasks` directory
+contains the various task definitions available for use within the project.
+This package will be automatically installed to a local cache in the project
+directory on the first time you run::
 
-    pipx install invoke
+    python3 develop.py
 
-In the top-level directory of the project, assuming you have installed invoke_,
-you can run::
+You can use::
 
-    invoke --list
+    python3 develop.py --list
 
 to see a list of the available development tasks.
 

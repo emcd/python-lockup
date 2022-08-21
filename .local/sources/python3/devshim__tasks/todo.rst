@@ -16,13 +16,6 @@ Testing Improvements
 * Build sdist and wheels as part of ``push`` command. Do not require to sign
   them during a test run.
 
-Move Invoke Tasks to Development Sources
-===============================================================================
-
-* Call via ``develop.py``.
-
-* Bootstrap ``invoke`` as a local development dependency.
-
 Prefer Prebuilt Python Executables
 ===============================================================================
 

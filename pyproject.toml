@@ -93,6 +93,7 @@ load-plugins = [
 [tool.pylint.'MESSAGES CONTROL']
 disable = [
   "consider-using-f-string",
+  "duplicate-code",  # TODO: Re-enable after heuristic is fixed.
   "fixme",
   "f-string-without-interpolation",
   "import-outside-toplevel",
