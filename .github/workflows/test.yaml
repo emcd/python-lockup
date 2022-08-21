@@ -18,7 +18,7 @@ jobs:
       - name: Relocate Coverage Results
         run: mv .local/caches/pytest/coverage-results-*/coverage.sqlite3.* .local/caches/pytest
       - name: Report Coverage
-        run: invoke report-coverage
+        run: python3 develop.py report-coverage
       - name: Upload Coverage Report
         uses: codecov/codecov-action@v2
         with:

@@ -21,20 +21,6 @@
 ''' Constants and utilities for project maintenance tasks. '''
 
 
-def _setup_python_search_paths( ):
-    from pathlib import Path
-    from sys import path as python_search_paths
-    project_path = Path( __file__ ).parent.parent
-    python_search_paths.insert(
-        0, str( project_path / '.local' / 'sources' / 'python3' ) )
-
-_setup_python_search_paths( )
-
-
-from devshim__base import assert_sanity as _assert_sanity
-_assert_sanity( )
-
-
 from lockup import NamespaceClass as _NamespaceClass
 class __( metaclass = _NamespaceClass ):
 

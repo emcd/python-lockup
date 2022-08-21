@@ -48,15 +48,10 @@ runs:
     - name: Install Managed Versions
       run: asdf install
       shell: bash
-    - name: Install Invoke
-      run: |
-        set -eu
-        python -m pip install --upgrade invoke pip setuptools wheel
-        asdf reshim python
-      shell: bash
     - name: Create Virtual Environments
+      # TODO? Use 'bootstrap' subcommand instead.
       run: |
         set -eu
-        invoke build-python-venv --version ALL
+        python3 develop.py build-python-venv --version ALL
         asdf reshim python
       shell: bash

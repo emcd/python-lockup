@@ -59,7 +59,7 @@ to match the existing style. Though it is not perfect and good judgment will
 still need to be exercised, you can execute the following on an uncommitted
 patch to receive additional hints::
 
-    pipenv run invoke check-code-style
+    python3 develop.py check-code-style
 
 Unwitting "offenses" in new code can be readily forgiven, but patches which
 contain reformatting noise against existing code will almost certainly be
