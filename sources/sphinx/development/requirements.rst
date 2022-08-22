@@ -51,4 +51,3 @@ signature verification public key to well-known public key servers, such as:
 
 * `MIT PGP Keyserver <https://pgp.mit.edu/>`_
 * `Ubuntu Keyserver <https://keyserver.ubuntu.com/>`_
-
