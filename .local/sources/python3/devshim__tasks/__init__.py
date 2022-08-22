@@ -17,13 +17,9 @@
 #                                                                            #
 #============================================================================#
 
-''' Project maintenance tasks, executed via :command:`invoke`.
+''' Project maintenance tasks.
 
-    `Invoke Documentation <http://docs.pyinvoke.org/en/stable/index.html>`_
-
-    Only relies on Python standard library and Invoke and TOML modules to
-    minimize dependencies, since it can be used to prepare development
-    environments. '''
+    `Invoke Documentation <http://docs.pyinvoke.org/en/stable/index.html>`_ '''
 
 
 from .base import assert_sanity as _assert_sanity
@@ -87,6 +83,9 @@ class __( metaclass = _NamespaceClass ):
         paths,
         project_name,
     )
+    from devshim__shell_function import (
+        generate_cli_functions,
+    )
 
     # https://www.sphinx-doc.org/en/master/man/sphinx-build.html
     sphinx_options = f"-j auto -d {paths.caches.sphinx} -n -T"
@@ -98,6 +97,18 @@ class __( metaclass = _NamespaceClass ):
         'build',
         f"--build-base {paths.caches.setuptools}",
     ) )
+
+
+@__.task
+def ease(
+    context, # pylint: disable=unused-argument
+    shell_name = None,
+    function_name = 'devshim',
+    with_completions = False
+):
+    ''' Prints shell functions for easy invocation of development shim. '''
+    print( __.generate_cli_functions(
+        shell_name, function_name, with_completions ) )
 
 
 @__.task

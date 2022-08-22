@@ -34,14 +34,13 @@ developer needs to remember, we use a Python-native solution: `invoke
 Instead of defining tasks in a ``Makefile``, we instead define them as Python
 code. To see a summary of the available tasks, you can execute::
 
-    python3 develop.py --list
+    devshim --list
 
-We recommend the use of :command:`python3 develop.py` rather than running tools
-directly, since it performs environment sanitization and other
-frequently-overlooked tasks automatically, freeing you from fighting weird
-cache effects or various oversights, such as validating URLs in documentation
-or linting tests. Our invoke_ tasks also operate in virtual environments, when
-necessary.
+We recommend the use of :command:`devshim` rather than running tools directly,
+since it performs environment sanitization and other frequently-overlooked
+tasks automatically, freeing you from fighting weird cache effects or various
+oversights, such as validating URLs in documentation or linting tests. Our
+invoke_ tasks also operate in virtual environments, when necessary.
 
 Documentation
 ===============================================================================
@@ -53,7 +52,7 @@ using an extended form of the
 plaintext markup language. The sources for the documentation are under
 :file:`sources/sphinx`; the artifacts can be produced by::
 
-    python3 develop.py make-html
+    devshim make-html
 
 Some useful references for editing the sources are:
 
@@ -94,7 +93,7 @@ Our primary Python linter is `Pylint <https://pylint.pycqa.org/en/latest/>`_.
 Note that we use this as an actual static analysis tool
 and not merely a style checker. You can lint the sources by::
 
-    python3 develop.py lint
+    devshim lint
 
 *Why not use* `Flake8 <https://flake8.pycqa.org/en/latest/>`_ *?*
 
@@ -117,12 +116,12 @@ extensive use of `parametrized tests
 and `property-based testing <https://hypothesis.readthedocs.io/en/latest/>`_.
 To run the test suite in a relevant virtual environment, you can execute::
 
-    python3 develop.py test
+    devshim test
 
 To ensure that the test suite passes on all Python implementations,
 which are supported by the project, you can execute::
 
-    python3 develop.py test --version=ALL
+    devshim test --version=ALL
 
 This may take a longer time to complete, as it iterates over all virtual
 environments associated with the project.
