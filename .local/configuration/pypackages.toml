@@ -12,6 +12,7 @@ installation = [ ]
 [development]
 base = [
   'invoke',
+  'shellingham',
   'tomli',
   'tomli-w',
 ]

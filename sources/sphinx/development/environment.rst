@@ -81,18 +81,25 @@ Many common development tasks, such as running tests, pushing new commit tags,
 uploading a new release, etc... can be automated. We use invoke_ to run such
 automations. It has various nice features, such as the ability to tee standard
 output streams, run commands in a pseudo-TTY, manage dependencies between tasks
-... to name a few. The :file:`.local/sources/python3/devshim__tasks` directory
-contains the various task definitions available for use within the project.
-This package will be automatically installed to a local cache in the project
-directory on the first time you run::
+... to name a few. To get started, run::
 
-    python3 develop.py
+    python3 develop.py bootstrap
 
-You can use::
+This will automatically install invoke_ to a local cache in the project
+directory and setup a standard set of virtual environments that can be used for
+testing.
 
-    python3 develop.py --list
+While you can write ``python3 develop.py`` for each task invocation, there
+exists a shortcut for popular shells:
 
-to see a list of the available development tasks.
+.. tab:: bash
+
+    .. code-block:: sh
+
+        eval "$(python3 develop.py ease --with-completions)"
+
+By default, this will create a shell function, called ``devshim``, which you
+can use as a command instead of ``python3 develop.py``.
 
 To use certain development tools that we support, you may need to install
 some packages with your OS package manager first:
@@ -154,8 +161,10 @@ to the project.
 ===============================================================================
 
 As part of the development environment that we provide via Pipenv, there is the
-pre-commit_ command. Among other things, this allows you to install
-Git pre-commit hooks which will perform additional checks, such as TOML and
-YAML linting, before recording a new commit. To use these hooks, you can run::
+pre-commit_ command. Among other things, this allows you to install Git
+pre-commit hooks which will perform additional checks, such as TOML and YAML
+linting, before recording a new commit. These hooks will be installed if you
+ran ``python3 develop.py bootstrap``. To update them at a later time you can
+run::
 
-    pre-commit install --config sources/pre-commit.yaml
+    devshim freshen-git-hooks install-git-hooks

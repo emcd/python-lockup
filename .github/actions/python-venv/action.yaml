@@ -49,7 +49,6 @@ runs:
       run: asdf install
       shell: bash
     - name: Create Virtual Environments
-      # TODO? Use 'bootstrap' subcommand instead.
       run: |
         set -eu
         python3 develop.py build-python-venv --version ALL
