@@ -925,12 +925,12 @@ digests = [
 
 [["cpython-3.7.13--linux--x86_64"]]
 name = "semgrep"
-version = "0.110.0"
+version = "0.111.0"
 digests = [
-    "sha256:898f32f9fa99e98ce1467a4e969a8d549237157e7b24fb16221ccd971c9ffa79",
-    "sha256:01280a957e3ff48a9d667abe745c39cbfeb2ff08d6691696e7694a48031fec14",
-    "sha256:5502eaf14cbbc6af535efd199ef65d20ac3ec076dfe3150881d345feb39cd224",
-    "sha256:5ad373a56eeda8bc140377724f47cdfda23e332b5e407f15699cf1ed6a4495db",
+    "sha256:af1ff505126e994ff17e1826aaa19929a3b2b3cee9ec7bc5258b546a7e7694b7",
+    "sha256:ea655d6b8718079ef17d6812060e913b91ac633f40bf3d25d70d3ee8b01859be",
+    "sha256:991de9786187dc0c11ed1750d970ba0037da529dceb48acfd94894f7e1489d4a",
+    "sha256:9af184e094b15d4f85459c7aa76b9d18046953c99273d66d5fe8df12fbcd9709",
 ]
 
 [["cpython-3.7.13--linux--x86_64"]]
@@ -1213,10 +1213,10 @@ digests = [
 
 [["cpython-3.7.13--linux--x86_64"]]
 name = "urllib3"
-version = "1.26.11"
+version = "1.26.12"
 digests = [
-    "sha256:c33ccba33c819596124764c23a97d25f32b28433ba0dedeb77d873a38722c9bc",
-    "sha256:ea6e8fb210b19d950fab93b60c9009226c63a28808bc8386e05301e25883ac0a",
+    "sha256:b930dd878d5a8afb066a637fbb35144fe7901e3b209d1cd4f524bd0e9deee997",
+    "sha256:3fa96cf423e6987997fc326ae8df396db2a8b7c667747d47ddd8ecba91f4a74e",
 ]
 
 [["cpython-3.7.13--linux--x86_64"]]
@@ -2256,12 +2256,12 @@ digests = [
 
 [["cpython-3.8.13--linux--x86_64"]]
 name = "semgrep"
-version = "0.110.0"
+version = "0.111.0"
 digests = [
-    "sha256:898f32f9fa99e98ce1467a4e969a8d549237157e7b24fb16221ccd971c9ffa79",
-    "sha256:01280a957e3ff48a9d667abe745c39cbfeb2ff08d6691696e7694a48031fec14",
-    "sha256:5502eaf14cbbc6af535efd199ef65d20ac3ec076dfe3150881d345feb39cd224",
-    "sha256:5ad373a56eeda8bc140377724f47cdfda23e332b5e407f15699cf1ed6a4495db",
+    "sha256:af1ff505126e994ff17e1826aaa19929a3b2b3cee9ec7bc5258b546a7e7694b7",
+    "sha256:ea655d6b8718079ef17d6812060e913b91ac633f40bf3d25d70d3ee8b01859be",
+    "sha256:991de9786187dc0c11ed1750d970ba0037da529dceb48acfd94894f7e1489d4a",
+    "sha256:9af184e094b15d4f85459c7aa76b9d18046953c99273d66d5fe8df12fbcd9709",
 ]
 
 [["cpython-3.8.13--linux--x86_64"]]
@@ -2514,10 +2514,10 @@ digests = [
 
 [["cpython-3.8.13--linux--x86_64"]]
 name = "urllib3"
-version = "1.26.11"
+version = "1.26.12"
 digests = [
-    "sha256:c33ccba33c819596124764c23a97d25f32b28433ba0dedeb77d873a38722c9bc",
-    "sha256:ea6e8fb210b19d950fab93b60c9009226c63a28808bc8386e05301e25883ac0a",
+    "sha256:b930dd878d5a8afb066a637fbb35144fe7901e3b209d1cd4f524bd0e9deee997",
+    "sha256:3fa96cf423e6987997fc326ae8df396db2a8b7c667747d47ddd8ecba91f4a74e",
 ]
 
 [["cpython-3.8.13--linux--x86_64"]]
@@ -3495,12 +3495,12 @@ digests = [
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
 name = "semgrep"
-version = "0.110.0"
+version = "0.111.0"
 digests = [
-    "sha256:898f32f9fa99e98ce1467a4e969a8d549237157e7b24fb16221ccd971c9ffa79",
-    "sha256:01280a957e3ff48a9d667abe745c39cbfeb2ff08d6691696e7694a48031fec14",
-    "sha256:5502eaf14cbbc6af535efd199ef65d20ac3ec076dfe3150881d345feb39cd224",
-    "sha256:5ad373a56eeda8bc140377724f47cdfda23e332b5e407f15699cf1ed6a4495db",
+    "sha256:af1ff505126e994ff17e1826aaa19929a3b2b3cee9ec7bc5258b546a7e7694b7",
+    "sha256:ea655d6b8718079ef17d6812060e913b91ac633f40bf3d25d70d3ee8b01859be",
+    "sha256:991de9786187dc0c11ed1750d970ba0037da529dceb48acfd94894f7e1489d4a",
+    "sha256:9af184e094b15d4f85459c7aa76b9d18046953c99273d66d5fe8df12fbcd9709",
 ]
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
@@ -3753,10 +3753,10 @@ digests = [
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
 name = "urllib3"
-version = "1.26.11"
+version = "1.26.12"
 digests = [
-    "sha256:c33ccba33c819596124764c23a97d25f32b28433ba0dedeb77d873a38722c9bc",
-    "sha256:ea6e8fb210b19d950fab93b60c9009226c63a28808bc8386e05301e25883ac0a",
+    "sha256:b930dd878d5a8afb066a637fbb35144fe7901e3b209d1cd4f524bd0e9deee997",
+    "sha256:3fa96cf423e6987997fc326ae8df396db2a8b7c667747d47ddd8ecba91f4a74e",
 ]
 
 [["pypy-3.7.13-7.3.9--linux--x86_64"]]
@@ -4779,12 +4779,12 @@ digests = [
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
 name = "semgrep"
-version = "0.110.0"
+version = "0.111.0"
 digests = [
-    "sha256:898f32f9fa99e98ce1467a4e969a8d549237157e7b24fb16221ccd971c9ffa79",
-    "sha256:01280a957e3ff48a9d667abe745c39cbfeb2ff08d6691696e7694a48031fec14",
-    "sha256:5502eaf14cbbc6af535efd199ef65d20ac3ec076dfe3150881d345feb39cd224",
-    "sha256:5ad373a56eeda8bc140377724f47cdfda23e332b5e407f15699cf1ed6a4495db",
+    "sha256:af1ff505126e994ff17e1826aaa19929a3b2b3cee9ec7bc5258b546a7e7694b7",
+    "sha256:ea655d6b8718079ef17d6812060e913b91ac633f40bf3d25d70d3ee8b01859be",
+    "sha256:991de9786187dc0c11ed1750d970ba0037da529dceb48acfd94894f7e1489d4a",
+    "sha256:9af184e094b15d4f85459c7aa76b9d18046953c99273d66d5fe8df12fbcd9709",
 ]
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
@@ -5037,10 +5037,10 @@ digests = [
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
 name = "urllib3"
-version = "1.26.11"
+version = "1.26.12"
 digests = [
-    "sha256:c33ccba33c819596124764c23a97d25f32b28433ba0dedeb77d873a38722c9bc",
-    "sha256:ea6e8fb210b19d950fab93b60c9009226c63a28808bc8386e05301e25883ac0a",
+    "sha256:b930dd878d5a8afb066a637fbb35144fe7901e3b209d1cd4f524bd0e9deee997",
+    "sha256:3fa96cf423e6987997fc326ae8df396db2a8b7c667747d47ddd8ecba91f4a74e",
 ]
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
@@ -6064,12 +6064,12 @@ digests = [
 
 [["cpython-3.9.13--linux--x86_64"]]
 name = "semgrep"
-version = "0.110.0"
+version = "0.111.0"
 digests = [
-    "sha256:898f32f9fa99e98ce1467a4e969a8d549237157e7b24fb16221ccd971c9ffa79",
-    "sha256:01280a957e3ff48a9d667abe745c39cbfeb2ff08d6691696e7694a48031fec14",
-    "sha256:5502eaf14cbbc6af535efd199ef65d20ac3ec076dfe3150881d345feb39cd224",
-    "sha256:5ad373a56eeda8bc140377724f47cdfda23e332b5e407f15699cf1ed6a4495db",
+    "sha256:af1ff505126e994ff17e1826aaa19929a3b2b3cee9ec7bc5258b546a7e7694b7",
+    "sha256:ea655d6b8718079ef17d6812060e913b91ac633f40bf3d25d70d3ee8b01859be",
+    "sha256:991de9786187dc0c11ed1750d970ba0037da529dceb48acfd94894f7e1489d4a",
+    "sha256:9af184e094b15d4f85459c7aa76b9d18046953c99273d66d5fe8df12fbcd9709",
 ]
 
 [["cpython-3.9.13--linux--x86_64"]]
@@ -6322,10 +6322,10 @@ digests = [
 
 [["cpython-3.9.13--linux--x86_64"]]
 name = "urllib3"
-version = "1.26.11"
+version = "1.26.12"
 digests = [
-    "sha256:c33ccba33c819596124764c23a97d25f32b28433ba0dedeb77d873a38722c9bc",
-    "sha256:ea6e8fb210b19d950fab93b60c9009226c63a28808bc8386e05301e25883ac0a",
+    "sha256:b930dd878d5a8afb066a637fbb35144fe7901e3b209d1cd4f524bd0e9deee997",
+    "sha256:3fa96cf423e6987997fc326ae8df396db2a8b7c667747d47ddd8ecba91f4a74e",
 ]
 
 [["cpython-3.9.13--linux--x86_64"]]
@@ -7365,12 +7365,12 @@ digests = [
 
 [["pyston-3.8.12-2.3.4--linux--x86_64"]]
 name = "semgrep"
-version = "0.110.0"
+version = "0.111.0"
 digests = [
-    "sha256:898f32f9fa99e98ce1467a4e969a8d549237157e7b24fb16221ccd971c9ffa79",
-    "sha256:01280a957e3ff48a9d667abe745c39cbfeb2ff08d6691696e7694a48031fec14",
-    "sha256:5502eaf14cbbc6af535efd199ef65d20ac3ec076dfe3150881d345feb39cd224",
-    "sha256:5ad373a56eeda8bc140377724f47cdfda23e332b5e407f15699cf1ed6a4495db",
+    "sha256:af1ff505126e994ff17e1826aaa19929a3b2b3cee9ec7bc5258b546a7e7694b7",
+    "sha256:ea655d6b8718079ef17d6812060e913b91ac633f40bf3d25d70d3ee8b01859be",
+    "sha256:991de9786187dc0c11ed1750d970ba0037da529dceb48acfd94894f7e1489d4a",
+    "sha256:9af184e094b15d4f85459c7aa76b9d18046953c99273d66d5fe8df12fbcd9709",
 ]
 
 [["pyston-3.8.12-2.3.4--linux--x86_64"]]
@@ -7623,10 +7623,10 @@ digests = [
 
 [["pyston-3.8.12-2.3.4--linux--x86_64"]]
 name = "urllib3"
-version = "1.26.11"
+version = "1.26.12"
 digests = [
-    "sha256:c33ccba33c819596124764c23a97d25f32b28433ba0dedeb77d873a38722c9bc",
-    "sha256:ea6e8fb210b19d950fab93b60c9009226c63a28808bc8386e05301e25883ac0a",
+    "sha256:b930dd878d5a8afb066a637fbb35144fe7901e3b209d1cd4f524bd0e9deee997",
+    "sha256:3fa96cf423e6987997fc326ae8df396db2a8b7c667747d47ddd8ecba91f4a74e",
 ]
 
 [["pyston-3.8.12-2.3.4--linux--x86_64"]]
@@ -8650,12 +8650,12 @@ digests = [
 
 [["cpython-3.10.6--linux--x86_64"]]
 name = "semgrep"
-version = "0.110.0"
+version = "0.111.0"
 digests = [
-    "sha256:898f32f9fa99e98ce1467a4e969a8d549237157e7b24fb16221ccd971c9ffa79",
-    "sha256:01280a957e3ff48a9d667abe745c39cbfeb2ff08d6691696e7694a48031fec14",
-    "sha256:5502eaf14cbbc6af535efd199ef65d20ac3ec076dfe3150881d345feb39cd224",
-    "sha256:5ad373a56eeda8bc140377724f47cdfda23e332b5e407f15699cf1ed6a4495db",
+    "sha256:af1ff505126e994ff17e1826aaa19929a3b2b3cee9ec7bc5258b546a7e7694b7",
+    "sha256:ea655d6b8718079ef17d6812060e913b91ac633f40bf3d25d70d3ee8b01859be",
+    "sha256:991de9786187dc0c11ed1750d970ba0037da529dceb48acfd94894f7e1489d4a",
+    "sha256:9af184e094b15d4f85459c7aa76b9d18046953c99273d66d5fe8df12fbcd9709",
 ]
 
 [["cpython-3.10.6--linux--x86_64"]]
@@ -8908,10 +8908,10 @@ digests = [
 
 [["cpython-3.10.6--linux--x86_64"]]
 name = "urllib3"
-version = "1.26.11"
+version = "1.26.12"
 digests = [
-    "sha256:c33ccba33c819596124764c23a97d25f32b28433ba0dedeb77d873a38722c9bc",
-    "sha256:ea6e8fb210b19d950fab93b60c9009226c63a28808bc8386e05301e25883ac0a",
+    "sha256:b930dd878d5a8afb066a637fbb35144fe7901e3b209d1cd4f524bd0e9deee997",
+    "sha256:3fa96cf423e6987997fc326ae8df396db2a8b7c667747d47ddd8ecba91f4a74e",
 ]
 
 [["cpython-3.10.6--linux--x86_64"]]
