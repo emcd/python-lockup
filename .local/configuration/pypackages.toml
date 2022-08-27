@@ -34,7 +34,9 @@ lint = [
   'pre-commit',
   # Pylint relies on 'typed_ast', which does not build under PyPy 3.7.
   #   https://github.com/python/typed_ast/issues/111
-  'pylint; implementation_name != "pypy" or python_version >= "3.8"',
+  # Pylint 2.15 relies on Astroid 2.12 series, which is broken on PyPy 3.8.
+  #   https://github.com/PyCQA/astroid/issues/1755
+  'pylint ~= 2.14.5; implementation_name != "pypy" or python_version >= "3.8"',
   'safety',
   'semgrep',
 ]
