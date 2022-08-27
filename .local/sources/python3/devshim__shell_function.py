@@ -70,17 +70,22 @@ invocation_code_table = __.DictionaryProxy( {
         function {function_name} {{
             "{python_path}" "{shim_path}" "$@"
         }}''',
+    'fish': '''
+		function {function_name}
+            "{python_path}" "{shim_path}" $argv
+        end''',
+    'zsh': '''
+        function {function_name} {{
+            "{python_path}" "{shim_path}" "$@"
+        }}''',
 } )
 
 completion_code_table = __.DictionaryProxy( {
-    'bash': '''
-        function complete--{function_name} {{
-            local -r candidates=$({function_name} --complete -- ${{COMP_WORDS[*]}})
-            COMPREPLY=( $(compgen -W "${{candidates}}" -- $2) )
-        }}
-
-        complete -F complete--{function_name} -o default {function_name}''',
+    # TODO: Implement.
 } )
+
+# TODO? direnv configuration snippets to allow devshim to operate
+#       in any supported directory.
 
 
 __.reclassify_module( __name__ )
