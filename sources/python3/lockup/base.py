@@ -33,35 +33,16 @@
 base_package_name = __package__.split( '.', maxsplit = 1 )[ 0 ]
 
 
-from sys import ( # pylint: disable=unused-import
-    implementation as python_implementation,
-    version_info as python_version,
-)
-from types import MappingProxyType as DictionaryProxy
-
-
-class __:
-
-    from collections.abc import Collection, Mapping as Dictionary
-    from functools import wraps
-    import inspect
-    from inspect import (
-        Parameter as Variate, Signature,
-        isclass as is_class, isfunction as is_function, ismodule as is_module,
-        isroutine as is_routine,
-        signature as scan_signature, )
-    from keyword import iskeyword as is_keyword
-    from sys import modules
-
-
 def intercept( invocation ):
     ''' Decorator to intercept fugitive exceptions.
 
         Fugitive exceptions are ones which are not expected
         to cross an API boundary. '''
     validate_argument_invocability( invocation, 'invocation', intercept )
-    signature = __.scan_signature( invocation )
-    @__.wraps( invocation )
+    from inspect import signature as scan_signature
+    signature = scan_signature( invocation )
+    from functools import wraps
+    @wraps( invocation )
     def interception_invoker( *things, **sundry ):
         # Validate that arguments correspond to function signature.
         try: signature.bind( *things, **sundry )
@@ -103,7 +84,8 @@ def create_argument_validation_exception(
     name, invocation, expectation_label
 ):
     ''' Creates error with context about invalid argument. '''
-    signature = __.scan_signature( invocation )
+    from inspect import signature as scan_signature
+    signature = scan_signature( invocation )
     argument_label = _calculate_argument_label( name, signature )
     invocation_label = calculate_invocable_label( invocation )
     if not isinstance( expectation_label, str ):
@@ -144,6 +126,12 @@ def create_impermissible_instantiation_exception( class_ ):
     return ImpermissibleOperation(
         f"Impermissible instantiation of {label}." )
 
+def create_implementation_absence_exception( invocation, variant_name ):
+    ''' Creates error about absent implementation of invocable. '''
+    invocation_label = calculate_invocable_label( invocation )
+    return AbsentImplementation(
+        f"No implementation of {invocation_label} exists for {variant_name}." )
+
 def create_invocation_validation_exception( invocation, cause ):
     ''' Creates error with context about invalid invocation. '''
     label = calculate_invocable_label( invocation )
@@ -156,9 +144,10 @@ def create_invocation_validation_exception( invocation, cause ):
 
 def calculate_label( object_, attribute_label = None ):
     ''' Produces human-comprehensible label, based on classification. '''
-    if __.is_module( object_ ):
+    from inspect import isclass as is_class, ismodule as is_module
+    if is_module( object_ ):
         return calculate_module_label( object_, attribute_label )
-    if __.is_class( object_ ):
+    if is_class( object_ ):
         return calculate_class_label( object_, attribute_label )
     return calculate_instance_label( object_, attribute_label )
 
@@ -167,7 +156,9 @@ def calculate_class_label( classes, attribute_label = None ):
 
         Each provided class may be a class object or namespace dictionary
         that is present during class creation. '''
-    if __.is_class( classes ) or isinstance( classes, __.Dictionary ):
+    from collections.abc import Mapping as Dictionary
+    from inspect import isclass as is_class
+    if is_class( classes ) or isinstance( classes, Dictionary ):
         classes = ( classes, )
     label = ' or '.join( map(
         lambda class_: "class '{}'".format(
@@ -177,7 +168,8 @@ def calculate_class_label( classes, attribute_label = None ):
 
 def calculate_module_label( module, attribute_label = None ):
     ''' Produces human-comprehensible label for module. '''
-    if not __.is_module( module ):
+    from inspect import ismodule as is_module
+    if not is_module( module ):
         raise create_argument_validation_exception(
             'module', calculate_module_label, 'module' )
     label = f"module '{module.__name__}'"
@@ -198,10 +190,9 @@ def calculate_invocable_label( invocable ):
         or invocable instance of a class. '''
     validate_argument_invocability(
         invocable, 'invocable', calculate_invocable_label )
-    if __.is_routine( invocable ):
-        return _calculate_routine_label( invocable )
-    if __.is_class( invocable ):
-        return calculate_class_label( invocable )
+    from inspect import isclass as is_class, isroutine as is_routine
+    if is_routine( invocable ): return _calculate_routine_label( invocable )
+    if is_class( invocable ): return calculate_class_label( invocable )
     if hasattr( invocable, '__call__' ):
         return "invocable {label}".format(
             label = calculate_instance_label( invocable ) )
@@ -214,18 +205,19 @@ def _calculate_routine_label( routine ):
     # because inspecting '__closure__' cells is guesswork that we avoid.
     qname = routine.__qualname__
     module_label = f"module '{routine.__module__}'"
+    import inspect
     if '<lambda>' == qname: return f"lambda from {module_label}"
-    if __.inspect.ismethod( routine ):
+    if inspect.ismethod( routine ):
         attribute_label = calculate_instance_label(
             routine.__self__, f"method '{routine.__name__}'" )
     else: attribute_label = _calculate_attribute_label( routine, 'function' )
-    if __.inspect.isgeneratorfunction( routine ):
+    if inspect.isgeneratorfunction( routine ):
         attribute_label = f"generator {attribute_label}"
-    elif __.inspect.isasyncgenfunction( routine ):
+    elif inspect.isasyncgenfunction( routine ):
         attribute_label = f"async generator {attribute_label}"
-    elif __.inspect.iscoroutinefunction( routine ):
+    elif inspect.iscoroutinefunction( routine ):
         attribute_label = f"async {attribute_label}"
-    if __.inspect.isbuiltin( routine ):
+    if inspect.isbuiltin( routine ):
         attribute_label = f"builtin {attribute_label}"
     return attribute_label
 
@@ -245,13 +237,14 @@ def _calculate_argument_label( name, invocation_signature ):
     position = next( # pragma: no branch
         position for position, name_
         in enumerate( invocation_signature.parameters ) if name_ == name )
-    if __.Variate.POSITIONAL_ONLY is species:
+    from inspect import Parameter as Variate
+    if Variate.POSITIONAL_ONLY is species:
         return f"positional argument #{position}"
-    if __.Variate.POSITIONAL_OR_KEYWORD is species:
+    if Variate.POSITIONAL_OR_KEYWORD is species:
         return f"argument '{name}' (position #{position})"
-    if __.Variate.VAR_POSITIONAL is species:
+    if Variate.VAR_POSITIONAL is species:
         return f"sequence of extra positional arguments '{name}'"
-    if __.Variate.VAR_KEYWORD is species:
+    if Variate.VAR_KEYWORD is species:
         return f"dictionary of extra nominative arguments '{name}'"
     raise InvalidState # pragma: no cover
 
@@ -260,8 +253,8 @@ def module_qualify_class_name( class_ ):
     ''' Concatenates module name and qualified name of class.
 
         Also supports class namespace dictionaries. '''
-    if __.is_class( class_ ):
-        return f"{class_.__module__}.{class_.__qualname__}"
+    from inspect import isclass as is_class
+    if is_class( class_ ): return f"{class_.__module__}.{class_.__qualname__}"
     try:
         module_name = class_[ '__module__' ]
         class_qname = class_[ '__qualname__' ]
@@ -274,8 +267,9 @@ def module_qualify_class_name( class_ ):
 
 def is_python_identifier( name ):
     ''' Is object a legal Python identifier? Excludes Python keywords. '''
+    from keyword import iskeyword as is_keyword
     return (    isinstance( name, str )
-            and name.isidentifier( ) and not __.is_keyword( name ) )
+            and name.isidentifier( ) and not is_keyword( name ) )
 
 
 def is_public_name( name ):
@@ -318,6 +312,7 @@ def select_public_attributes(
         Can optionally include specific attributes that would not be selected
         under normal operation and can exclude specific attributes that would
         selected under normal operation. '''
+    from inspect import isclass as is_class
     names = (
           # Slotted object might not have '__dict__' attribute.
           getattr( object_, '__dict__', { } ).keys( )
@@ -327,7 +322,7 @@ def select_public_attributes(
         | frozenset( super( class_, object_ ).__dir__( *(
             # Classes in 'type' family bind '__dir__' differently.
             ( object_, )
-            if __.is_class( object_ ) and issubclass( object_, type )
+            if is_class( object_ ) and issubclass( object_, type )
             else ( ) ) ) ) )
     return (
         name for name in names
@@ -371,60 +366,6 @@ class Class( type ):
     def __dir__( class_ ): return select_public_attributes( __class__, class_ )
 
 
-if python_implementation.name in ( 'cpython', 'pyston', ): # pragma: no branch
-
-    def _make_god_unto_itself( factory ):
-        ''' Turns a class factory class into the factory for itself. '''
-        if not issubclass( factory, type ):
-            raise InvalidState # pragma: no cover
-        from ctypes import Structure, c_ssize_t, c_void_p
-        import sys
-        # Detect if compiled with the 'TRACE_REFS' macro.
-        trace_refs = hasattr( sys, 'getobjects' )
-        class PyObject( Structure ):
-            ''' Structural representation of :c:struct:`PyObject`. '''
-            _fields_ = tuple( filter( None, (
-                ( '_ob_next', c_void_p ) if trace_refs else None,
-                ( '_ob_prev', c_void_p ) if trace_refs else None,
-                ( 'ob_refcnt', c_ssize_t ),
-                ( 'ob_type', c_void_p )
-            ) ) )
-        f_pointer = id( factory )
-        f_struct = PyObject.from_address( f_pointer )
-        f_struct.ob_type = c_void_p( f_pointer )
-
-    _make_god_unto_itself( Class )
-
-# TODO: Find the secret sauce to make PyPy honor the metaclass change.
-#       Need to investigate, in more detail, how type lookups work in PyPy.
-#       Possible code of interest:
-#         https://foss.heptapod.net/pypy/pypy/-/blob/branch/default/pypy/objspace/std/typeobject.py
-#elif 'pypy' == python_implementation.name: # pragma: no branch
-#
-#    def _make_god_unto_itself( factory ):
-#        if not issubclass( factory, type ):
-#            raise InvalidState # pragma: no cover
-#        from ctypes import Structure, c_ssize_t, c_void_p
-#        #from pypyjit import releaseall
-#        #releaseall( )
-#        class PyObject( Structure ):
-#            ''' Structural representation of :c:struct:`PyObject`. '''
-#            _fields_ = tuple( (
-#                ( 'ob_refcnt', c_ssize_t ),
-#                ( 'ob_pypy_link', c_ssize_t ),
-#                ( 'ob_type', c_void_p )
-#            ) )
-#        # Although there are admonitions against relying upon 'id'
-#        # to get the address of an object in PyPy, the class address from 'id'
-#        # _seems_ stable and reliable.
-#        f_pointer = id( factory )
-#        f_struct = PyObject.from_address( f_pointer )
-#        f_struct.ob_type = c_void_p( f_pointer )
-#        #releaseall( )
-#
-#    _make_god_unto_itself( Class )
-
-
 #================================= Exceptions ================================#
 
 # Note: Normally, we would define exceptions in a separate module.
@@ -442,8 +383,10 @@ class Exception0( BaseException, metaclass = Class ):
     __module__ = f"{base_package_name}.exceptions"
 
     def __init__( self, *things, tags = None, **sundry ):
+        from collections.abc import Mapping as Dictionary
+        from types import MappingProxyType as DictionaryProxy
         self.tags = (
-            DictionaryProxy( tags ) if isinstance( tags, __.Dictionary )
+            DictionaryProxy( tags ) if isinstance( tags, Dictionary )
             else DictionaryProxy( { } ) )
         super( ).__init__( *things, **sundry )
 
@@ -453,6 +396,12 @@ class Exception0( BaseException, metaclass = Class ):
 
 class InvalidOperation( Exception0, Exception ):
     ''' Complaint about invalid operation. '''
+
+    __module__ = f"{base_package_name}.exceptions"
+
+
+class AbsentImplementation( Exception0, NotImplementedError ):
+    ''' Complaint about attempt execute nonexistent implementation. '''
 
     __module__ = f"{base_package_name}.exceptions"
 
