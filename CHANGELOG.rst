@@ -19,6 +19,23 @@
 Changelog
 ===============================================================================
 
+v2.0.0 (not released)
+-------------------------------------------------------------------------------
+
+API
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Expose ``reflect_class_factory_per_se`` function which allows for a class
+  factory class ("metaclass") to be made into its own factory, similar to how
+  `type <https://docs.python.org/3/library/functions.html#type>`_ behaves.
+
+Python Support
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Drop CPython 3.6.
+
+* Add PyPy 3.9.
+
 v1.1.0
 -------------------------------------------------------------------------------
 
@@ -26,43 +43,3 @@ Documentation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Officially verify and mention PyPy and Pyston support.
-* More documentation improvements.
-
-
-v1.0.5
--------------------------------------------------------------------------------
-
-Documentation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* Add missing links in README.
-* Replace example in README with one that is clearer and able to be doctested.
-
-v1.0.3
--------------------------------------------------------------------------------
-
-Documentation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* Improve presentation of overview in README.
-* Properly fence Python code blocks in README for correct rendering on PyPI.
-
-v1.0.2
--------------------------------------------------------------------------------
-
-Documentation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* Provide direct link in README to stable API documentation.
-
-v1.0.1
--------------------------------------------------------------------------------
-
-Documentation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* Improve wording of introduction in README.
-* Add badges in README for supported Python versions, current release, code
-  coverage, and license.
-* Provide direct links in README to current API documentation, code of conduct,
-  and contribution guide.
