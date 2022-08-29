@@ -25,8 +25,14 @@
 __version__ = '2.0a202112310633'
 
 
-from . import exceptions
+from . import exceptions, reflection
 from .base import Class, NamespaceClass, create_namespace
+from .reflection import reflect_class_factory_per_se
+
+
+# If Python implementation does not support reflection,
+# we can still provide functionality without the extra protection.
+reflect_class_factory_per_se( Class, assert_implementation = False )
 
 
 class __( metaclass = NamespaceClass ):
@@ -107,4 +113,5 @@ def reclassify_module( module ):
 
 reclassify_module( base ) # type: ignore # pylint: disable=undefined-variable
 reclassify_module( exceptions )
+reclassify_module( reflection )
 reclassify_module( __name__ )

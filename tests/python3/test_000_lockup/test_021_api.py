@@ -30,9 +30,10 @@ class __( metaclass = NamespaceClass ):
 
     from lockup import exceptions
     from lockup import (
-        reclassify_module,
         Module,
         NamespaceClass,
+        reclassify_module,
+        reflect_class_factory_per_se,
     )
 
 
@@ -64,20 +65,30 @@ def test_212_fail_to_produce_instantiable_namespace( ):
 
 def test_301_reclassify_module_object( ):
     ''' Module instance can be reclassified. '''
-    import types
-    __.reclassify_module( types )
-    assert isinstance( types, __.Module )
+    # NOTE: Must NOT reclassify any module that we use in our package during
+    #       testing. This causes nasty dependency cycles / infinite recursion
+    #       during exception generation, likely due to Pytest's modification of
+    #       the import mechanism. Choose ones which are "obscure" relative to
+    #       the purpose of our package.
+    import bisect
+    __.reclassify_module( bisect )
+    assert isinstance( bisect, __.Module )
     with raises( __.exceptions.ImpermissibleAttributeOperation ):
-        types.ModuleType = types.FunctionType
+        bisect.bisect_left = bisect.bisect_right
 
 
 def test_302_reclassify_module_by_name( ):
     ''' Module can be reclassified by import name. '''
-    import pprint
-    __.reclassify_module( 'pprint' )
-    assert isinstance( pprint, __.Module )
+    # NOTE: Must NOT reclassify any module that we use in our package during
+    #       testing. This causes nasty dependency cycles / infinite recursion
+    #       during exception generation, likely due to Pytest's modification of
+    #       the import mechanism. Choose ones which are "obscure" relative to
+    #       the purpose of our package.
+    import numbers
+    __.reclassify_module( 'numbers' )
+    assert isinstance( numbers, __.Module )
     with raises( __.exceptions.ImpermissibleAttributeOperation ):
-        pprint.pprint = print
+        numbers.Complex = numbers.Real
 
 
 def test_303_reclassify_module_idempotence( ):
@@ -92,3 +103,19 @@ def test_304_reclassify_invalid_module( module ):
     ''' Only modules may be reclassified. '''
     with raises( __.exceptions.IncorrectData ):
         __.reclassify_module( module )
+
+
+def test_401_reflect_class_factory( ):
+    ''' Class factory class can be made into a factory of itself. '''
+    class TrivialFactory( type ): ''' Trivial class factory class. '''
+    assert issubclass( TrivialFactory, type )
+    __.reflect_class_factory_per_se(
+        TrivialFactory, assert_implementation = False )
+    assert issubclass( TrivialFactory, TrivialFactory )
+
+
+@mark.parametrize( 'factory', ( 123, 'ph00b4r' * 5, ) )
+def test_402_reflect_invalid_class_factory( factory ):
+    ''' Only class factory classes can be reflected. '''
+    with raises( __.exceptions.IncorrectData ):
+        __.reflect_class_factory_per_se( factory )

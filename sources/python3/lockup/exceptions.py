@@ -26,6 +26,7 @@
 
 
 from .base import (
+    AbsentImplementation,
     Exception0,
     FugitiveException,
     ImpermissibleAttributeOperation,
