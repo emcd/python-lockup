@@ -55,8 +55,8 @@ Enables the creation of classes, modules, and namespaces on which the following
 properties are true:
 
 * All attributes are **immutable**. Immutability increases code safety by
-  discouraging monkey-patching and preventing accidental or deliberate changes
-  to state.
+  discouraging monkey-patching and preventing changes to state, accidental or
+  otherwise.
 
   .. code-block:: python
 
@@ -86,11 +86,11 @@ properties are true:
 
     >>> import lockup
     >>> dir( lockup )
-    ['Class', 'Module', 'NamespaceClass', 'base', 'create_namespace', 'exceptions', 'reclassify_module']
+    ['Class', 'Module', 'NamespaceClass', 'base', 'create_namespace', 'exceptions', 'reclassify_module', 'reflect_class_factory_per_se', 'reflection']
     >>> len( dir( lockup ) )
-    7
+    9
     >>> len( lockup.__dict__ )  # doctest: +SKIP
-    18
+    20
 
 Quick Tour
 ===============================================================================
@@ -260,6 +260,40 @@ part of the module API, for example:
     0
 
 The above technique is used internally within this package itself.
+
+Reflection
+-------------------------------------------------------------------------------
+
+Have you ever wondered how the type of `type
+<https://docs.python.org/3/library/functions.html#type>`_ can be type_ itself?
+Have you ever had a need to make a class with a similar behavior?
+
+.. code-block:: python
+
+    >>> type( type )
+    <class 'type'>
+
+Well, we can:
+
+.. code-block:: python
+
+    >>> class Class( type ): pass
+    ...
+    >>> type( Class )
+    <class 'type'>
+    >>> import lockup
+    >>> lockup.reflect_class_factory_per_se( Class, assert_implementation = False )
+    <class '__main__.Class'>
+    >>> type( Class )  # doctest: +SKIP
+    <class '__main__.Class'>
+
+The above technique is used internally within this package itself.
+
+.. note::
+   This function only works on some flavors of Python, such as the reference
+   implementation (CPython) and Pyston, at present. You can still use this
+   package on other flavors of Python, but the reflection operation may not be
+   implemented.
 
 `Exceptions`_
 -------------------------------------------------------------------------------

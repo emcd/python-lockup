@@ -33,11 +33,19 @@ class __( metaclass = NamespaceClass ):
     from functools import wraps
 
     from lockup.base import (
+        AbsentImplementation,
+        Class,
+        FugitiveException,
+        InaccessibleAttribute,
+        IncorrectData,
+        InvalidOperation,
+        InvalidState,
         calculate_label,
         calculate_class_label,
         calculate_invocable_label,
         calculate_module_label,
         create_argument_validation_exception,
+        create_implementation_absence_exception,
         create_namespace,
         intercept,
         is_operational_name,
@@ -47,12 +55,6 @@ class __( metaclass = NamespaceClass ):
         validate_argument_invocability,
         validate_attribute_existence,
         select_public_attributes,
-        Class,
-        FugitiveException,
-        InaccessibleAttribute,
-        IncorrectData,
-        InvalidOperation,
-        InvalidState,
     )
 
 
@@ -272,6 +274,14 @@ def test_063_argument_validation_exceptions( trial_function ):
     assert isinstance(
         __.create_argument_validation_exception(
             'iterable', trial_function, object ), __.IncorrectData )
+
+
+@mark.parametrize( 'argument', _invocables )
+def test_066_implementation_absence_exception( argument ):
+    ''' Validation exception is created from argument. '''
+    assert isinstance(
+        __.create_implementation_absence_exception( argument, 'something' ),
+        __.AbsentImplementation )
 
 
 @mark.parametrize( 'argument', _invocables )
