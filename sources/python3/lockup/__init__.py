@@ -22,7 +22,7 @@
 
 
 # https://www.python.org/dev/peps/pep-0396/
-__version__ = '2.0a202112310633'
+__version__ = '2.0a202208290127'
 
 
 from . import exceptions, reflection
