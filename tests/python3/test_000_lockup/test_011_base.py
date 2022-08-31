@@ -52,9 +52,11 @@ class __( metaclass = NamespaceClass ):
         is_public_or_operational_name,
         module_qualify_class_name,
         select_public_attributes,
+        select_public_attributes,
+    )
+    from lockup.validators import (
         validate_argument_invocability,
         validate_attribute_existence,
-        select_public_attributes,
     )
 
 
@@ -220,7 +222,8 @@ def test_044_calculate_class_attribute_label( ):
 @mark.parametrize(
     'invocable, expectation',
     ( ( lambda: None, f"lambda from module '{__name__}'" ),
-      ( __.intercept, "function 'intercept' on module 'lockup.base'" ),
+      ( __.calculate_label,
+        "function 'calculate_label' on module 'lockup.base'" ),
       ( _InvocableObject, f"class '{__name__}._InvocableObject'" ),
       ( _invocable_object,
         f"invocable instance of class '{__name__}._InvocableObject'" ),

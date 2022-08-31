@@ -86,9 +86,9 @@ properties are true:
 
     >>> import lockup
     >>> dir( lockup )
-    ['Class', 'Module', 'NamespaceClass', 'base', 'create_namespace', 'exceptions', 'reclassify_module', 'reflect_class_factory_per_se', 'reflection']
+    ['Class', 'Module', 'NamespaceClass', 'base', 'create_interception_decorator', 'create_namespace', 'exceptions', 'interception', 'reclassify_module', 'reflect_class_factory_per_se', 'reflection', 'validators']
     >>> len( dir( lockup ) )
-    9
+    12
     >>> len( lockup.__dict__ )  # doctest: +SKIP
     20
 

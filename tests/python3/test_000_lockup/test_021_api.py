@@ -28,10 +28,15 @@ from lockup import NamespaceClass
 
 class __( metaclass = NamespaceClass ):
 
+    from importlib import import_module
+    from sys import implementation as python_implementation
+    python_name = python_implementation.name
+
     from lockup import exceptions
     from lockup import (
         Module,
         NamespaceClass,
+        create_interception_decorator,
         reclassify_module,
         reflect_class_factory_per_se,
     )
@@ -105,13 +110,20 @@ def test_304_reclassify_invalid_module( module ):
         __.reclassify_module( module )
 
 
+@mark.skipif(
+    __.python_name not in (
+        'cpython', 'pyston',
+    ),
+    reason = f"Functionality not supported on '{__.python_name}'."
+)
 def test_401_reflect_class_factory( ):
     ''' Class factory class can be made into a factory of itself. '''
     class TrivialFactory( type ): ''' Trivial class factory class. '''
     assert issubclass( TrivialFactory, type )
-    __.reflect_class_factory_per_se(
+    factory = __.reflect_class_factory_per_se(
         TrivialFactory, assert_implementation = False )
     assert issubclass( TrivialFactory, TrivialFactory )
+    assert factory is TrivialFactory
 
 
 @mark.parametrize( 'factory', ( 123, 'ph00b4r' * 5, ) )
@@ -119,3 +131,48 @@ def test_402_reflect_invalid_class_factory( factory ):
     ''' Only class factory classes can be reflected. '''
     with raises( __.exceptions.IncorrectData ):
         __.reflect_class_factory_per_se( factory )
+
+
+def _provide_exception( name ):
+    ''' Simple exception provider. '''
+    return getattr( __.import_module( 'lockup.base' ), name )
+
+
+def test_501_create_interception_decorator( ):
+    ''' Interception decorator receives invocable and returns invocable. '''
+    decorator = __.create_interception_decorator(
+        exception_provider = _provide_exception )
+    assert callable( decorator )
+
+
+@mark.parametrize( 'provider', ( 123, 'ph00b4r' * 5, ) )
+def test_502_interceptor_creation_with_invalid_exception_provider( provider ):
+    ''' Only class factory classes can be reflected. '''
+    with raises( __.exceptions.IncorrectData ):
+        __.create_interception_decorator( exception_provider = provider )
+
+
+def test_506_translate_fugitive_with_interceptor( ):
+    ''' Interception decorator intercepts and translates fugitives. '''
+    decorator = __.create_interception_decorator(
+        exception_provider = _provide_exception )
+    @decorator
+    def raise_divide_by_zero( ): 1 / 0 # pylint: disable=pointless-statement
+    with raises( __.exceptions.FugitiveException ):
+        raise_divide_by_zero( )
+
+
+@mark.parametrize(
+    'exception_class', (
+        __.exceptions.InvalidOperation,
+        __.exceptions.InvalidState,
+    )
+)
+def test_507_relay_permissible_with_interceptor( exception_class ):
+    ''' Interception decorator relays permissible exceptions. '''
+    decorator = __.create_interception_decorator(
+        exception_provider = _provide_exception )
+    @decorator
+    def raise_permissible_exception( ): raise exception_class
+    with raises( exception_class ):
+        raise_permissible_exception( )
