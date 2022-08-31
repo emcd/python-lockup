@@ -45,6 +45,7 @@ def reflect_class_factory_per_se( factory, assert_implementation = True ):
         'cpython', 'pyston',
     ): return _reflect_cpython_class_factory_per_se( factory )
     # TODO: pypy
+    # Note: Update corresponding tests as Python flavors become supported.
     if assert_implementation: # pragma: no cover
         raise create_implementation_absence_exception(
             reflect_class_factory_per_se,

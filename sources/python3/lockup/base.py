@@ -30,51 +30,14 @@
 #       The module is highly robust once its initialization is complete.
 
 
+from .interception import (
+    create_interception_decorator as _create_interception_decorator,
+)
+# TODO: Privatize after move to new modules.
+intercept = _create_interception_decorator( )
+
+
 base_package_name = __package__.split( '.', maxsplit = 1 )[ 0 ]
-
-
-def intercept( invocation ):
-    ''' Decorator to intercept fugitive exceptions.
-
-        Fugitive exceptions are ones which are not expected
-        to cross an API boundary. '''
-    validate_argument_invocability( invocation, 'invocation', intercept )
-    from inspect import signature as scan_signature
-    signature = scan_signature( invocation )
-    from functools import wraps
-    @wraps( invocation )
-    def interception_invoker( *things, **sundry ):
-        # Validate that arguments correspond to function signature.
-        try: signature.bind( *things, **sundry )
-        except TypeError as exc:
-            raise create_invocation_validation_exception(
-                invocation, exc ) from exc
-        try: return invocation( *things, **sundry )
-        except ( InvalidState, InvalidOperation, ): raise
-        # Prevent escape of impermissible exceptions.
-        except BaseException as exc:
-            raise FugitiveException from exc # pylint: disable=broad-except
-    return interception_invoker
-
-
-#============================ Internal Validaters ============================#
-
-
-def validate_argument_invocability( argument, name, invocation ):
-    ''' Validates argument as an invocable object, such as a function. '''
-    if callable( argument ): return argument
-    raise create_argument_validation_exception( name, invocation, 'invocable' )
-
-def validate_attribute_name( name, context ):
-    ''' Validates attribute name as Python identifier. '''
-    if is_python_identifier( name ): return name
-    label = calculate_label( context, f"attribute '{name}'" )
-    raise InaccessibleAttribute( f"Illegal name for {label}." )
-
-def validate_attribute_existence( name, context ):
-    ''' Validates attribute exists on context object. '''
-    if hasattr( context, name ): return name
-    raise create_attribute_nonexistence_exception( name, context )
 
 
 #======================== Internal Exception Factories =======================#
@@ -188,6 +151,7 @@ def calculate_invocable_label( invocable ):
 
         An invocable object may be a function, bound method, class,
         or invocable instance of a class. '''
+    from .validators import validate_argument_invocability
     validate_argument_invocability(
         invocable, 'invocable', calculate_invocable_label )
     from inspect import isclass as is_class, isroutine as is_routine
@@ -353,12 +317,17 @@ class Class( type ):
 
     @intercept
     def __setattr__( class_, name, value ):
+        # TODO: Move import to non-public module attribute for performance.
+        from .validators import validate_attribute_name
         validate_attribute_name( name, class_ )
         raise create_attribute_immutability_exception( name, class_ )
 
     @intercept
     def __delattr__( class_, name ):
+        # TODO: Move imports to non-public module attributes for performance.
+        from .validators import validate_attribute_name
         validate_attribute_name( name, class_ )
+        from .validators import validate_attribute_existence
         validate_attribute_existence( name, class_ )
         raise create_attribute_indelibility_exception( name, class_ )
 

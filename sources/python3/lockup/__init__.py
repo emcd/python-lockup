@@ -25,12 +25,13 @@
 __version__ = '2.0a202208290127'
 
 
-from . import exceptions, reflection
+from . import exceptions, interception, reflection, validators
 from .base import Class, NamespaceClass, create_namespace
+from .interception import create_interception_decorator
 from .reflection import reflect_class_factory_per_se
 
 
-# If Python implementation does not support reflection,
+# If Python implementation does not support class reflection,
 # we can still provide functionality without the extra protection.
 reflect_class_factory_per_se( Class, assert_implementation = False )
 
@@ -48,10 +49,14 @@ class __( metaclass = NamespaceClass ):
         create_attribute_immutability_exception,
         create_attribute_indelibility_exception,
         create_attribute_nonexistence_exception,
-        intercept,
         is_operational_name, select_public_attributes,
+    )
+    from .validators import (
         validate_attribute_existence,
-        validate_attribute_name, )
+        validate_attribute_name,
+    )
+
+    intercept = create_interception_decorator( )
 
 
 class Module( __.Module, metaclass = Class ):
@@ -113,5 +118,7 @@ def reclassify_module( module ):
 
 reclassify_module( base ) # type: ignore # pylint: disable=undefined-variable
 reclassify_module( exceptions )
+reclassify_module( interception )
 reclassify_module( reflection )
+reclassify_module( validators )
 reclassify_module( __name__ )
