@@ -38,7 +38,9 @@ lint = [
   #   https://github.com/PyCQA/astroid/issues/1755
   'pylint ~= 2.14.5; implementation_name != "pypy" or python_version >= "3.8"',
   'safety',
-  'semgrep',
+  # PyPy is quite sensitive to a data race in Semgrep (as of 0.111.1).
+  #   https://github.com/returntocorp/semgrep/issues/5996
+  'semgrep; implementation_name != "pypy"',
 ]
 publication = [
   'bump2version',
