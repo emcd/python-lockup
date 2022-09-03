@@ -114,7 +114,7 @@ def test_304_reclassify_invalid_module( module ):
     __.python_name not in (
         'cpython', 'pyston',
     ),
-    reason = f"Functionality not supported on '{__.python_name}'."
+    reason = f"Not yet supported on Python implementation: {__.python_name}"
 )
 def test_401_reflect_class_factory( ):
     ''' Class factory class can be made into a factory of itself. '''
@@ -126,8 +126,23 @@ def test_401_reflect_class_factory( ):
     assert factory is TrivialFactory
 
 
+@mark.skipif(
+    __.python_name in (
+        'cpython', 'pyston',
+    ),
+    reason = f"Unreachable branch on Python implementation: {__.python_name}"
+)
+def test_402_no_implementation_of_reflect_class_factory( ):
+    ''' Class factory class cannot be made into a factory of itself. '''
+    class TrivialFactory( type ): ''' Trivial class factory class. '''
+    assert issubclass( TrivialFactory, type )
+    with raises( __.exceptions.AbsentImplementation ):
+        __.reflect_class_factory_per_se( TrivialFactory )
+    assert issubclass( TrivialFactory, type )
+
+
 @mark.parametrize( 'factory', ( 123, 'ph00b4r' * 5, ) )
-def test_402_reflect_invalid_class_factory( factory ):
+def test_403_reflect_invalid_class_factory( factory ):
     ''' Only class factory classes can be reflected. '''
     with raises( __.exceptions.IncorrectData ):
         __.reflect_class_factory_per_se( factory )
