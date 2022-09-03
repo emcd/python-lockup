@@ -89,14 +89,6 @@ class __( metaclass = _NamespaceClass ):
 
     # https://www.sphinx-doc.org/en/master/man/sphinx-build.html
     sphinx_options = f"-j auto -d {paths.caches.sphinx} -n -T"
-    setuptools_build_command = ' '.join( (
-        # https://github.com/pypa/setuptools/issues/1347#issuecomment-707979218
-        'egg_info',
-        f"--egg-base {paths.caches.setuptools}",
-        # https://github.com/pypa/wheel/issues/306#issuecomment-522529825
-        'build',
-        f"--build-base {paths.caches.setuptools}",
-    ) )
 
 
 @__.task
@@ -485,11 +477,9 @@ def make_sdist( context ):
     __.render_boxed_title( 'Artifact: Source Distribution' )
     __.assert_gpg_tty( )
     path = _get_sdist_path( )
-    # https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html
+    # TODO: https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html
     context.run(
-        f"python3 setup.py {__.setuptools_build_command} "
-            f"sdist --dist-dir {__.paths.artifacts.sdists}",
-        **__.derive_venv_context_options( ) )
+        'python3 setup.py sdist', **__.derive_venv_context_options( ) )
     context.run( f"gpg --detach-sign --armor {path}", pty = True )
 
 
@@ -505,11 +495,9 @@ def make_wheel( context ):
     __.render_boxed_title( 'Artifact: Python Wheel' )
     __.assert_gpg_tty( )
     path = _get_wheel_path( )
-    # https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html
+    # TODO: https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html
     context.run(
-        f"python3 setup.py {__.setuptools_build_command} "
-            f"bdist_wheel --dist-dir {__.paths.artifacts.wheels}",
-        **__.derive_venv_context_options( ) )
+        'python3 setup.py bdist_wheel', **__.derive_venv_context_options( ) )
     context.run( f"gpg --detach-sign --armor {path}", pty = True )
 
 
