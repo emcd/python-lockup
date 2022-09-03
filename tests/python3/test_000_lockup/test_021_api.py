@@ -135,7 +135,8 @@ def test_402_reflect_invalid_class_factory( factory ):
 
 def _provide_exception( name ):
     ''' Simple exception provider. '''
-    return getattr( __.import_module( 'lockup.base' ), name )
+    from lockup import exceptions
+    return getattr( exceptions, name )
 
 
 def test_501_create_interception_decorator( ):
