@@ -18,8 +18,30 @@
 #============================================================================#
 
 
-''' All exceptions raised by this package have a common base:
-    :py:exc:`Exception0`. '''
+''' :py:exc:`Exception0` is the ancestor of all exceptions from this package.
+
+    These exceptions can be matched by corresponding builtin exception classes
+    or by their ancestral exception classes from this module:
+
+    .. code-block:: python
+
+        >>> import os
+        >>> import lockup
+        >>> from lockup.exceptions import InvalidOperation
+        >>> os.O_RDONLY
+        0
+        >>> lockup.reclassify_module( os )
+        >>> try: os.O_RDONLY = 15
+        ... except AttributeError as exc:
+        ...     type( exc ).mro( )
+        ...
+        [<class 'lockup.exceptions.ImpermissibleAttributeOperation'>, <class 'lockup.exceptions.ImpermissibleOperation'>, <class 'lockup.exceptions.InvalidOperation'>, <class 'lockup.exceptions.Exception0'>, <class 'TypeError'>, <class 'AttributeError'>, <class 'Exception'>, <class 'BaseException'>, <class 'object'>]
+        >>> try: os.does_not_exist
+        ... except InvalidOperation as exc:
+        ...     type( exc ).mro( )
+        ...
+        [<class 'lockup.exceptions.InaccessibleAttribute'>, <class 'lockup.exceptions.InaccessibleEntity'>, <class 'lockup.exceptions.InvalidOperation'>, <class 'lockup.exceptions.Exception0'>, <class 'AttributeError'>, <class 'Exception'>, <class 'BaseException'>, <class 'object'>]
+    ''' # pylint: disable=line-too-long
 
 
 # Initialization Dependencies:

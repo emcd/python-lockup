@@ -61,12 +61,18 @@ properties are true:
   .. code-block:: python
 
     >>> import math
+    >>> math.pi = math.e
+    >>> f"Oh no! π is {math.pi}"
+    'Oh no! π is 2.718281828459045'
+    >>> math.pi = 4 * math.atan( 1 )
     >>> import lockup
     >>> lockup.reclassify_module( math )
     >>> math.pi = math.e
     Traceback (most recent call last):
     ...
     lockup.exceptions.ImpermissibleAttributeOperation: Attempt to assign immutable attribute 'pi' on module 'math'.
+    >>> math.pi
+    3.141592653589793
 
   .. code-block:: python
 
@@ -85,18 +91,18 @@ properties are true:
   .. code-block:: python
 
     >>> import lockup
-    >>> dir( lockup )
-    ['Class', 'Module', 'NamespaceClass', 'base', 'create_interception_decorator', 'create_namespace', 'exceptions', 'interception', 'reclassify_module', 'reflect_class_factory_per_se', 'reflection', 'validators']
-    >>> len( dir( lockup ) )
-    12
-    >>> len( lockup.__dict__ )  # doctest: +SKIP
-    20
+    >>> class Demo( metaclass = lockup.Class ):
+    ...     _foo = 'Semi-private class variable.'
+    ...     hello = 'Public class variable.'
+    ...     def __len__( self ): return 1
+    ...
+    >>> dir( Demo )
+    ['hello']
 
 Quick Tour
 ===============================================================================
 
 .. _`Class Factory`: https://python-lockup.readthedocs.io/en/stable/api.html#lockup.Class
-.. _Exceptions: https://python-lockup.readthedocs.io/en/stable/api.html#module-lockup.exceptions
 .. _Module: https://python-lockup.readthedocs.io/en/stable/api.html#lockup.Module
 .. _`Namespace Factory`: https://python-lockup.readthedocs.io/en/stable/api.html#lockup.NamespaceClass
 
@@ -294,31 +300,6 @@ The above technique is used internally within this package itself.
    implementation (CPython) and Pyston, at present. You can still use this
    package on other flavors of Python, but the reflection operation may not be
    implemented.
-
-`Exceptions`_
--------------------------------------------------------------------------------
-
-Exceptions can be intercepted with appropriate builtin exception classes or
-with package exception classes:
-
-.. code-block:: python
-
-	>>> import os
-	>>> import lockup
-	>>> from lockup.exceptions import InvalidOperation
-	>>> os.O_RDONLY
-	0
-	>>> lockup.reclassify_module( os )
-	>>> try: os.O_RDONLY = 15
-	... except AttributeError as exc:
-	...     type( exc ).mro( )
-	...
-	[<class 'lockup.exceptions.ImpermissibleAttributeOperation'>, <class 'lockup.exceptions.ImpermissibleOperation'>, <class 'lockup.exceptions.InvalidOperation'>, <class 'lockup.exceptions.Exception0'>, <class 'TypeError'>, <class 'AttributeError'>, <class 'Exception'>, <class 'BaseException'>, <class 'object'>]
-	>>> try: os.does_not_exist
-	... except InvalidOperation as exc:
-	...     type( exc ).mro( )
-	...
-	[<class 'lockup.exceptions.InaccessibleAttribute'>, <class 'lockup.exceptions.InaccessibleEntity'>, <class 'lockup.exceptions.InvalidOperation'>, <class 'lockup.exceptions.Exception0'>, <class 'AttributeError'>, <class 'Exception'>, <class 'BaseException'>, <class 'object'>]
 
 Compatibility
 ===============================================================================
