@@ -66,6 +66,10 @@ command_line = '-m pytest'
 data_file = '.local/caches/pytest/coverage.sqlite3'
 parallel = true
 [tool.coverage.report]
+exclude_lines = [
+  '#.*\spragma: no cover(\s.*|$)',
+  'raise\s+InvalidState',
+]
 precision = 2
 [tool.coverage.html]
 directory = '.local/artifacts/coverage-pytest'

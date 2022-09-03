@@ -153,8 +153,8 @@ def calculate_argument_label( name, invocation_signature ):
         return f"sequence of extra positional arguments '{name}'"
     if Variate.VAR_KEYWORD is species:
         return f"dictionary of extra nominative arguments '{name}'"
-    from .exceptions import InvalidState
-    raise InvalidState # pragma: no cover
+    from .exceptions import InvalidState # pragma: no cover
+    raise InvalidState
 
 
 def module_qualify_class_name( class_ ):
