@@ -16,6 +16,11 @@ Testing Improvements
 * Build sdist and wheels as part of ``push`` command. Do not require to sign
   them during a test run.
 
+Add Pyright Linting
+===============================================================================
+
+* https://github.com/microsoft/pyright
+
 Prefer Prebuilt Python Executables
 ===============================================================================
 

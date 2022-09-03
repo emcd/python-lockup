@@ -36,27 +36,34 @@ from .reflection import reflect_class_factory_per_se
 reflect_class_factory_per_se( Class, assert_implementation = False )
 
 
+def _provide_exception( name ):
+    ''' Lazily imports exceptions to prevent dependency cycles. '''
+    return getattr( exceptions, name )
+
+
 class __( metaclass = NamespaceClass ):
+    ''' Internal namespace. '''
 
     from inspect import ismodule as is_module
     from sys import modules
     from types import ModuleType as Module # type: ignore
 
     from .base import (
+        is_operational_name, select_public_attributes,
+    )
+    from .exceptions import (
         InaccessibleAttribute,
-        base_package_name,
         create_argument_validation_exception,
         create_attribute_immutability_exception,
         create_attribute_indelibility_exception,
         create_attribute_nonexistence_exception,
-        is_operational_name, select_public_attributes,
     )
     from .validators import (
         validate_attribute_existence,
         validate_attribute_name,
     )
 
-    intercept = create_interception_decorator( )
+    intercept = create_interception_decorator( _provide_exception )
 
 
 class Module( __.Module, metaclass = Class ):
@@ -64,8 +71,7 @@ class Module( __.Module, metaclass = Class ):
 
         Can replace the ``__class__`` attribute on an existing module.
 
-        Non-public attributes of the module are concealed from :py:func:`dir`.
-        Also, a copy of the module dictionary is returned when the ``__dict__``
+        A copy of the module dictionary is returned when the ``__dict__``
         attribute is accessed; this is done to remove a backdoor by which
         attributes could be mutated.
 

@@ -21,34 +21,13 @@
 ''' Invocation boundary protection. '''
 
 
-# Module Initialization Dependencies: (none)
-# Module Execution Dependencies:
-#   interception -> exceptions -> interception
+# Initialization Dependencies: (none)
+# Latent Dependencies:
+#   interception -> exceptions -> base -> interception
 #   interception -> validators -> exceptions -> interception
 
 
-# TODO? Generalize and place into separate module.
-def _create_module_attribute_importer( module_name ):
-    ''' Returns just-in-time module importer and attribute accessor. '''
-    from importlib import import_module
-    base_package_name = __package__.split( '.', maxsplit = 1 )[ 0 ]
-    def return_module_attribute( name ):
-        ''' Imports package module just-in-time and returns attribute.
-
-            Lazy importing is needed to avoid dependency cycles
-            during initialization of certain modules. '''
-        # Semgrep rightly flags 'import_module' with a non-literal argument
-        # as dangerous. This should never be surfaced in such a way that it
-        # could accept arbitrary input from an untrusted user.
-        # nosemgrep: local.scm-modules.semgrep-rules.python.lang.security.audit.non-literal-import
-        return getattr( import_module(
-            f".{module_name}", package = base_package_name ), name )
-    return return_module_attribute
-
-_exception_provider = _create_module_attribute_importer( 'base' )
-
-
-def create_interception_decorator( exception_provider = _exception_provider ):
+def create_interception_decorator( exception_provider ):
     ''' Creates function decorator to intercept fugitive exceptions.
 
         Fugitive exceptions are ones which are not expected

@@ -25,7 +25,12 @@ v2.0.0 (not released)
 API
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* Expose ``reflect_class_factory_per_se`` function which allows for a class
+* Exposes ``create_interception_decorator`` function which creates function
+  decorators that can prevent unexpected classes of exceptions from escaping
+  from a function invocation without being chained to an exception of an
+  expected class.
+
+* Exposes ``reflect_class_factory_per_se`` function which allows for a class
   factory class ("metaclass") to be made into its own factory, similar to how
   `type <https://docs.python.org/3/library/functions.html#type>`_ behaves.
 
