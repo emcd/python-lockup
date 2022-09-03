@@ -21,6 +21,11 @@
 ''' Class reflection facilities. '''
 
 
+# Initialization Dependencies: (none)
+# Latent Dependencies:
+#   reflection -> exceptions
+
+
 def reflect_class_factory_per_se( factory, assert_implementation = True ):
     ''' Turns a class factory class into the factory for itself.
 
@@ -32,7 +37,7 @@ def reflect_class_factory_per_se( factory, assert_implementation = True ):
         If ``assert_implementation`` is true, then an exception will be raised
         if no reflector is implemented for the executing flavor of Python. '''
     from inspect import isclass as is_class
-    from .base import (
+    from .exceptions import (
         create_argument_validation_exception,
         create_implementation_absence_exception,
     )

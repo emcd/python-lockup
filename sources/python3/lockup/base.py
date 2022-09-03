@@ -21,85 +21,26 @@
 ''' Package foundation. Mostly internal classes and functions. '''
 
 
-# Note: This module contains a number of cyclic dependencies
-#       between various definitions, which will either manifest as
-#       undefined references or infinite recursion,
-#       if module initialization leaves the "happy path".
-#       This "fragility" comes from the nature of early bootstrapping.
-#       Be cautious when introducing changes and be sure to test them well.
-#       The module is highly robust once its initialization is complete.
+# Initialization Dependencies:
+#   base -> interception
+# Latent Dependencies:
+#   base -> exceptions -> base
 
 
 from .interception import (
     create_interception_decorator as _create_interception_decorator,
 )
+
+
+def _provide_exception( name ):
+    ''' Lazily imports exceptions to prevent dependency cycles. '''
+    from . import exceptions
+    return getattr( exceptions, name )
+
+
 # TODO: Privatize after move to new modules.
-intercept = _create_interception_decorator( )
-
-
-base_package_name = __package__.split( '.', maxsplit = 1 )[ 0 ]
-
-
-#======================== Internal Exception Factories =======================#
-
-
-def create_argument_validation_exception(
-    name, invocation, expectation_label
-):
-    ''' Creates error with context about invalid argument. '''
-    from inspect import signature as scan_signature
-    signature = scan_signature( invocation )
-    argument_label = _calculate_argument_label( name, signature )
-    invocation_label = calculate_invocable_label( invocation )
-    if not isinstance( expectation_label, str ):
-        expectation_label = calculate_label( expectation_label )
-    return IncorrectData(
-        f"Invalid {argument_label} to {invocation_label}: "
-        f"must be {expectation_label}" )
-
-def create_attribute_nonexistence_exception( name, context ):
-    ''' Creates error with context about nonexistent attribute. '''
-    label = calculate_label( context, f"attribute '{name}'" )
-    return InaccessibleAttribute(
-        f"Attempt to access nonexistent {label}." )
-
-def create_attribute_immutability_exception(
-    name, context, action = 'assign'
-):
-    ''' Creates error with context about immutable attribute. '''
-    label = calculate_label( context, f"attribute '{name}'" )
-    return ImpermissibleAttributeOperation(
-        f"Attempt to {action} immutable {label}." )
-
-def create_attribute_indelibility_exception( name, context ):
-    ''' Creates error with context about indelible attribute. '''
-    label = calculate_label( context, f"attribute '{name}'" )
-    return ImpermissibleAttributeOperation(
-        f"Attempt to delete indelible {label}." )
-
-def create_class_attribute_rejection_exception( name, class_ ):
-    ''' Creates error with context about class attribute rejection. '''
-    label = calculate_class_label( class_, f"attribute '{name}'" )
-    return ImpermissibleOperation(
-        f"Rejection of extant definition of {label}." )
-
-def create_impermissible_instantiation_exception( class_ ):
-    ''' Creates error with context about impermissible instantiation. '''
-    label = calculate_class_label( class_ )
-    return ImpermissibleOperation(
-        f"Impermissible instantiation of {label}." )
-
-def create_implementation_absence_exception( invocation, variant_name ):
-    ''' Creates error about absent implementation of invocable. '''
-    invocation_label = calculate_invocable_label( invocation )
-    return AbsentImplementation(
-        f"No implementation of {invocation_label} exists for {variant_name}." )
-
-def create_invocation_validation_exception( invocation, cause ):
-    ''' Creates error with context about invalid invocation. '''
-    label = calculate_invocable_label( invocation )
-    return IncorrectData(
-        f"Incompatible arguments for invocation of {label}: {cause}" )
+intercept = _create_interception_decorator( _provide_exception )
+package_name = __package__.split( '.', maxsplit = 1 )[ 0 ]
 
 
 #========================== Nomenclatural Utilities ==========================#
@@ -133,6 +74,7 @@ def calculate_module_label( module, attribute_label = None ):
     ''' Produces human-comprehensible label for module. '''
     from inspect import ismodule as is_module
     if not is_module( module ):
+        from .exceptions import create_argument_validation_exception
         raise create_argument_validation_exception(
             'module', calculate_module_label, 'module' )
     label = f"module '{module.__name__}'"
@@ -195,8 +137,9 @@ def _calculate_attribute_label( attribute, label_base ):
         alabel = alabel, mname = mname,
         class_qname = qname.rsplit( '.', maxsplit = 1 )[ 0 ] )
 
-def _calculate_argument_label( name, invocation_signature ):
+def calculate_argument_label( name, invocation_signature ):
     ''' Produces human-comprehensible label for argument. '''
+    # TODO: Implement argument validation.
     species = invocation_signature.parameters[ name ].kind
     position = next( # pragma: no branch
         position for position, name_
@@ -210,6 +153,7 @@ def _calculate_argument_label( name, invocation_signature ):
         return f"sequence of extra positional arguments '{name}'"
     if Variate.VAR_KEYWORD is species:
         return f"dictionary of extra nominative arguments '{name}'"
+    from .exceptions import InvalidState
     raise InvalidState # pragma: no cover
 
 
@@ -224,6 +168,7 @@ def module_qualify_class_name( class_ ):
         class_qname = class_[ '__qualname__' ]
         return f"{module_name}.{class_qname}"
     except ( KeyError, TypeError, ): pass
+    from .exceptions import create_argument_validation_exception
     raise create_argument_validation_exception(
         'class_', module_qualify_class_name,
         'class or class namespace dictionary' )
@@ -307,7 +252,7 @@ class Class( type ):
            will have mutable attributes without additional intervention beyond
            the scope of this package. '''
 
-    __module__ = base_package_name
+    __module__ = package_name
 
     __slots__ = ( )
 
@@ -317,133 +262,24 @@ class Class( type ):
 
     @intercept
     def __setattr__( class_, name, value ):
-        # TODO: Move import to non-public module attribute for performance.
         from .validators import validate_attribute_name
         validate_attribute_name( name, class_ )
+        from .exceptions import create_attribute_immutability_exception
         raise create_attribute_immutability_exception( name, class_ )
 
     @intercept
     def __delattr__( class_, name ):
-        # TODO: Move imports to non-public module attributes for performance.
-        from .validators import validate_attribute_name
+        from .validators import (
+            validate_attribute_name,
+            validate_attribute_existence,
+        )
         validate_attribute_name( name, class_ )
-        from .validators import validate_attribute_existence
         validate_attribute_existence( name, class_ )
+        from .exceptions import create_attribute_indelibility_exception
         raise create_attribute_indelibility_exception( name, class_ )
 
     @intercept
     def __dir__( class_ ): return select_public_attributes( __class__, class_ )
-
-
-#================================= Exceptions ================================#
-
-# Note: Normally, we would define exceptions in a separate module.
-#       However, due to bootstrapping constraints which are fairly unique
-#       to this package, we define them in this module
-#       and set their apparent module to a different module.
-
-
-# pylint: disable=too-many-ancestors
-
-
-class Exception0( BaseException, metaclass = Class ):
-    ''' Base for all exceptions in the package. '''
-
-    __module__ = f"{base_package_name}.exceptions"
-
-    def __init__( self, *things, tags = None, **sundry ):
-        from collections.abc import Mapping as Dictionary
-        from types import MappingProxyType as DictionaryProxy
-        self.tags = (
-            DictionaryProxy( tags ) if isinstance( tags, Dictionary )
-            else DictionaryProxy( { } ) )
-        super( ).__init__( *things, **sundry )
-
-
-#------------------------------ Object Interface -----------------------------#
-
-
-class InvalidOperation( Exception0, Exception ):
-    ''' Complaint about invalid operation. '''
-
-    __module__ = f"{base_package_name}.exceptions"
-
-
-class AbsentImplementation( Exception0, NotImplementedError ):
-    ''' Complaint about attempt execute nonexistent implementation. '''
-
-    __module__ = f"{base_package_name}.exceptions"
-
-
-class ImpermissibleOperation( InvalidOperation, TypeError ):
-    ''' Complaint about impermissible operation. '''
-
-    __module__ = f"{base_package_name}.exceptions"
-
-
-class ImpermissibleAttributeOperation(
-    ImpermissibleOperation, AttributeError
-):
-    ''' Complaint about impermissible attribute operation.
-
-        Cannot use :py:exc:`ImpermissibleOperation` because some packages,
-        such as Sphinx Autodoc, expect an :py:exc:`AttributeError`. '''
-
-    __module__ = f"{base_package_name}.exceptions"
-
-
-class InaccessibleEntity( InvalidOperation ):
-    ''' Complaint about attempt to retrieve inaccessible entity. '''
-
-    __module__ = f"{base_package_name}.exceptions"
-
-
-class InaccessibleAttribute( InaccessibleEntity, AttributeError ):
-    ''' Complaint about attempt to retrieve inaccessible attribute.
-
-        Cannot use :py:exc:`InaccessibleEntity` because some Python internals
-        expect an :py:exc:`AttributeError`. '''
-
-    __module__ = f"{base_package_name}.exceptions"
-
-
-class IncorrectData( InvalidOperation, TypeError, ValueError ):
-    ''' Complaint about incorrect data for invocation or operation. '''
-
-    __module__ = f"{base_package_name}.exceptions"
-
-
-#------------------------------- Internal State ------------------------------#
-
-
-class InvalidState( Exception0, Exception ):
-    ''' Alert about invalid internal state in the package.
-
-        Owner of problem: maintainers of this package. '''
-
-    __module__ = f"{base_package_name}.exceptions"
-
-    def __init__( self, supplement = None ):
-        # TODO: Add issue tracker information to message.
-        super( ).__init__( ' '.join( filter( None, (
-            f"Invalid internal state encountered "
-            f"in package '{base_package_name}'.",
-            supplement,
-            f"Please report this error to the package maintainers." ) ) ) )
-
-
-class FugitiveException( InvalidState, RuntimeError ):
-    ''' Alert about fugitive exception intercepted at API boundary.
-
-        An fugitive exception is one which is not intended
-        to be reported across the package API boundary.
-        Fugitive exceptions include Python built-ins,
-        such as :py:exc:`IndexError`. '''
-
-    __module__ = f"{base_package_name}.exceptions"
-
-
-# pylint: enable=too-many-ancestors
 
 
 #============================ Additional Factories ===========================#
@@ -463,16 +299,23 @@ class NamespaceClass( Class, metaclass = Class ):
            attribute errors when accessed. However, these are a fairly rare
            case and are probably not needed on namespaces, in general. '''
 
-    __module__ = base_package_name
+    __module__ = package_name
 
     @intercept
     def __new__( factory, name, bases, namespace ):
         for aname in namespace:
             if aname in ( '__doc__', '__module__', '__qualname__', ): continue
             if is_public_name( aname ): continue
-            raise create_class_attribute_rejection_exception(
-                aname, namespace )
+            # Lazy import of 'create_class_attribute_rejection_exception' to
+            # avoid cycle with use of internal namespace in the exceptions
+            # module happy path at module initialization time.
+            raise _provide_exception(
+                'create_class_attribute_rejection_exception' )(
+                    aname, namespace )
         def __new__( kind, *posargs, **nomargs ): # pylint: disable=unused-argument
+            from .exceptions import (
+                create_impermissible_instantiation_exception,
+            )
             raise create_impermissible_instantiation_exception( kind )
         namespace[ '__new__' ] = __new__
         return super( ).__new__( factory, name, bases, namespace )
@@ -494,6 +337,6 @@ class NamespaceClass( Class, metaclass = Class ):
 def create_namespace( **nomargs ):
     ''' Creates immutable namespaces from nominative arguments. '''
     namespace = {
-        '__module__': base_package_name, '__qualname__': 'Namespace' }
+        '__module__': package_name, '__qualname__': 'Namespace' }
     namespace.update( nomargs )
     return NamespaceClass( 'Namespace', ( ), namespace )
