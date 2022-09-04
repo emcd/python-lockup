@@ -25,8 +25,15 @@
 __version__ = '2.0a202209040105'
 
 
+# Public API
 from . import (
-    exceptions, factories, interception, module, reflection, validators,
+    exceptions,
+    factories,
+    interception,
+    module,
+    reflection,
+    validators,
+    visibility,
 )
 from .factories import Class, NamespaceClass, create_namespace
 from .interception import create_interception_decorator
@@ -44,4 +51,5 @@ reclassify_module( interception )
 reclassify_module( module )
 reclassify_module( reflection )
 reclassify_module( validators )
+reclassify_module( visibility )
 reclassify_module( __name__ )

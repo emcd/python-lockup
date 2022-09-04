@@ -36,10 +36,7 @@ class __( metaclass = _NamespaceClass ):
         calculate_invocable_label,
         calculate_module_label,
         intercept,
-        is_operational_name,
-        is_public_or_operational_name,
         module_qualify_class_name,
-        select_public_attributes,
     )
     from lockup.exceptions import (
         AbsentImplementation,
@@ -57,6 +54,11 @@ class __( metaclass = _NamespaceClass ):
     from lockup.validators import (
         validate_argument_invocability,
         validate_attribute_existence,
+    )
+    from lockup.visibility import (
+        is_operational_name,
+        is_public_or_operational_name,
+        select_public_attributes,
     )
 
 
