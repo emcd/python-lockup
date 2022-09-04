@@ -47,8 +47,8 @@
 # Initialization Dependencies:
 #   exceptions -> base
 #   exceptions -> factories
+#   exceptions -> nomenclature
 # Latent Dependencies:
-#   exceptions -> base -> exceptions
 #   exceptions -> factories -> exceptions
 # pylint: disable=cyclic-import
 
@@ -57,7 +57,9 @@ from .factories import NamespaceClass as _NamespaceClass
 class __( metaclass = _NamespaceClass ):
     ''' Internal namespace. '''
 
-    from .base import (
+    from .base import package_name
+    from .factories import Class
+    from .nomenclature import (
         calculate_argument_label,
         calculate_class_label,
         calculate_invocable_label,
@@ -66,9 +68,7 @@ class __( metaclass = _NamespaceClass ):
         # as a normal part of attribute lookup, and
         # 'create_attribute_nonexistence_exception'.
         calculate_label,
-        package_name,
     )
-    from .factories import Class
 
 
 #============================ Exception Factories ============================#

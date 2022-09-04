@@ -28,10 +28,8 @@
 
 from inspect import isclass as _is_class
 
-from .base import (
-    intercept as _intercept,
-    is_python_identifier as _is_python_identifier,
-)
+from .base import intercept as _intercept
+from .nomenclature import is_python_identifier as _is_python_identifier
 
 
 @_intercept
