@@ -26,12 +26,14 @@
 
 .. image:: https://img.shields.io/pypi/status/lockup
    :alt: PyPI - Status
+   :target: https://pypi.org/project/lockup/
 
 .. image:: https://github.com/emcd/python-lockup/actions/workflows/test.yaml/badge.svg?branch=master&event=push
    :alt: Tests Status
    :target: https://github.com/emcd/python-lockup/actions/workflows/test.yaml
 
 .. image:: https://codecov.io/gh/emcd/python-lockup/branch/master/graph/badge.svg?token=PA9QI9RL63
+   :alt: Code Coverage
    :target: https://app.codecov.io/gh/emcd/python-lockup
 
 `API Documentation (stable)
@@ -46,10 +48,15 @@
 
 .. image:: https://img.shields.io/pypi/pyversions/lockup
    :alt: Python Versions
+   :target: https://pypi.org/project/lockup/
 
 .. image:: https://img.shields.io/pypi/l/lockup
    :alt: Project License
    :target: https://github.com/emcd/python-lockup/blob/master/LICENSE.txt
+
+.. image:: https://img.shields.io/github/last-commit/emcd/python-lockup
+   :alt: GitHub last commit
+   :target: https://github.com/emcd/python-lockup
 
 Overview
 ===============================================================================
@@ -323,19 +330,18 @@ It likely works on others as well, but please report if it does not.
 ===============================================================================
 ...than the required minimum
 
-.. image:: https://img.shields.io/github/last-commit/emcd/python-lockup
-   :alt: GitHub last commit
-
 .. image:: https://img.shields.io/badge/security-bandit-yellow.svg
-   :target: https://github.com/PyCQA/bandit
    :alt: Security Status
+   :target: https://github.com/PyCQA/bandit
 
 .. image:: https://img.shields.io/badge/linting-pylint-yellowgreen
-   :target: https://github.com/PyCQA/pylint
    :alt: Static Analysis Status
+   :target: https://github.com/PyCQA/pylint
 
 .. image:: https://img.shields.io/pypi/implementation/lockup
    :alt: PyPI - Implementation
+   :target: https://pypi.org/project/lockup/
 
 .. image:: https://img.shields.io/pypi/wheel/lockup
    :alt: PyPI - Wheel
+   :target: https://pypi.org/project/lockup/
