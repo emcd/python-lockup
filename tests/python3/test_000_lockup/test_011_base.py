@@ -23,27 +23,22 @@
 
 from pytest import mark, raises
 
-from lockup import NamespaceClass
-
-
-class __( metaclass = NamespaceClass ):
+from lockup import NamespaceClass as _NamespaceClass
+class __( metaclass = _NamespaceClass ):
 
     import types
 
     from functools import wraps
 
     from lockup.base import (
-        Class,
         calculate_label,
         calculate_class_label,
         calculate_invocable_label,
         calculate_module_label,
-        create_namespace,
         intercept,
         is_operational_name,
         is_public_or_operational_name,
         module_qualify_class_name,
-        select_public_attributes,
         select_public_attributes,
     )
     from lockup.exceptions import (
@@ -55,6 +50,9 @@ class __( metaclass = NamespaceClass ):
         InvalidState,
         create_argument_validation_exception,
         create_implementation_absence_exception,
+    )
+    from lockup.factories import (
+        Class,
     )
     from lockup.validators import (
         validate_argument_invocability,
@@ -107,7 +105,7 @@ _invocables = (
 )
 
 class _A: red = 1
-class _B( metaclass = NamespaceClass ): blue = 2
+class _B( metaclass = _NamespaceClass ): blue = 2
 class _C: __slots__ = ( 'blue', 'red', )
 
 
@@ -159,8 +157,8 @@ def test_017_module_qualify_invalid_class_name( class_ ):
     'class_, object_, includes, excludes, expectation',
     ( ( type, _A, ( ), ( ), [ 'mro', 'red' ] ),
       ( _A, _A( ), ( ), ( ), [ 'red' ] ),
-      ( __.Class, NamespaceClass, ( ), ( ), [ 'mro' ] ),
-      ( NamespaceClass, _B, ( ), ( ), [ 'blue' ] ),
+      ( __.Class, _NamespaceClass, ( ), ( ), [ 'mro' ] ),
+      ( _NamespaceClass, _B, ( ), ( ), [ 'blue' ] ),
       ( _C, _C( ), ( ), ( ), [ 'blue', 'red' ] ),
       ( _C, _C( ), ( '__str__', ), ( 'red', ), [ '__str__', 'blue' ] ) ) )
 def test_021_select_public_attributes(
