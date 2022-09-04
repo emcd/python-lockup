@@ -34,13 +34,6 @@
 .. image:: https://codecov.io/gh/emcd/python-lockup/branch/master/graph/badge.svg?token=PA9QI9RL63
    :target: https://app.codecov.io/gh/emcd/python-lockup
 
-.. image:: https://img.shields.io/pypi/pyversions/lockup
-   :alt: Python Versions
-
-.. image:: https://img.shields.io/pypi/l/lockup
-   :alt: Project License
-   :target: https://github.com/emcd/python-lockup/blob/master/LICENSE.txt
-
 `API Documentation (stable)
 <https://python-lockup.readthedocs.io/en/stable/api.html>`_
 |
@@ -50,6 +43,13 @@
 <https://emcd.github.io/python-lockup/contribution.html#code-of-conduct>`_
 |
 `Contribution Guide <https://emcd.github.io/python-lockup/contribution.html>`_
+
+.. image:: https://img.shields.io/pypi/pyversions/lockup
+   :alt: Python Versions
+
+.. image:: https://img.shields.io/pypi/l/lockup
+   :alt: Project License
+   :target: https://github.com/emcd/python-lockup/blob/master/LICENSE.txt
 
 Overview
 ===============================================================================
