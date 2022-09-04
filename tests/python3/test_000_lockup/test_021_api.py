@@ -36,8 +36,8 @@ class __( metaclass = _NamespaceClass ):
         NamespaceClass,
         create_interception_decorator,
         reclassify_module,
-        reflect_class_factory_per_se,
     )
+    from lockup.reflection import reflect_class_factory_per_se
 
 
 def test_211_produce_namespace( ):
