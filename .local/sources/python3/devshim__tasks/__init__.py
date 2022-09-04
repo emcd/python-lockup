@@ -402,6 +402,7 @@ def lint_semgrep( context, version = None ):
         return
     sgconfig_path = __.paths.scm_modules / 'semgrep-rules' / 'python' / 'lang'
     context.run(
+        #f"strace -ff -tt --string-limit=120 --output=strace/semgrep "
         f"semgrep --config {sgconfig_path} --error --use-git-ignore "
         f"{__.paths.sources.p.python3}", pty = __.on_tty, **context_options )
 

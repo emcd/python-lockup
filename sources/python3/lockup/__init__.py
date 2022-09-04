@@ -18,114 +18,30 @@
 #============================================================================#
 
 
-''' Immutable module class and namespace factory. '''
+''' Supports attribute concealment and immutability. '''
 
 
 # https://www.python.org/dev/peps/pep-0396/
 __version__ = '2.0a202209040105'
 
 
-from . import base, exceptions, factories, interception, reflection, validators
+from . import (
+    exceptions, factories, interception, module, reflection, validators,
+)
 from .factories import Class, NamespaceClass, create_namespace
 from .interception import create_interception_decorator
-from .reflection import reflect_class_factory_per_se
+from .module import Module, reclassify_module
 
 
 # If Python implementation does not support class reflection,
 # we can still provide functionality without the extra protection.
-reflect_class_factory_per_se( Class, assert_implementation = False )
+reflection.reflect_class_factory_per_se( Class, assert_implementation = False )
 
 
-def _provide_exception( name ):
-    ''' Lazily imports exceptions to prevent dependency cycles. '''
-    return getattr( exceptions, name )
-
-
-class __( metaclass = NamespaceClass ):
-    ''' Internal namespace. '''
-
-    from inspect import ismodule as is_module
-    from sys import modules
-    from types import ModuleType as Module # type: ignore
-
-    from .base import (
-        is_operational_name, select_public_attributes,
-    )
-    from .exceptions import (
-        InaccessibleAttribute,
-        create_argument_validation_exception,
-        create_attribute_immutability_exception,
-        create_attribute_indelibility_exception,
-        create_attribute_nonexistence_exception,
-    )
-    from .validators import (
-        validate_attribute_existence,
-        validate_attribute_name,
-    )
-
-    intercept = create_interception_decorator( _provide_exception )
-
-
-class Module( __.Module, metaclass = Class ):
-    ''' Module whose attributes are immutable except during module definition.
-
-        Can replace the ``__class__`` attribute on an existing module.
-
-        A copy of the module dictionary is returned when the ``__dict__``
-        attribute is accessed; this is done to remove a backdoor by which
-        attributes could be mutated.
-
-        .. note::
-           Copies of the module dictionary are mutable so as to not violate the
-           internal expectations of Python as well as important packages,
-           such as :py:mod:`doctest`. Ideally, these would be immutable,
-           but cannot be as of this writing. '''
-
-    @__.intercept
-    def __getattribute__( self, name ):
-        if '__dict__' == name: return dict( super( ).__getattribute__( name ) )
-        try: return super( ).__getattribute__( name )
-        except AttributeError as exc:
-            raise __.create_attribute_nonexistence_exception(
-                name, self ) from exc
-
-    @__.intercept
-    def __setattr__( self, name, value ):
-        __.validate_attribute_name( name, self )
-        raise __.create_attribute_immutability_exception( name, self )
-
-    @__.intercept
-    def __delattr__( self, name ):
-        __.validate_attribute_name( name, self )
-        __.validate_attribute_existence( name, self )
-        raise __.create_attribute_indelibility_exception( name, self )
-
-    @__.intercept
-    def __dir__( self ): return __.select_public_attributes( __class__, self )
-
-
-def reclassify_module( module ):
-    ''' Assigns :py:class:`Module` as class for module.
-
-        Takes either a module object or the name of a module
-        in :py:data:`sys.modules`. If the module has already been reclassified,
-        then nothing is done (i.e., the operation is idempotent). '''
-    module_validity_error = __.create_argument_validation_exception(
-        'module', reclassify_module,
-        'module or name of module in Python loaded modules dictionary' )
-    if isinstance( module, Module ): return
-    if __.is_module( module ): pass
-    elif isinstance( module, str ):
-        module = __.modules.get( module )
-        if None is module: raise module_validity_error
-    else: raise module_validity_error
-    module.__class__ = Module
-
-
-reclassify_module( base )
 reclassify_module( exceptions )
 reclassify_module( factories )
 reclassify_module( interception )
+reclassify_module( module )
 reclassify_module( reflection )
 reclassify_module( validators )
 reclassify_module( __name__ )
