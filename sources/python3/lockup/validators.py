@@ -23,8 +23,7 @@
 
 # Module Initialization Dependencies: (none)
 # Module Execution Dependencies:
-#   validators -> base -> validators
-#   validators -> exceptions -> interception -> validators
+#   validators -> nomenclature -> validators
 # pylint: disable=cyclic-import
 
 
@@ -37,9 +36,9 @@ def validate_argument_invocability( argument, name, invocation ):
 
 def validate_attribute_name( name, context ):
     ''' Validates attribute name as Python identifier. '''
-    from .base import is_python_identifier
+    from .nomenclature import is_python_identifier
     if is_python_identifier( name ): return name
-    from .base import calculate_label
+    from .nomenclature import calculate_label
     label = calculate_label( context, f"attribute '{name}'" )
     from .exceptions import InaccessibleAttribute
     raise InaccessibleAttribute( f"Illegal name for {label}." )

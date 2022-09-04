@@ -30,14 +30,7 @@ class __( metaclass = _NamespaceClass ):
 
     from functools import wraps
 
-    from lockup.base import (
-        calculate_label,
-        calculate_class_label,
-        calculate_invocable_label,
-        calculate_module_label,
-        intercept,
-        module_qualify_class_name,
-    )
+    from lockup.base import intercept
     from lockup.exceptions import (
         AbsentImplementation,
         FugitiveException,
@@ -50,6 +43,13 @@ class __( metaclass = _NamespaceClass ):
     )
     from lockup.factories import (
         Class,
+    )
+    from lockup.nomenclature import (
+        calculate_label,
+        calculate_class_label,
+        calculate_invocable_label,
+        calculate_module_label,
+        module_qualify_class_name,
     )
     from lockup.validators import (
         validate_argument_invocability,
@@ -225,7 +225,7 @@ def test_044_calculate_class_attribute_label( ):
     'invocable, expectation',
     ( ( lambda: None, f"lambda from module '{__name__}'" ),
       ( __.calculate_label,
-        "function 'calculate_label' on module 'lockup.base'" ),
+        "function 'calculate_label' on module 'lockup.nomenclature'" ),
       ( _InvocableObject, f"class '{__name__}._InvocableObject'" ),
       ( _invocable_object,
         f"invocable instance of class '{__name__}._InvocableObject'" ),

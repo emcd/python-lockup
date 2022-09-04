@@ -31,6 +31,7 @@ from . import (
     factories,
     interception,
     module,
+    nomenclature,
     reflection,
     validators,
     visibility,
@@ -49,6 +50,7 @@ reclassify_module( exceptions )
 reclassify_module( factories )
 reclassify_module( interception )
 reclassify_module( module )
+reclassify_module( nomenclature )
 reclassify_module( reflection )
 reclassify_module( validators )
 reclassify_module( visibility )
