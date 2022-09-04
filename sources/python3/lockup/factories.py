@@ -18,7 +18,7 @@
 #============================================================================#
 
 
-''' Class factories. '''
+''' Concealment and immutability of class and namespace attributes. '''
 
 
 # Initialization Dependencies:

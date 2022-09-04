@@ -149,7 +149,7 @@ Now, let us see what protection it gains from becoming immutable:
 	...
 	lockup.exceptions.ImpermissibleAttributeOperation: Attempt to assign immutable attribute 'EX_OK' on module 'os'.
 	>>> type( os )
-	<class 'lockup.Module'>
+	<class 'lockup.module.Module'>
 
 `Class Factory`_
 -------------------------------------------------------------------------------
@@ -293,8 +293,8 @@ Well, we can:
     ...
     >>> type( Class )
     <class 'type'>
-    >>> import lockup
-    >>> lockup.reflect_class_factory_per_se( Class, assert_implementation = False )
+    >>> import lockup.reflection
+    >>> lockup.reflection.reflect_class_factory_per_se( Class, assert_implementation = False )
     <class '__main__.Class'>
     >>> type( Class )  # doctest: +SKIP
     <class '__main__.Class'>
