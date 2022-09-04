@@ -26,6 +26,7 @@
 #   module -> exceptions
 #   module -> factories
 #   module -> validators
+#   module -> visibility
 # Latent Dependencies: (no cycles)
 
 
@@ -36,10 +37,7 @@ class __( metaclass = _NamespaceClass ):
     from types import ModuleType as Module # type: ignore
 
     from . import base
-    from .base import (
-        intercept,
-        select_public_attributes,
-    )
+    from .base import intercept
     from .exceptions import (
         create_attribute_immutability_exception,
         create_attribute_indelibility_exception,
@@ -50,6 +48,7 @@ class __( metaclass = _NamespaceClass ):
         validate_attribute_existence,
         validate_attribute_name,
     )
+    from .visibility import select_public_attributes
 
 
 class Module( __.Module, metaclass = __.Class ):
