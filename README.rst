@@ -20,12 +20,12 @@
                                     lockup
 *******************************************************************************
 
-.. image:: https://img.shields.io/pypi/pyversions/lockup
-   :alt: Python Versions
-
 .. image:: https://img.shields.io/pypi/v/lockup
    :alt: Project Version
    :target: https://pypi.org/project/lockup/
+
+.. image:: https://img.shields.io/pypi/status/lockup
+   :alt: PyPI - Status
 
 .. image:: https://github.com/emcd/python-lockup/actions/workflows/test.yaml/badge.svg?branch=master&event=push
    :alt: Tests Status
@@ -33,6 +33,9 @@
 
 .. image:: https://codecov.io/gh/emcd/python-lockup/branch/master/graph/badge.svg?token=PA9QI9RL63
    :target: https://app.codecov.io/gh/emcd/python-lockup
+
+.. image:: https://img.shields.io/pypi/pyversions/lockup
+   :alt: Python Versions
 
 .. image:: https://img.shields.io/pypi/l/lockup
    :alt: Project License
@@ -315,3 +318,24 @@ It likely works on others as well, but please report if it does not.
 .. TODO: https://github.com/oracle/graalpython
 .. TODO: https://github.com/IronLanguages/ironpython3
 .. TODO: https://github.com/RustPython/RustPython
+
+`More Flair <https://www.imdb.com/title/tt0151804/characters/nm0431918>`_
+===============================================================================
+...than the required minimum
+
+.. image:: https://img.shields.io/github/last-commit/emcd/python-lockup
+   :alt: GitHub last commit
+
+.. image:: https://img.shields.io/badge/security-bandit-yellow.svg
+   :target: https://github.com/PyCQA/bandit
+   :alt: Security Status
+
+.. image:: https://img.shields.io/badge/linting-pylint-yellowgreen
+   :target: https://github.com/PyCQA/pylint
+   :alt: Static Analysis Status
+
+.. image:: https://img.shields.io/pypi/implementation/lockup
+   :alt: PyPI - Implementation
+
+.. image:: https://img.shields.io/pypi/wheel/lockup
+   :alt: PyPI - Wheel
