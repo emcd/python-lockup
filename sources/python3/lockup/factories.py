@@ -23,6 +23,7 @@
 
 # Initialization Dependencies:
 #   factories -> base
+#   factories -> visibility -> base
 # Latent Dependencies:
 #   factories -> exceptions -> factories
 # pylint: disable=cyclic-import
@@ -30,9 +31,11 @@
 
 from .base import (
     intercept as _intercept,
-    is_public_name as _is_public_name,
     package_name as _package_name,
     provide_exception as _provide_exception,
+)
+from .visibility import (
+    is_public_name as _is_public_name,
     select_public_attributes as _select_public_attributes,
 )
 
