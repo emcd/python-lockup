@@ -23,7 +23,7 @@
 
 # Initialization Dependencies:
 #   factories -> base
-#   factories -> visibility -> base
+#   factories -> visibility
 # Latent Dependencies:
 #   factories -> exceptions -> factories
 # pylint: disable=cyclic-import

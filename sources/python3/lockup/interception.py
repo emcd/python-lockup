@@ -22,9 +22,7 @@
 
 
 # Initialization Dependencies: (none)
-# Latent Dependencies:
-#   interception -> exceptions -> base -> interception
-#   interception -> validators -> exceptions -> interception
+# Latent Dependencies: (no cycles)
 
 
 def create_interception_decorator( exception_provider ):
