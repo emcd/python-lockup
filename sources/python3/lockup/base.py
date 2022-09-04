@@ -18,13 +18,13 @@
 #============================================================================#
 
 
-''' Package foundation. Mostly internal classes and functions. '''
+''' Package foundation. Internal constants and functions. '''
 
 
 # Initialization Dependencies:
 #   base -> interception
 # Latent Dependencies:
-#   base -> exceptions -> base
+#   base -> exceptions -> factories -> base
 
 
 from .interception import (
@@ -32,14 +32,13 @@ from .interception import (
 )
 
 
-def _provide_exception( name ):
+def provide_exception( name ):
     ''' Lazily imports exceptions to prevent dependency cycles. '''
     from . import exceptions
     return getattr( exceptions, name )
 
+intercept = _create_interception_decorator( provide_exception )
 
-# TODO: Privatize after move to new modules.
-intercept = _create_interception_decorator( _provide_exception )
 package_name = __package__.split( '.', maxsplit = 1 )[ 0 ]
 
 
@@ -237,106 +236,3 @@ def select_public_attributes(
         name for name in names
         if      name not in excludes
             and ( name in includes or is_public_name( name ) ) )
-
-
-#============================ Primal Class Factory ===========================#
-
-
-class Class( type ):
-    ''' Produces classes which have immutable attributes.
-
-        Non-public attributes of each class are concealed from :py:func:`dir`.
-
-        .. note::
-           Only class attributes are immutable. Instances of immutable classes
-           will have mutable attributes without additional intervention beyond
-           the scope of this package. '''
-
-    __module__ = package_name
-
-    __slots__ = ( )
-
-    @intercept
-    def __new__( factory, name, bases, namespace ):
-        return super( ).__new__( factory, name, bases, namespace )
-
-    @intercept
-    def __setattr__( class_, name, value ):
-        from .validators import validate_attribute_name
-        validate_attribute_name( name, class_ )
-        from .exceptions import create_attribute_immutability_exception
-        raise create_attribute_immutability_exception( name, class_ )
-
-    @intercept
-    def __delattr__( class_, name ):
-        from .validators import (
-            validate_attribute_name,
-            validate_attribute_existence,
-        )
-        validate_attribute_name( name, class_ )
-        validate_attribute_existence( name, class_ )
-        from .exceptions import create_attribute_indelibility_exception
-        raise create_attribute_indelibility_exception( name, class_ )
-
-    @intercept
-    def __dir__( class_ ): return select_public_attributes( __class__, class_ )
-
-
-#============================ Additional Factories ===========================#
-
-
-class NamespaceClass( Class, metaclass = Class ):
-    ''' Produces namespace classes which have immutable attributes.
-
-        Each produced namespace is a unique class, which cannot be
-        instantiated.
-
-        Non-public attributes of each class are concealed from :py:func:`dir`.
-
-        .. warning::
-           Although most descriptor attributes will be inert on a class,
-           :py:func:`types.DynamicClassAttribute` and similar, may trigger
-           attribute errors when accessed. However, these are a fairly rare
-           case and are probably not needed on namespaces, in general. '''
-
-    __module__ = package_name
-
-    @intercept
-    def __new__( factory, name, bases, namespace ):
-        for aname in namespace:
-            if aname in ( '__doc__', '__module__', '__qualname__', ): continue
-            if is_public_name( aname ): continue
-            # Lazy import of 'create_class_attribute_rejection_exception' to
-            # avoid cycle with use of internal namespace in the exceptions
-            # module happy path at module initialization time.
-            raise _provide_exception(
-                'create_class_attribute_rejection_exception' )(
-                    aname, namespace )
-        def __new__( kind, *posargs, **nomargs ): # pylint: disable=unused-argument
-            from .exceptions import (
-                create_impermissible_instantiation_exception,
-            )
-            raise create_impermissible_instantiation_exception( kind )
-        namespace[ '__new__' ] = __new__
-        return super( ).__new__( factory, name, bases, namespace )
-
-    @intercept
-    def __repr__( kind ):
-        namespace = {
-            '__module__': kind.__module__, '__qualname__': kind.__qualname__ }
-        namespace.update( kind.__dict__ )
-        return "{kind}( {name!r}, {bases!r}, {{ {namespace} }} )".format(
-            kind = type( kind ).__qualname__,
-            name = kind.__name__,
-            bases = tuple( ( base.__qualname__ for base in kind.__bases__ ) ),
-            namespace = ", ".join( (
-                f"{aname!r}: {avalue!r}" for aname, avalue
-                in namespace.items( ) ) ) )
-
-
-def create_namespace( **nomargs ):
-    ''' Creates immutable namespaces from nominative arguments. '''
-    namespace = {
-        '__module__': package_name, '__qualname__': 'Namespace' }
-    namespace.update( nomargs )
-    return NamespaceClass( 'Namespace', ( ), namespace )

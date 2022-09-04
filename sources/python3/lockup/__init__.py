@@ -25,8 +25,8 @@
 __version__ = '2.0a202209040105'
 
 
-from . import exceptions, interception, reflection, validators
-from .base import Class, NamespaceClass, create_namespace
+from . import base, exceptions, factories, interception, reflection, validators
+from .factories import Class, NamespaceClass, create_namespace
 from .interception import create_interception_decorator
 from .reflection import reflect_class_factory_per_se
 
@@ -122,8 +122,9 @@ def reclassify_module( module ):
     module.__class__ = Module
 
 
-reclassify_module( base ) # type: ignore # pylint: disable=undefined-variable
+reclassify_module( base )
 reclassify_module( exceptions )
+reclassify_module( factories )
 reclassify_module( interception )
 reclassify_module( reflection )
 reclassify_module( validators )

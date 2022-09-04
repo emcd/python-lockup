@@ -23,10 +23,8 @@
 
 from pytest import mark, raises
 
-from lockup import NamespaceClass
-
-
-class __( metaclass = NamespaceClass ):
+from lockup import NamespaceClass as _NamespaceClass
+class __( metaclass = _NamespaceClass ):
 
     from importlib import import_module
     from sys import implementation as python_implementation
