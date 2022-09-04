@@ -36,6 +36,14 @@
    :alt: Code Coverage
    :target: https://app.codecov.io/gh/emcd/python-lockup
 
+.. image:: https://img.shields.io/pypi/pyversions/lockup
+   :alt: Python Versions
+   :target: https://pypi.org/project/lockup/
+
+.. image:: https://img.shields.io/pypi/l/lockup
+   :alt: Project License
+   :target: https://github.com/emcd/python-lockup/blob/master/LICENSE.txt
+
 `API Documentation (stable)
 <https://python-lockup.readthedocs.io/en/stable/api.html>`_
 |
@@ -45,18 +53,6 @@
 <https://emcd.github.io/python-lockup/contribution.html#code-of-conduct>`_
 |
 `Contribution Guide <https://emcd.github.io/python-lockup/contribution.html>`_
-
-.. image:: https://img.shields.io/pypi/pyversions/lockup
-   :alt: Python Versions
-   :target: https://pypi.org/project/lockup/
-
-.. image:: https://img.shields.io/pypi/l/lockup
-   :alt: Project License
-   :target: https://github.com/emcd/python-lockup/blob/master/LICENSE.txt
-
-.. image:: https://img.shields.io/github/last-commit/emcd/python-lockup
-   :alt: GitHub last commit
-   :target: https://github.com/emcd/python-lockup
 
 Overview
 ===============================================================================
@@ -329,6 +325,10 @@ It likely works on others as well, but please report if it does not.
 `More Flair <https://www.imdb.com/title/tt0151804/characters/nm0431918>`_
 ===============================================================================
 ...than the required minimum
+
+.. image:: https://img.shields.io/github/last-commit/emcd/python-lockup
+   :alt: GitHub last commit
+   :target: https://github.com/emcd/python-lockup
 
 .. image:: https://img.shields.io/badge/security-bandit-yellow.svg
    :alt: Security Status
