@@ -22,9 +22,9 @@
 
 
 # Initialization Dependencies:
-#   base -> interception
+#   _base -> interception
 # Latent Dependencies:
-#   base -> exceptions -> factories -> base
+#   _base -> exceptions -> factories -> _base
 
 
 from .interception import (

@@ -18,13 +18,50 @@
 #============================================================================#
 
 
-''' Ensure correctness of internal base. '''
+''' Ensure correctness of class factories. '''
 
 
-#from pytest import mark, raises
+from pytest import raises
 
 from lockup import NamespaceClass as _NamespaceClass
 class __( metaclass = _NamespaceClass ):
     ''' Internal namespace. '''
 
-# TODO: Validate 'package_name' and 'provide_exception'.
+    from lockup import exceptions
+    from lockup.factories import (
+        Class,
+        NamespaceClass,
+        create_namespace,
+    )
+
+
+# TODO: Test 'Class'.
+
+
+def test_111_produce_namespace( ):
+    ''' Normal production of namespace. '''
+
+    class Namespace( metaclass = __.NamespaceClass ):
+        ''' Test namespace. '''
+
+        answer = 42
+
+    assert isinstance( Namespace, __.NamespaceClass )
+
+
+def test_112_fail_to_produce_instantiable_namespace( ):
+    ''' No production of namespace with possible instantiation. '''
+
+    with raises( __.exceptions.InvalidOperation ):
+
+        class Namespace( metaclass = __.NamespaceClass ):
+            ''' Test namespace. '''
+
+            def __new__( class_, *pos_arguments, **nom_arguments ):
+                return super( class_, __.NamespaceClass ).__new__(
+                    *pos_arguments, **nom_arguments )
+
+        del Namespace
+
+
+# TODO: Test 'create_namespace'.

@@ -22,14 +22,14 @@
 
 
 # Initialization Dependencies:
-#   factories -> base
+#   factories -> _base
 #   factories -> visibility
 # Latent Dependencies:
 #   factories -> exceptions -> factories
 # pylint: disable=cyclic-import
 
 
-from .base import (
+from ._base import (
     intercept as _intercept,
     package_name as _package_name,
     provide_exception as _provide_exception,

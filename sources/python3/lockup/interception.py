@@ -25,6 +25,11 @@
 # Latent Dependencies: (no cycles)
 
 
+# TODO: Create interception decorator factory for classes that will produce
+#       class decorators which will attach function decorators to all public
+#       and operational methods on a class.
+
+
 def create_interception_decorator( exception_provider ):
     ''' Creates function decorator to intercept fugitive exceptions.
 

@@ -22,7 +22,7 @@
 
 
 # Initialization Dependencies:
-#   module -> base
+#   module -> _base
 #   module -> exceptions
 #   module -> factories
 #   module -> validators
@@ -36,8 +36,8 @@ class __( metaclass = _NamespaceClass ):
 
     from types import ModuleType as Module # type: ignore
 
-    from . import base
-    from .base import intercept
+    from . import _base as base
+    from ._base import intercept
     from .exceptions import (
         create_attribute_immutability_exception,
         create_attribute_indelibility_exception,

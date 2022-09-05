@@ -45,7 +45,7 @@
 
 
 # Initialization Dependencies:
-#   exceptions -> base
+#   exceptions -> _base
 #   exceptions -> factories
 #   exceptions -> nomenclature
 # Latent Dependencies:
@@ -57,7 +57,7 @@ from .factories import NamespaceClass as _NamespaceClass
 class __( metaclass = _NamespaceClass ):
     ''' Internal namespace. '''
 
-    from .base import package_name
+    from ._base import package_name
     from .factories import Class
     from .nomenclature import (
         calculate_argument_label,

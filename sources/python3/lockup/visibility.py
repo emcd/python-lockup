@@ -22,13 +22,13 @@
 
 
 # Initialization Dependencies:
-#   visibility -> base
+#   visibility -> _base
 # Latent Dependencies: (no cycles)
 
 
 from inspect import isclass as _is_class
 
-from .base import intercept as _intercept
+from ._base import intercept as _intercept
 from .nomenclature import is_python_identifier as _is_python_identifier
 
 
