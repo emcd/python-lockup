@@ -18,13 +18,49 @@
 #============================================================================#
 
 
-''' Ensure correctness of internal base. '''
+''' Test Fixtures: Invocable Objects '''
 
-
-#from pytest import mark, raises
 
 from lockup import NamespaceClass as _NamespaceClass
 class __( metaclass = _NamespaceClass ):
     ''' Internal namespace. '''
 
-# TODO: Validate 'package_name' and 'provide_exception'.
+    from functools import wraps
+
+
+def _decorator( invocable ):
+    ''' Decorator used for testing wrapped functions. '''
+    @__.wraps( invocable )
+    def envelop_execution( *posargs, **nomargs ):
+        ''' Completely transparent function wrapper. '''
+        return invocable( *posargs, **nomargs )
+    return envelop_execution
+
+class InvocableObject:
+    ''' Produces invocable instances. '''
+
+    def __call__( self ): return self
+
+    def a_method( self ):
+        ''' For testing bound methods on an instance. '''
+        return self
+
+    @_decorator
+    def decorated_method( self ):
+        ''' For testing decorated bound methods of an instance. '''
+        return self
+
+    class Inner:
+        ''' Nested class for '__qualname__' testing. '''
+
+        def generator( self ):
+            ''' For testing generator methods. '''
+            yield self
+
+        async def agenerator( self ):
+            ''' For testing async generator methods. '''
+            yield self
+
+        async def coroutine( self ):
+            ''' For testing async methods. '''
+            return self

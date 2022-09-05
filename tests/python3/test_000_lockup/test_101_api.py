@@ -18,13 +18,13 @@
 #============================================================================#
 
 
-''' Ensure correctness of internal base. '''
+''' Ensure correctness of package API. '''
 
 
-#from pytest import mark, raises
+# from pytest import mark, raises
 
 from lockup import NamespaceClass as _NamespaceClass
 class __( metaclass = _NamespaceClass ):
     ''' Internal namespace. '''
 
-# TODO: Validate 'package_name' and 'provide_exception'.
+# TODO: Validate that public members of package root module are as expected.

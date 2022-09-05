@@ -22,7 +22,7 @@
 Internal API Documentation
 *******************************************************************************
 
-Module ``lockup.base``
+Module ``lockup._base``
 -------------------------------------------------------------------------------
 
-.. automodule:: lockup.base
+.. automodule:: lockup._base

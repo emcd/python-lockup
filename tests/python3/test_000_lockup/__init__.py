@@ -18,13 +18,4 @@
 #============================================================================#
 
 
-''' Ensure correctness of internal base. '''
-
-
-#from pytest import mark, raises
-
-from lockup import NamespaceClass as _NamespaceClass
-class __( metaclass = _NamespaceClass ):
-    ''' Internal namespace. '''
-
-# TODO: Validate 'package_name' and 'provide_exception'.
+''' Package of tests. '''

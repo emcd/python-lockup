@@ -22,14 +22,14 @@
 
 
 # Initialization Dependencies:
-#   nomenclature -> base
+#   nomenclature -> _base
 # Latent Dependencies:
 #   nomenclature -> exceptions -> nomenclature
 #   nomenclature -> validators -> nomenclature
 # pylint: disable=cyclic-import
 
 
-from .base import intercept as _intercept
+from ._base import intercept as _intercept
 
 
 # TODO: Wrap all functions with interceptors.
