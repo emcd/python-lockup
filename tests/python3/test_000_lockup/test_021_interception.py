@@ -28,21 +28,20 @@ class __( metaclass = _NamespaceClass ):
     ''' Internal namespace. '''
 
     from lockup import exceptions
-    from lockup._base import intercept
+    from lockup._base import (
+        ExceptionProvider,
+        intercept,
+    )
     from lockup.interception import (
         create_interception_decorator,
     )
 
-
-def _provide_exception( name ):
-    ''' Simple exception provider. '''
-    return getattr( __.exceptions, name )
+    exception_provider = ExceptionProvider( )
 
 
 def test_011_create_interception_decorator( ):
     ''' Interception decorator receives invocable and returns invocable. '''
-    decorator = __.create_interception_decorator(
-        exception_provider = _provide_exception )
+    decorator = __.create_interception_decorator( __.exception_provider )
     assert callable( decorator )
 
 
@@ -50,7 +49,11 @@ def test_011_create_interception_decorator( ):
 def test_012_interceptor_creation_with_invalid_exception_provider( provider ):
     ''' Only class factory classes can be reflected. '''
     with raises( __.exceptions.IncorrectData ):
-        __.create_interception_decorator( exception_provider = provider )
+        __.create_interception_decorator( provider )
+
+
+# TODO: Check that exception provider is tested for 'is_imperssible_exception'
+#       attribute and that that attribute is invocable.
 
 
 @mark.parametrize(

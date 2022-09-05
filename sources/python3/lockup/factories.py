@@ -30,9 +30,9 @@
 
 
 from ._base import (
+    exception_provider as _exception_provider,
     intercept as _intercept,
     package_name as _package_name,
-    provide_exception as _provide_exception,
 )
 from .visibility import (
     is_public_name as _is_public_name,
@@ -105,7 +105,7 @@ class NamespaceClass( Class, metaclass = Class ):
             # Lazy import of 'create_class_attribute_rejection_exception' to
             # avoid cycle with use of internal namespace in the exceptions
             # module happy path at module initialization time.
-            raise _provide_exception(
+            raise _exception_provider(
                 'create_class_attribute_rejection_exception' )(
                     aname, namespace )
         def __new__( kind, *posargs, **nomargs ): # pylint: disable=unused-argument

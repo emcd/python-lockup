@@ -31,20 +31,44 @@
 
 
 def create_interception_decorator( exception_provider ):
-    ''' Creates function decorator to intercept fugitive exceptions.
+    ''' Creates function decorator to apprehend "fugitive" exceptions.
 
-        Fugitive exceptions are ones which are not expected
-        to cross an API boundary. '''
-    from .validators import validate_argument_invocability
+        Fugitive exceptions are exceptions which are not expected to cross the
+        boundary of an API and which should have been caught internally.
+        When the function apprehends a fugitive exception, it creates an
+        instance of a class which officially denotes fugitive exceptions and
+        chains the fugitive to its ``cause`` before propagating across the API
+        boundary. A list of permissible exceptions is consulted to determine
+        whether an exception is permissible, and thus allowed to propagate
+        freely, or if it is a fugitive.
+
+        The ``exception_provider`` argument must be a callable object, such as
+        a function, which takes an exception name as an argument.  The
+        exception name will be ``FugitiveException``; the provider must return
+        a valid exception class.
+
+        The ``exception_provider`` argument must have an attribute, named
+        ``is_permissible_exception``. This attribute must be a callable object,
+        such as a function, that takes an exception as an argument and returns
+        a boolean value. '''
+    from .validators import (
+        validate_argument_invocability,
+        validate_attribute_existence,
+    )
     validate_argument_invocability(
-            exception_provider, 'exception_provider',
-            create_interception_decorator )
+        exception_provider, 'exception_provider',
+        create_interception_decorator )
+    validate_attribute_existence(
+        'is_permissible_exception', exception_provider )
+    # TODO: Validate attribute invocability.
+
     def intercept( invocation ):
         ''' Decorates function to intercept fugitive exceptions. '''
         validate_argument_invocability( invocation, 'invocation', intercept )
         from inspect import signature as scan_signature
         signature = scan_signature( invocation )
         from functools import wraps
+
         # https://github.com/returntocorp/semgrep-rules/issues/2367
         # nosemgrep: local.scm-modules.semgrep-rules.python.lang.maintainability.useless-inner-function
         @wraps( invocation )
@@ -55,13 +79,13 @@ def create_interception_decorator( exception_provider ):
                 raise exception_provider(
                     'create_invocation_validation_exception' )(
                         invocation, exc ) from exc
+            # Invoke function. Apprehend fugitives as necessary.
             try: return invocation( *things, **sundry )
-            except ( # pylint: disable=try-except-raise
-                exception_provider( 'InvalidState' ),
-                exception_provider( 'InvalidOperation' ),
-            ): raise
-            # Prevent escape of impermissible exceptions.
             except BaseException as exc: # pylint: disable=broad-except
+                if exception_provider.is_permissible_exception( exc ): raise
+                # TODO: Validate returned exception class.
                 raise exception_provider( 'FugitiveException' ) from exc
+
         return interception_invoker
+
     return intercept
