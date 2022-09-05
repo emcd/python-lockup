@@ -32,11 +32,23 @@ from .interception import (
 )
 
 
-def provide_exception( name ):
-    ''' Lazily imports exceptions to prevent dependency cycles. '''
-    from . import exceptions
-    return getattr( exceptions, name )
+class ExceptionProvider:
+    ''' Lazy importer of exception classes to avoid dependency cycles. '''
 
-intercept = _create_interception_decorator( provide_exception )
+    @staticmethod
+    def __call__( name ):
+        ''' Import exception class by name. '''
+        from . import exceptions
+        return getattr( exceptions, name )
+
+    @staticmethod
+    def is_permissible_exception( exception ):
+        ''' Can exception cross API boundary? '''
+        from .exceptions import InvalidOperation, InvalidState
+        return isinstance( exception, ( InvalidOperation, InvalidState, ) )
+
+exception_provider = ExceptionProvider( )
+intercept = _create_interception_decorator( exception_provider )
+
 
 package_name = __package__.split( '.', maxsplit = 1 )[ 0 ]

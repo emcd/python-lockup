@@ -66,7 +66,14 @@ class Module( __.Module, metaclass = __.Class ):
            such as :py:mod:`doctest`. Ideally, these would be immutable,
            but cannot be as of this writing. '''
 
-    @__.intercept # type: ignore
+    # Note: Cannot wrap the '__getattribute__' method with an interceptor
+    #       because the import machinery may throw 'AttributeError' as a normal
+    #       part of operation and the 'exceptions' module in this package will
+    #       be imported to check the exception class, which will lead to
+    #       infinite recursion, as its class is our 'Module' class after being
+    #       reclassified. Also, there is a performance hit with wrapping this
+    #       particular method, because it is on the hot path for module
+    #       attribute access. And, it is mostly proof against exception leaks.
     def __getattribute__( self, name ):
         if '__dict__' == name: return dict( super( ).__getattribute__( name ) )
         try: return super( ).__getattribute__( name )

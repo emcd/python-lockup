@@ -25,14 +25,28 @@ v2.0.0 (not released)
 API
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* Exposes ``create_interception_decorator`` function which creates function
-  decorators that can prevent unexpected classes of exceptions from escaping
-  from a function invocation without being chained to an exception of an
-  expected class.
+* Provide ``create_interception_decorator`` function which creates function
+  decorators that apprehend "fugitive" exceptions before they escape across the
+  boundary of a public API. Fugitive exceptions are exceptions which are
+  unexpected and which should have been caught internally.
 
-* Exposes ``reflect_class_factory_per_se`` function which allows for a class
+* Provide ``reflect_class_factory_per_se`` function which allows for a class
   factory class ("metaclass") to be made into its own factory, similar to how
-  `type <https://docs.python.org/3/library/functions.html#type>`_ behaves.
+  `type <https://docs.python.org/3/library/functions.html#type>`_ behaves. This
+  package uses it internally, when possible, to allow class factory classes to
+  enforce attribute concealment and immutability on themselves and not just
+  their instances. But, it can be put to other purposes too.
+
+* Provide nomenclatural utilities which determine the classification of objects
+  that are provided to them. These are useful for the creation of more helpful
+  exception messages or log entries. This package internally uses the utilities
+  to create descritpive exception messages.
+
+* Provide visibility utilities which determine if an attribute is considered
+  public or non-public and what attributes should be concealed on an object.
+  This package uses the utilities internally to conceal non-public attributes
+  on classes, modules, and namespaces. But, they can be put to other purposes
+  as well.
 
 Python Support
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
