@@ -29,13 +29,15 @@ class __( metaclass = _NamespaceClass ):
 
     import types
     from functools import wraps
+    from inspect import signature as scan_signature
 
     from lockup._base import intercept
     from lockup.exceptions import IncorrectData
     from lockup.nomenclature import (
-        calculate_label,
+        calculate_argument_label,
         calculate_class_label,
         calculate_invocable_label,
+        calculate_label,
         calculate_module_label,
         module_qualify_class_name,
     )
@@ -116,30 +118,69 @@ def test_034_calculate_class_attribute_label( ):
 
 @mark.parametrize(
     'invocable, expectation',
-    ( ( lambda: None, f"lambda from module '{__name__}'" ),
-      ( __.calculate_label,
-        "function 'calculate_label' on module 'lockup.nomenclature'" ),
-      ( _InvocableObject, f"class '{_invocables.__name__}.InvocableObject'" ),
-      ( _invocable_object,
-        f"invocable instance of class "
-        f"'{_invocables.__name__}.InvocableObject'" ),
-      ( _invocable_object.a_method,
-        f"method 'a_method' on instance "
-        f"of class '{_invocables.__name__}.InvocableObject'" ),
-      ( _invocable_object.decorated_method,
-        f"method 'decorated_method' on instance "
-        f"of class '{_invocables.__name__}.InvocableObject'" ),
-      ( _inner_object.generator,
-        f"generator method 'generator' on instance "
-        f"of class '{_invocables.__name__}.InvocableObject.Inner'" ),
-      ( _inner_object.agenerator,
-        f"async generator method 'agenerator' on instance "
-        f"of class '{_invocables.__name__}.InvocableObject.Inner'" ),
-      ( _inner_object.coroutine,
-        f"async method 'coroutine' on instance "
-        f"of class '{_invocables.__name__}.InvocableObject.Inner'" ),
-      ( sorted, "builtin function 'sorted' on module 'builtins'" ),
-    ) )
+    (
+        ( lambda: None, f"lambda from module '{__name__}'" ),
+        ( __.calculate_label,
+          "function 'calculate_label' on module 'lockup.nomenclature'" ),
+        ( _InvocableObject,
+          f"class '{_invocables.__name__}.InvocableObject'" ),
+        ( _invocable_object,
+          f"invocable instance of class "
+          f"'{_invocables.__name__}.InvocableObject'" ),
+        ( _invocable_object.a_method,
+          f"method 'a_method' on instance "
+          f"of class '{_invocables.__name__}.InvocableObject'" ),
+        ( _invocable_object.decorated_method,
+          f"method 'decorated_method' on instance "
+          f"of class '{_invocables.__name__}.InvocableObject'" ),
+        ( _inner_object.generator,
+          f"generator method 'generator' on instance "
+          f"of class '{_invocables.__name__}.InvocableObject.Inner'" ),
+        ( _inner_object.agenerator,
+          f"async generator method 'agenerator' on instance "
+          f"of class '{_invocables.__name__}.InvocableObject.Inner'" ),
+        ( _inner_object.coroutine,
+          f"async method 'coroutine' on instance "
+          f"of class '{_invocables.__name__}.InvocableObject.Inner'" ),
+        ( sorted, "builtin function 'sorted' on module 'builtins'" ),
+    )
+)
 def test_041_calculate_invocable_label( invocable, expectation ):
     ''' Calculate correct label for invocable object. '''
     assert expectation == __.calculate_invocable_label( invocable )
+
+
+@mark.parametrize(
+    'invocable, expectation',
+    (
+        # TODO: Positional-only argument once Python 3.8 is baseline.
+        ( lambda foo: None, "argument 'foo' (position #0)" ),
+        ( lambda *foo: None,
+          "sequence of extra positional arguments 'foo'" ),
+        ( lambda *, foo = 42: None, "argument 'foo'" ),
+        ( lambda **foo: None,
+          "dictionary of extra nominative arguments 'foo'" ),
+    )
+)
+def test_051_calculate_argument_label( invocable, expectation ):
+    ''' Calculate correct argument label for invocation signature. '''
+    signature = __.scan_signature( invocable )
+    assert expectation == __.calculate_argument_label( 'foo', signature )
+
+@mark.parametrize( 'name', ( 123, 'ph00b4r' * 5 ) )
+def test_052_calculate_argument_label_with_invalid_name( name ):
+    ''' Error on attempt to calculate argument label for invalid name. '''
+    signature = __.scan_signature( lambda foo: None )
+    with raises( __.IncorrectData ):
+        __.calculate_argument_label( name, signature )
+
+def test_053_calculate_argument_label_with_nonexistent_name( ):
+    ''' Error on attempt to calculate argument label for nonexistent name. '''
+    signature = __.scan_signature( lambda foo: None )
+    with raises( __.IncorrectData ):
+        __.calculate_argument_label( 'bar', signature )
+
+def test_054_calculate_argument_label_with_invalid_signature( ):
+    ''' Error on attempt to calculate argument label for invalid signature. '''
+    with raises( __.IncorrectData ):
+        __.calculate_argument_label( 'bar', None )
