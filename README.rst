@@ -66,19 +66,18 @@ properties are true:
 
   .. code-block:: python
 
-    >>> import math
-    >>> math.pi = math.e
-    >>> f"Oh no! π is {math.pi}"
-    'Oh no! π is 2.718281828459045'
-    >>> math.pi = 4 * math.atan( 1 )
+    >>> import getpass
+    >>> def steal_password( prompt = 'Password: ', stream = None ):
+    ...     pwned = getpass.getpass( prompt = prompt, stream = stream )
+    ...     # Send host address, username, and password to dark web collector.
+    ...     return pwned
+    ...
     >>> import lockup
-    >>> lockup.reclassify_module( math )
-    >>> math.pi = math.e
+    >>> lockup.reclassify_module( getpass )
+    >>> getpass.getpass = steal_password
     Traceback (most recent call last):
     ...
-    lockup.exceptions.ImpermissibleAttributeOperation: Attempt to assign immutable attribute 'pi' on module 'math'.
-    >>> math.pi
-    3.141592653589793
+    lockup.exceptions.ImpermissibleAttributeOperation: Attempt to assign immutable attribute 'getpass' on module 'getpass'.
 
   .. code-block:: python
 
@@ -121,35 +120,34 @@ may be used in many places:
 
 .. code-block:: python
 
-	>>> import os
-	>>> os.EX_OK
-	0
-	>>> del os.EX_OK
-	>>> os.EX_OK
-	Traceback (most recent call last):
-	...
-	AttributeError: module 'os' has no attribute 'EX_OK'
-	>>> os.EX_OK = 0
-	>>> type( os )
-	<class 'module'>
+    >>> import os
+    >>> type( os )
+    <class 'module'>
+    >>> os.O_RDONLY
+    0
+    >>> os.O_RDONLY = os.O_RDWR
+    >>> os.O_RDONLY
+    2
+    >>> os.O_RDONLY = 0
 
 Now, let us see what protection it gains from becoming immutable:
 
 .. code-block:: python
 
-	>>> import os
-	>>> import lockup
-	>>> lockup.reclassify_module( os )
-	>>> del os.EX_OK
-	Traceback (most recent call last):
-	...
-	lockup.exceptions.ImpermissibleAttributeOperation: Attempt to delete indelible attribute 'EX_OK' on module 'os'.
-	>>> os.EX_OK = 255
-	Traceback (most recent call last):
-	...
-	lockup.exceptions.ImpermissibleAttributeOperation: Attempt to assign immutable attribute 'EX_OK' on module 'os'.
-	>>> type( os )
-	<class 'lockup.module.Module'>
+    >>> import os
+    >>> import lockup
+    >>> lockup.reclassify_module( os )
+    >>> type( os )
+    <class 'lockup.module.Module'>
+    >>> # How? https://docs.python.org/3/reference/datamodel.html#customizing-module-attribute-access
+    >>> os.O_RDONLY = os.O_RDWR
+    Traceback (most recent call last):
+    ...
+    lockup.exceptions.ImpermissibleAttributeOperation: Attempt to assign immutable attribute 'O_RDONLY' on module 'os'.
+    >>> del os.O_RDONLY
+    Traceback (most recent call last):
+    ...
+    lockup.exceptions.ImpermissibleAttributeOperation: Attempt to delete indelible attribute 'O_RDONLY' on module 'os'.
 
 `Class Factory`_
 -------------------------------------------------------------------------------

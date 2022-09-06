@@ -101,7 +101,24 @@ def reclassify_module( module ):
 
         Takes either a module object or the name of a module
         in :py:data:`sys.modules`. If the module has already been reclassified,
-        then nothing is done (i.e., the operation is idempotent). '''
+        then nothing is done (i.e., the operation is idempotent).
+
+        .. code-block:: python
+
+          >>> import math
+          >>> math.pi = math.e
+          >>> f"Oh no! π is {math.pi}"
+          'Oh no! π is 2.718281828459045'
+          >>> math.pi = 4 * math.atan( 1 )
+          >>> import lockup
+          >>> lockup.reclassify_module( math )
+          >>> math.pi = math.e
+          Traceback (most recent call last):
+          ...
+          lockup.exceptions.ImpermissibleAttributeOperation: Attempt to assign immutable attribute 'pi' on module 'math'.
+          >>> math.pi
+          3.141592653589793
+          ''' # pylint: disable=line-too-long
     if isinstance( module, Module ): return
     if isinstance( module, str ):
         from sys import modules

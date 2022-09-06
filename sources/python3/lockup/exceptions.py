@@ -25,20 +25,23 @@
 
     .. code-block:: python
 
-        >>> import os
+        >>> import csv
+        >>> type( csv )
+        <class 'module'>
         >>> import lockup
         >>> from lockup.exceptions import InvalidOperation
-        >>> os.O_RDONLY
-        0
-        >>> lockup.reclassify_module( os )
-        >>> try: os.O_RDONLY = 15
-        ... except AttributeError as exc:
-        ...     type( exc ).mro( )
+        >>> lockup.reclassify_module( csv )
+        >>> type( csv )
+        <class 'lockup.module.Module'>
+        >>> try: del csv.reader
+        ... except AttributeError as exc: type( exc ).mro( )
         ...
         [<class 'lockup.exceptions.ImpermissibleAttributeOperation'>, <class 'lockup.exceptions.ImpermissibleOperation'>, <class 'lockup.exceptions.InvalidOperation'>, <class 'lockup.exceptions.Exception0'>, <class 'TypeError'>, <class 'AttributeError'>, <class 'Exception'>, <class 'BaseException'>, <class 'object'>]
-        >>> try: os.does_not_exist
-        ... except InvalidOperation as exc:
-        ...     type( exc ).mro( )
+        >>> try: del csv.reader
+        ... except InvalidOperation as exc: pass
+        ...
+        >>> try: del csv.nonexistent_attribute
+        ... except InvalidOperation as exc: type( exc ).mro( )
         ...
         [<class 'lockup.exceptions.InaccessibleAttribute'>, <class 'lockup.exceptions.InaccessibleEntity'>, <class 'lockup.exceptions.InvalidOperation'>, <class 'lockup.exceptions.Exception0'>, <class 'AttributeError'>, <class 'Exception'>, <class 'BaseException'>, <class 'object'>]
     ''' # pylint: disable=line-too-long
