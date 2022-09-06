@@ -140,12 +140,12 @@ min-similarity-lines = 5
 ignore-imports = true
 
 [tool.pytest.ini_options]
-minversion = "6.1"
-addopts = "--exitfirst -rA --doctest-modules --doctest-glob='*.rst'"
-testpaths = ["tests/python3", "sources/sphinx"]
-python_files = ["*.py"]
-python_functions = ["test_[0-9][0-9][0-9]_*"]
-cache_dir = ".local/caches/pytest"
+minversion = '6.1'
+addopts = '--exitfirst -rA --doctest-modules --doctest-glob="*.rst"'
+testpaths = ['tests/python3', 'sources/python3', 'sources/sphinx']
+python_files = ['*.py']
+python_functions = ['test_[0-9][0-9][0-9]_*']
+cache_dir = '.local/caches/pytest'
 
 [tool.yapf]
 # https://github.com/google/yapf
