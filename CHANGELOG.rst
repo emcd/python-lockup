@@ -42,6 +42,12 @@ API
   exception messages or log entries. This package internally uses the utilities
   to create descritpive exception messages.
 
+* Provide validation utilities which return back the object they validation if
+  the validation is successful. Otherwise, they raise a validation error. This
+  allows for multiple validators to be fluently applied in succession. This
+  package internally uses the validators on arguments to functions that are
+  part of its public API.
+
 * Provide visibility utilities which determine if an attribute is considered
   public or non-public and what attributes should be concealed on an object.
   This package uses the utilities internally to conceal non-public attributes
