@@ -262,7 +262,7 @@ part of the module API, for example:
 
 .. code-block:: python
 
-	>>> import lockup
+    >>> import lockup
     >>> class __( metaclass = lockup.NamespaceClass ):
     ...     from os import O_RDONLY, O_RDWR
     ...
