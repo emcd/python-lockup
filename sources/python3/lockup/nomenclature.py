@@ -24,7 +24,7 @@
 # Initialization Dependencies:
 #   nomenclature -> _base
 # Latent Dependencies:
-#   nomenclature -> exceptions -> nomenclature
+#   nomenclature -> exception_factories -> nomenclature
 #   nomenclature -> validators -> nomenclature
 # pylint: disable=cyclic-import
 
@@ -65,7 +65,7 @@ def calculate_module_label( module, attribute_label = None ):
     ''' Produces human-comprehensible label for module. '''
     from inspect import ismodule as is_module
     if not is_module( module ):
-        from .exceptions import create_argument_validation_exception
+        from .exception_factories import create_argument_validation_exception
         raise create_argument_validation_exception(
             'module', calculate_module_label, 'module' )
     label = f"module '{module.__name__}'"
@@ -149,12 +149,12 @@ def calculate_argument_label( name, signature ):
     ''' Produces human-comprehensible label for argument. '''
     from inspect import Signature
     if not isinstance( signature, Signature ):
-        from .exceptions import create_argument_validation_exception
+        from .exception_factories import create_argument_validation_exception
         raise create_argument_validation_exception(
             'signature', calculate_argument_label,
             "instance of class 'inspect.Signature'" )
     if not isinstance( name, str ) or name not in signature.parameters:
-        from .exceptions import create_argument_validation_exception
+        from .exception_factories import create_argument_validation_exception
         raise create_argument_validation_exception(
             'name', calculate_argument_label, 'name of valid argument' )
     species = signature.parameters[ name ].kind
@@ -193,7 +193,7 @@ def module_qualify_class_name( class_ ):
         class_qname = class_[ '__qualname__' ]
         return f"{module_name}.{class_qname}"
     except ( KeyError, TypeError, ): pass
-    from .exceptions import create_argument_validation_exception
+    from .exception_factories import create_argument_validation_exception
     raise create_argument_validation_exception(
         'class_', module_qualify_class_name,
         'class or class namespace dictionary' )

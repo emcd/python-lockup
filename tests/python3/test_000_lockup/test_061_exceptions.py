@@ -31,6 +31,8 @@ class __( metaclass = _NamespaceClass ):
     from lockup.exceptions import (
         AbsentImplementation,
         IncorrectData,
+    )
+    from lockup.exception_factories import (
         create_argument_validation_exception,
         create_implementation_absence_exception,
     )

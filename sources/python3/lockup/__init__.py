@@ -18,7 +18,10 @@
 #============================================================================#
 
 
-''' Supports attribute concealment and immutability. '''
+''' Supports attribute concealment and immutability.
+
+    Also supports various related functionality, such as apprehension of
+    fugitive exceptions at API boundaries. '''
 
 
 # https://www.python.org/dev/peps/pep-0396/
@@ -27,8 +30,9 @@ __version__ = '2.0a202209040105'
 
 # Public API
 from . import (
+    class_factories,
     exceptions,
-    factories,
+    exception_factories,
     interception,
     module,
     nomenclature,
@@ -36,7 +40,7 @@ from . import (
     validators,
     visibility,
 )
-from .factories import Class, NamespaceClass, create_namespace
+from .class_factories import Class, NamespaceClass, create_namespace
 from .interception import create_interception_decorator
 from .module import Module, reclassify_module
 
@@ -46,8 +50,9 @@ from .module import Module, reclassify_module
 reflection.reflect_class_factory_per_se( Class, assert_implementation = False )
 
 
+reclassify_module( class_factories )
 reclassify_module( exceptions )
-reclassify_module( factories )
+reclassify_module( exception_factories )
 reclassify_module( interception )
 reclassify_module( module )
 reclassify_module( nomenclature )

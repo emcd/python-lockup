@@ -30,7 +30,7 @@
 def validate_argument_invocability( argument, name, invocation ):
     ''' Validates argument as an invocable object, such as a function. '''
     if callable( argument ): return argument
-    from .exceptions import create_argument_validation_exception
+    from .exception_factories import create_argument_validation_exception
     raise create_argument_validation_exception( name, invocation, 'invocable' )
 
 
@@ -47,5 +47,5 @@ def validate_attribute_name( name, context ):
 def validate_attribute_existence( name, context ):
     ''' Validates attribute existence on context object. '''
     if hasattr( context, name ): return name
-    from .exceptions import create_attribute_nonexistence_exception
+    from .exception_factories import create_attribute_nonexistence_exception
     raise create_attribute_nonexistence_exception( name, context )

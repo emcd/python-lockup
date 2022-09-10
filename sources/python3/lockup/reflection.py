@@ -22,8 +22,7 @@
 
 
 # Initialization Dependencies: (none)
-# Latent Dependencies:
-#   reflection -> exceptions
+# Latent Dependencies: (no cycles)
 
 
 def reflect_class_factory_per_se( factory, assert_implementation = True ):
@@ -37,7 +36,7 @@ def reflect_class_factory_per_se( factory, assert_implementation = True ):
         If ``assert_implementation`` is true, then an exception will be raised
         if no reflector is implemented for the executing flavor of Python. '''
     from inspect import isclass as is_class
-    from .exceptions import (
+    from .exception_factories import (
         create_argument_validation_exception,
         create_implementation_absence_exception,
     )
