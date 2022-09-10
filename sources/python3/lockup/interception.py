@@ -76,9 +76,11 @@ def create_interception_decorator( exception_provider ):
             # Validate that arguments correspond to function signature.
             try: signature.bind( *things, **sundry )
             except TypeError as exc:
-                raise exception_provider(
-                    'create_invocation_validation_exception' )(
-                        invocation, exc ) from exc
+                from .exception_factories import (
+                    create_invocation_validation_exception,
+                )
+                raise create_invocation_validation_exception(
+                    invocation, exc ) from exc
             # Invoke function. Apprehend fugitives as necessary.
             try: return invocation( *things, **sundry )
             except BaseException as exc: # pylint: disable=broad-except
