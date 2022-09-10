@@ -27,7 +27,7 @@ from lockup import NamespaceClass as _NamespaceClass
 class __( metaclass = _NamespaceClass ):
     ''' Internal namespace. '''
 
-    from lockup.factories import Class
+    from lockup.class_factories import Class
     from lockup.visibility import (
         is_operational_name,
         is_public_or_operational_name,

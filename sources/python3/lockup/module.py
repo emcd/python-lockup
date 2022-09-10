@@ -40,14 +40,14 @@
 
 # Initialization Dependencies:
 #   module -> _base
-#   module -> exceptions
-#   module -> factories
+#   module -> exception_factories
+#   module -> class_factories
 #   module -> validators
 #   module -> visibility
 # Latent Dependencies: (no cycles)
 
 
-from .factories import NamespaceClass as _NamespaceClass
+from .class_factories import NamespaceClass as _NamespaceClass
 class __( metaclass = _NamespaceClass ):
     ''' Internal namespace. '''
 
@@ -55,12 +55,12 @@ class __( metaclass = _NamespaceClass ):
 
     from . import _base as base
     from ._base import intercept
-    from .exceptions import (
+    from .exception_factories import (
         create_attribute_immutability_exception,
         create_attribute_indelibility_exception,
         create_attribute_nonexistence_exception,
     )
-    from .factories import Class
+    from .class_factories import Class
     from .validators import (
         validate_attribute_existence,
         validate_attribute_name,
@@ -125,7 +125,7 @@ def reclassify_module( module ):
         module = modules.get( module )
     from inspect import ismodule as is_module
     if None is module or not is_module( module ):
-        from .exceptions import create_argument_validation_exception
+        from .exception_factories import create_argument_validation_exception
         raise create_argument_validation_exception(
             'module', reclassify_module,
             'module or name of module in Python loaded modules dictionary' )

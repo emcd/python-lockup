@@ -53,7 +53,8 @@ _inner_object = _InvocableObject.Inner( )
     'class_',
     ( _InvocableObject,
       { '__module__': _InvocableObject.__module__,
-        '__qualname__': _InvocableObject.__qualname__ } ) )
+        '__qualname__': _InvocableObject.__qualname__ } )
+)
 def test_011_module_qualify_class_name( class_ ):
     ''' Valid class or class dictionary qualifies name. '''
     assert ( f"{_invocables.__name__}.InvocableObject"
@@ -62,7 +63,8 @@ def test_011_module_qualify_class_name( class_ ):
 
 @mark.parametrize(
     'class_',
-    ( 123, { '__qualname__': 'A.B' }, { '__module__': 'me' }, ) )
+    ( 123, { '__qualname__': 'A.B' }, { '__module__': 'me' }, )
+)
 def test_012_module_qualify_invalid_class_name( class_ ):
     ''' Invalid class or class dictionary raises exception. '''
     with raises( __.IncorrectData ): __.module_qualify_class_name( class_ )
@@ -74,7 +76,8 @@ def test_012_module_qualify_invalid_class_name( class_ ):
       ( _InvocableObject,
         f"class '{_invocables.__name__}.InvocableObject'" ),
       ( _invocable_object,
-        f"instance of class '{_invocables.__name__}.InvocableObject'" ) ) )
+        f"instance of class '{_invocables.__name__}.InvocableObject'" ) )
+)
 def test_021_calculate_label( object_, expectation ):
     ''' Label calculation is dispatched according to kind of object. '''
     assert expectation == __.calculate_label( object_ )

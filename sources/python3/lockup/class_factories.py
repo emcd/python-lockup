@@ -22,15 +22,15 @@
 
 
 # Initialization Dependencies:
-#   factories -> _base
-#   factories -> visibility
+#   class_factories -> _base
+#   class_factories -> visibility
 # Latent Dependencies:
-#   factories -> exceptions -> factories
+#   class_factories -> exception_factories -> exceptions -> class_factories
 # pylint: disable=cyclic-import
 
 
 from ._base import (
-    exception_provider as _exception_provider,
+    #exception_provider as _exception_provider,
     intercept as _intercept,
     package_name as _package_name,
 )
@@ -62,7 +62,9 @@ class Class( type ):
     def __setattr__( class_, name, value ):
         from .validators import validate_attribute_name
         validate_attribute_name( name, class_ )
-        from .exceptions import create_attribute_immutability_exception
+        from .exception_factories import (
+            create_attribute_immutability_exception,
+        )
         raise create_attribute_immutability_exception( name, class_ )
 
     @_intercept
@@ -73,7 +75,9 @@ class Class( type ):
         )
         validate_attribute_name( name, class_ )
         validate_attribute_existence( name, class_ )
-        from .exceptions import create_attribute_indelibility_exception
+        from .exception_factories import (
+            create_attribute_indelibility_exception,
+        )
         raise create_attribute_indelibility_exception( name, class_ )
 
     @_intercept
@@ -102,14 +106,19 @@ class NamespaceClass( Class, metaclass = Class ):
         for aname in namespace:
             if aname in ( '__doc__', '__module__', '__qualname__', ): continue
             if _is_public_name( aname ): continue
-            # Lazy import of 'create_class_attribute_rejection_exception' to
-            # avoid cycle with use of internal namespace in the exceptions
-            # module happy path at module initialization time.
-            raise _exception_provider(
-                'create_class_attribute_rejection_exception' )(
-                    aname, namespace )
+            from .exception_factories import (
+                create_class_attribute_rejection_exception,
+            )
+            raise create_class_attribute_rejection_exception(
+                aname, namespace )
+            # # Lazy import of 'create_class_attribute_rejection_exception' to
+            # # avoid cycle with use of internal namespace in the exceptions
+            # # module happy path at module initialization time.
+            # raise _exception_provider(
+            #     'create_class_attribute_rejection_exception' )(
+            #         aname, namespace )
         def __new__( kind, *posargs, **nomargs ): # pylint: disable=unused-argument
-            from .exceptions import (
+            from .exception_factories import (
                 create_impermissible_instantiation_exception,
             )
             raise create_impermissible_instantiation_exception( kind )
