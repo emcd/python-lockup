@@ -8,10 +8,10 @@ digests = [
 
 [["cpython-3.7.13--linux--x86_64"]]
 name = "astroid"
-version = "2.11.7"
+version = "2.12.9"
 digests = [
-    "sha256:86b0a340a512c65abf4368b80252754cda17c02cdbbd3f587dddf98112233e7b",
-    "sha256:bb24615c77f4837c707669d16907331374ae8a964650a66999da3f5ca68dc946",
+    "sha256:27a22f40e45af6d362498647a0940e8ae9c35f71cb572a1b6f8f810122a11918",
+    "sha256:0dafbfcf4ebdecd3c8f6d742c9d9c88508229ca823d5c98ab872d964f3321e56",
 ]
 
 [["cpython-3.7.13--linux--x86_64"]]
@@ -739,10 +739,10 @@ digests = [
 
 [["cpython-3.7.13--linux--x86_64"]]
 name = "pylint"
-version = "2.14.5"
+version = "2.15.2"
 digests = [
-    "sha256:fabe30000de7d07636d2e82c9a518ad5ad7908590fe135ace169b44839c15f90",
-    "sha256:487ce2192eee48211269a0e976421f334cf94de1806ca9d0a99449adcdf0285e",
+    "sha256:cc3da458ba810c49d330e09013dec7ced5217772dec8f043ccdd34dae648fde8",
+    "sha256:f63404a2547edb5247da263748771ac9a806ed1de4174cda01293c08ddbc2999",
 ]
 
 [["cpython-3.7.13--linux--x86_64"]]
@@ -1359,10 +1359,10 @@ digests = [
 
 [["cpython-3.8.13--linux--x86_64"]]
 name = "astroid"
-version = "2.11.7"
+version = "2.12.9"
 digests = [
-    "sha256:86b0a340a512c65abf4368b80252754cda17c02cdbbd3f587dddf98112233e7b",
-    "sha256:bb24615c77f4837c707669d16907331374ae8a964650a66999da3f5ca68dc946",
+    "sha256:27a22f40e45af6d362498647a0940e8ae9c35f71cb572a1b6f8f810122a11918",
+    "sha256:0dafbfcf4ebdecd3c8f6d742c9d9c88508229ca823d5c98ab872d964f3321e56",
 ]
 
 [["cpython-3.8.13--linux--x86_64"]]
@@ -2090,10 +2090,10 @@ digests = [
 
 [["cpython-3.8.13--linux--x86_64"]]
 name = "pylint"
-version = "2.14.5"
+version = "2.15.2"
 digests = [
-    "sha256:fabe30000de7d07636d2e82c9a518ad5ad7908590fe135ace169b44839c15f90",
-    "sha256:487ce2192eee48211269a0e976421f334cf94de1806ca9d0a99449adcdf0285e",
+    "sha256:cc3da458ba810c49d330e09013dec7ced5217772dec8f043ccdd34dae648fde8",
+    "sha256:f63404a2547edb5247da263748771ac9a806ed1de4174cda01293c08ddbc2999",
 ]
 
 [["cpython-3.8.13--linux--x86_64"]]
@@ -3786,10 +3786,10 @@ digests = [
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
 name = "astroid"
-version = "2.11.7"
+version = "2.12.9"
 digests = [
-    "sha256:86b0a340a512c65abf4368b80252754cda17c02cdbbd3f587dddf98112233e7b",
-    "sha256:bb24615c77f4837c707669d16907331374ae8a964650a66999da3f5ca68dc946",
+    "sha256:27a22f40e45af6d362498647a0940e8ae9c35f71cb572a1b6f8f810122a11918",
+    "sha256:0dafbfcf4ebdecd3c8f6d742c9d9c88508229ca823d5c98ab872d964f3321e56",
 ]
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
@@ -4439,10 +4439,10 @@ digests = [
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
 name = "pylint"
-version = "2.14.5"
+version = "2.15.2"
 digests = [
-    "sha256:fabe30000de7d07636d2e82c9a518ad5ad7908590fe135ace169b44839c15f90",
-    "sha256:487ce2192eee48211269a0e976421f334cf94de1806ca9d0a99449adcdf0285e",
+    "sha256:cc3da458ba810c49d330e09013dec7ced5217772dec8f043ccdd34dae648fde8",
+    "sha256:f63404a2547edb5247da263748771ac9a806ed1de4174cda01293c08ddbc2999",
 ]
 
 [["pypy-3.8.13-7.3.9--linux--x86_64"]]
@@ -4886,10 +4886,10 @@ digests = [
 
 [["cpython-3.9.13--linux--x86_64"]]
 name = "astroid"
-version = "2.11.7"
+version = "2.12.9"
 digests = [
-    "sha256:86b0a340a512c65abf4368b80252754cda17c02cdbbd3f587dddf98112233e7b",
-    "sha256:bb24615c77f4837c707669d16907331374ae8a964650a66999da3f5ca68dc946",
+    "sha256:27a22f40e45af6d362498647a0940e8ae9c35f71cb572a1b6f8f810122a11918",
+    "sha256:0dafbfcf4ebdecd3c8f6d742c9d9c88508229ca823d5c98ab872d964f3321e56",
 ]
 
 [["cpython-3.9.13--linux--x86_64"]]
@@ -5601,10 +5601,10 @@ digests = [
 
 [["cpython-3.9.13--linux--x86_64"]]
 name = "pylint"
-version = "2.14.5"
+version = "2.15.2"
 digests = [
-    "sha256:fabe30000de7d07636d2e82c9a518ad5ad7908590fe135ace169b44839c15f90",
-    "sha256:487ce2192eee48211269a0e976421f334cf94de1806ca9d0a99449adcdf0285e",
+    "sha256:cc3da458ba810c49d330e09013dec7ced5217772dec8f043ccdd34dae648fde8",
+    "sha256:f63404a2547edb5247da263748771ac9a806ed1de4174cda01293c08ddbc2999",
 ]
 
 [["cpython-3.9.13--linux--x86_64"]]
@@ -6191,10 +6191,10 @@ digests = [
 
 [["pyston-3.8.12-2.3.4--linux--x86_64"]]
 name = "astroid"
-version = "2.11.7"
+version = "2.12.9"
 digests = [
-    "sha256:86b0a340a512c65abf4368b80252754cda17c02cdbbd3f587dddf98112233e7b",
-    "sha256:bb24615c77f4837c707669d16907331374ae8a964650a66999da3f5ca68dc946",
+    "sha256:27a22f40e45af6d362498647a0940e8ae9c35f71cb572a1b6f8f810122a11918",
+    "sha256:0dafbfcf4ebdecd3c8f6d742c9d9c88508229ca823d5c98ab872d964f3321e56",
 ]
 
 [["pyston-3.8.12-2.3.4--linux--x86_64"]]
@@ -6922,10 +6922,10 @@ digests = [
 
 [["pyston-3.8.12-2.3.4--linux--x86_64"]]
 name = "pylint"
-version = "2.14.5"
+version = "2.15.2"
 digests = [
-    "sha256:fabe30000de7d07636d2e82c9a518ad5ad7908590fe135ace169b44839c15f90",
-    "sha256:487ce2192eee48211269a0e976421f334cf94de1806ca9d0a99449adcdf0285e",
+    "sha256:cc3da458ba810c49d330e09013dec7ced5217772dec8f043ccdd34dae648fde8",
+    "sha256:f63404a2547edb5247da263748771ac9a806ed1de4174cda01293c08ddbc2999",
 ]
 
 [["pyston-3.8.12-2.3.4--linux--x86_64"]]
@@ -7512,10 +7512,10 @@ digests = [
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
 name = "astroid"
-version = "2.11.7"
+version = "2.12.9"
 digests = [
-    "sha256:86b0a340a512c65abf4368b80252754cda17c02cdbbd3f587dddf98112233e7b",
-    "sha256:bb24615c77f4837c707669d16907331374ae8a964650a66999da3f5ca68dc946",
+    "sha256:27a22f40e45af6d362498647a0940e8ae9c35f71cb572a1b6f8f810122a11918",
+    "sha256:0dafbfcf4ebdecd3c8f6d742c9d9c88508229ca823d5c98ab872d964f3321e56",
 ]
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
@@ -8165,10 +8165,10 @@ digests = [
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
 name = "pylint"
-version = "2.14.5"
+version = "2.15.2"
 digests = [
-    "sha256:fabe30000de7d07636d2e82c9a518ad5ad7908590fe135ace169b44839c15f90",
-    "sha256:487ce2192eee48211269a0e976421f334cf94de1806ca9d0a99449adcdf0285e",
+    "sha256:cc3da458ba810c49d330e09013dec7ced5217772dec8f043ccdd34dae648fde8",
+    "sha256:f63404a2547edb5247da263748771ac9a806ed1de4174cda01293c08ddbc2999",
 ]
 
 [["pypy-3.9.12-7.3.9--linux--x86_64"]]
@@ -8612,10 +8612,10 @@ digests = [
 
 [["cpython-3.10.7--linux--x86_64"]]
 name = "astroid"
-version = "2.11.7"
+version = "2.12.9"
 digests = [
-    "sha256:86b0a340a512c65abf4368b80252754cda17c02cdbbd3f587dddf98112233e7b",
-    "sha256:bb24615c77f4837c707669d16907331374ae8a964650a66999da3f5ca68dc946",
+    "sha256:27a22f40e45af6d362498647a0940e8ae9c35f71cb572a1b6f8f810122a11918",
+    "sha256:0dafbfcf4ebdecd3c8f6d742c9d9c88508229ca823d5c98ab872d964f3321e56",
 ]
 
 [["cpython-3.10.7--linux--x86_64"]]
@@ -9327,10 +9327,10 @@ digests = [
 
 [["cpython-3.10.7--linux--x86_64"]]
 name = "pylint"
-version = "2.14.5"
+version = "2.15.2"
 digests = [
-    "sha256:fabe30000de7d07636d2e82c9a518ad5ad7908590fe135ace169b44839c15f90",
-    "sha256:487ce2192eee48211269a0e976421f334cf94de1806ca9d0a99449adcdf0285e",
+    "sha256:cc3da458ba810c49d330e09013dec7ced5217772dec8f043ccdd34dae648fde8",
+    "sha256:f63404a2547edb5247da263748771ac9a806ed1de4174cda01293c08ddbc2999",
 ]
 
 [["cpython-3.10.7--linux--x86_64"]]
