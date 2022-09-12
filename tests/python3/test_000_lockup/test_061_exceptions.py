@@ -28,6 +28,7 @@ class __( metaclass = _NamespaceClass ):
     ''' Internal namespace. '''
 
     from lockup._base import intercept
+    from lockup._exceptionality import exception_controller
     from lockup.exceptions import (
         AbsentImplementation,
         IncorrectData,
@@ -51,7 +52,7 @@ def test_011_argument_validation_exception( argument ):
     ''' Validation exception is created from argument. '''
     def tester( argument ): return argument
     assert isinstance(
-        __.create_argument_validation_exception(
+        __.exception_controller.provide_factory( 'argument_validation' )(
             'argument', tester, type( argument ) ), __.IncorrectData )
 
 
@@ -59,7 +60,7 @@ def test_012_argument_validation_exception_with_label( ):
     ''' Validation exception with special label is created from argument. '''
     label = 'special integer'
     def tester( argument ): return argument
-    result = __.create_argument_validation_exception(
+    result = __.exception_controller.provide_factory( 'argument_validation' )(
         'argument', tester, label )
     assert isinstance( result, __.IncorrectData )
     assert label in str( result )
@@ -72,7 +73,7 @@ def test_012_argument_validation_exception_with_label( ):
 def test_013_argument_validation_exceptions( trial_function ):
     ''' Validation exception with different categories of arguments. '''
     assert isinstance(
-        __.create_argument_validation_exception(
+        __.exception_controller.provide_factory( 'argument_validation' )(
             'iterable', trial_function, object ), __.IncorrectData )
 
 
@@ -80,5 +81,6 @@ def test_013_argument_validation_exceptions( trial_function ):
 def test_021_implementation_absence_exception( argument ):
     ''' Validation exception is created from argument. '''
     assert isinstance(
-        __.create_implementation_absence_exception( argument, 'something' ),
+        __.exception_controller.provide_factory( 'implementation_absence' )(
+            argument, 'something' ),
         __.AbsentImplementation )
