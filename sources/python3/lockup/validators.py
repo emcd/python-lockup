@@ -27,25 +27,45 @@
 # pylint: disable=cyclic-import
 
 
-def validate_argument_invocability( argument, name, invocation ):
+def validate_argument_invocability(
+    exception_controller, argument, name, invocation
+):
     ''' Validates argument as an invocable object, such as a function. '''
     if callable( argument ): return argument
-    from .exception_factories import create_argument_validation_exception
-    raise create_argument_validation_exception( name, invocation, 'invocable' )
+    raise _excoriate_and_validate_excc( exception_controller ).provide_factory(
+        'argument_validation' )( name, invocation, 'invocable' )
 
 
-def validate_attribute_name( name, context ):
+def validate_attribute_name( exception_controller, name ):
     ''' Validates attribute name as Python identifier. '''
     from .nomenclature import is_python_identifier
     if is_python_identifier( name ): return name
-    from .nomenclature import calculate_label
-    label = calculate_label( context, f"attribute '{name}'" )
-    from .exceptions import InaccessibleAttribute
-    raise InaccessibleAttribute( f"Illegal name for {label}." )
+    raise _excoriate_and_validate_excc( exception_controller ).provide_factory(
+        'attribute_name_illegality' )( name )
 
 
-def validate_attribute_existence( name, context ):
-    ''' Validates attribute existence on context object. '''
-    if hasattr( context, name ): return name
-    from .exception_factories import create_attribute_nonexistence_exception
-    raise create_attribute_nonexistence_exception( name, context )
+def validate_attribute_existence( exception_controller, name, object_ ):
+    ''' Validates attribute existence on object. '''
+    if hasattr( object_, name ): return name
+    raise _excoriate_and_validate_excc( exception_controller ).provide_factory(
+        'attribute_nonexistence' )( name, object_ )
+
+
+def validate_attribute_invocability( exception_controller, name, object_ ):
+    ''' Validates attribute invocability on object.
+
+        Implies attribute existence validation. '''
+    validate_attribute_existence( exception_controller, name, object_ )
+    if callable( getattr( object_, name ) ): return name
+    raise _excoriate_and_validate_excc( exception_controller ).provide_factory(
+        'attribute_noninvocability' )( name, object_ )
+
+
+def _excoriate_and_validate_excc( controller ):
+    ''' Validates exception controller, first unwrapping if it is callable. '''
+    from ._exceptionality import (
+        excoriate_exception_controller,
+        validate_exception_controller,
+    )
+    return validate_exception_controller( excoriate_exception_controller(
+        controller ) )

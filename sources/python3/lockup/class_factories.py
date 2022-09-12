@@ -30,7 +30,6 @@
 
 
 from ._base import (
-    #exception_provider as _exception_provider,
     intercept as _intercept,
     package_name as _package_name,
 )
@@ -60,25 +59,23 @@ class Class( type ):
 
     @_intercept
     def __setattr__( class_, name, value ):
+        from ._exceptionality import exception_controller
         from .validators import validate_attribute_name
-        validate_attribute_name( name, class_ )
-        from .exception_factories import (
-            create_attribute_immutability_exception,
-        )
-        raise create_attribute_immutability_exception( name, class_ )
+        validate_attribute_name( exception_controller, name )
+        raise exception_controller.provide_factory( 'attribute_immutability' )(
+            name, class_ )
 
     @_intercept
     def __delattr__( class_, name ):
+        from ._exceptionality import exception_controller
         from .validators import (
             validate_attribute_name,
             validate_attribute_existence,
         )
-        validate_attribute_name( name, class_ )
-        validate_attribute_existence( name, class_ )
-        from .exception_factories import (
-            create_attribute_indelibility_exception,
-        )
-        raise create_attribute_indelibility_exception( name, class_ )
+        validate_attribute_name( exception_controller, name )
+        validate_attribute_existence( exception_controller, name, class_ )
+        raise exception_controller.provide_factory( 'attribute_indelibility' )(
+            name, class_ )
 
     @_intercept
     def __dir__( class_ ):
@@ -106,22 +103,13 @@ class NamespaceClass( Class, metaclass = Class ):
         for aname in namespace:
             if aname in ( '__doc__', '__module__', '__qualname__', ): continue
             if _is_public_name( aname ): continue
-            from .exception_factories import (
-                create_class_attribute_rejection_exception,
-            )
-            raise create_class_attribute_rejection_exception(
-                aname, namespace )
-            # # Lazy import of 'create_class_attribute_rejection_exception' to
-            # # avoid cycle with use of internal namespace in the exceptions
-            # # module happy path at module initialization time.
-            # raise _exception_provider(
-            #     'create_class_attribute_rejection_exception' )(
-            #         aname, namespace )
+            from ._exceptionality import exception_controller
+            raise exception_controller.provide_factory(
+                'class_attribute_rejection' )( aname, namespace )
         def __new__( kind, *posargs, **nomargs ): # pylint: disable=unused-argument
-            from .exception_factories import (
-                create_impermissible_instantiation_exception,
-            )
-            raise create_impermissible_instantiation_exception( kind )
+            from ._exceptionality import exception_controller
+            raise exception_controller.provide_factory(
+                'impermissible_instantiation' )( kind )
         namespace[ '__new__' ] = __new__
         return super( ).__new__( factory, name, bases, namespace )
 
