@@ -18,27 +18,33 @@
 #============================================================================#
 
 
-''' Package foundation. Internal constants and functions. '''
+''' Facilities for exception production and control. '''
 
 
-# Initialization Dependencies:
-#   _base -> interception
-# Latent Dependencies:
-#   _base -> _exceptionality -> exceptions -> class_factories -> _base
-# pylint: disable=cyclic-import
+# Exception Controller
+#   pass to:
+#       interceptor factory
+#       validators
+
+# Interceptor factory and validators can take nullary function
+# which returns exception controller for cases where deferred importation /
+# latent evaluation is required.
 
 
-from .interception import (
-    create_interception_decorator as _create_interception_decorator,
-)
+from .class_factories import NamespaceClass as _NamespaceClass
+class __( metaclass = _NamespaceClass ):
+    ''' Internal namespace. '''
+
+    from .class_factories import Class
 
 
-def provide_exception_controller( ):
-    ''' Late-imports and returns exception controller. '''
-    from ._exceptionality import exception_controller
-    return exception_controller
+class ExceptionController( metaclass = __.Class ):
+    ''' Presents uniform interface for exception control. '''
 
-intercept = _create_interception_decorator( provide_exception_controller )
+    def __init__( self, factory_provider, fugitive_apprehender ):
+        # TODO: Validate arguments.
+        self.provide_factory = factory_provider
+        self.apprehend_fugitive = fugitive_apprehender
 
-
-package_name = __package__.split( '.', maxsplit = 1 )[ 0 ]
+    # TODO: Protect against attribute mutation and deletion
+    #       after initialization.

@@ -54,6 +54,11 @@ API
   on classes, modules, and namespaces. But, they can be put to other purposes
   as well.
 
+* Provide ``ExceptionController`` for use with
+  ``create_interception_decorator`` and the validaton utilities. This allows
+  you to define custom behaviors for how to handle fugitive exceptions and also
+  to plug your own exception factories into the validator utilities.
+
 Python Support
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

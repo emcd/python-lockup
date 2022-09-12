@@ -28,13 +28,16 @@ class __( metaclass = _NamespaceClass ):
     ''' Internal namespace. '''
 
     from lockup._base import intercept
+    from lockup._exceptionality import exception_controller
     from lockup.exceptions import (
         InaccessibleAttribute,
         IncorrectData,
+        InvalidOperation,
     )
     from lockup.validators import (
         validate_argument_invocability,
         validate_attribute_existence,
+        validate_attribute_invocability,
     )
 
 
@@ -51,7 +54,7 @@ def test_011_validate_invocable_argument( argument ):
     ''' Invocables are returned without alteration. '''
     def tester( argument ): return argument
     assert argument == __.validate_argument_invocability(
-        argument, 'argument', tester )
+        __.exception_controller, argument, 'argument', tester )
 
 
 @mark.parametrize( 'argument', ( 123, 'ph00b4r' * 5, ) )
@@ -59,17 +62,33 @@ def test_012_validate_noninvocable_argument( argument ):
     ''' Noninvocable objects causes exceptions. '''
     def tester( argument ): return argument
     with raises( __.IncorrectData ):
-        __.validate_argument_invocability( argument, 'argument', tester )
+        __.validate_argument_invocability(
+            __.exception_controller, argument, 'argument', tester )
 
 
 def test_021_validate_attribute_existence( ):
     ''' Names of valid attributes are returned without alteration. '''
     assert 'a_method' == __.validate_attribute_existence(
-        'a_method', _invocable_object )
+        __.exception_controller, 'a_method', _invocable_object )
 
 
 def test_022_validate_attribute_nonexistence( ):
     ''' Nonexistent attributes cause exceptions. '''
     aname = 'ph00b4r' * 5
     with raises( __.InaccessibleAttribute ):
-        __.validate_attribute_existence( aname, _invocable_object )
+        __.validate_attribute_existence(
+            __.exception_controller, aname, _invocable_object )
+
+
+def test_031_validate_invocable_attribute( ):
+    ''' Names of invocable attributes are returned without alteration. '''
+    assert 'a_method' == __.validate_attribute_invocability(
+        __.exception_controller, 'a_method', _invocable_object )
+
+
+def test_032_validate_attribute_noninvocability( ):
+    ''' Noninvocable attributes cause exceptions. '''
+    aname = '__dict__'
+    with raises( __.InvalidOperation ):
+        __.validate_attribute_invocability(
+            __.exception_controller, aname, _invocable_object )

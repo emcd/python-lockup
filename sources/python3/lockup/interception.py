@@ -30,7 +30,7 @@
 #       and operational methods on a class.
 
 
-def create_interception_decorator( exception_provider ):
+def create_interception_decorator( exception_controller ): # pylint: disable=too-complex
     ''' Creates function decorator to apprehend "fugitive" exceptions.
 
         Fugitive exceptions are exceptions which are not expected to cross the
@@ -42,29 +42,29 @@ def create_interception_decorator( exception_provider ):
         whether an exception is permissible, and thus allowed to propagate
         freely, or if it is a fugitive.
 
-        The ``exception_provider`` argument must be a callable object, such as
-        a function, which takes an exception name as an argument.  The
-        exception name will be ``FugitiveException``; the provider must return
-        a valid exception class.
+        The ``exception_controller`` argument must be an object, which has the
+        following attributes:
 
-        The ``exception_provider`` argument must have an attribute, named
-        ``is_permissible_exception``. This attribute must be a callable object,
-        such as a function, that takes an exception as an argument and returns
-        a boolean value. '''
-    from .validators import (
-        validate_argument_invocability,
-        validate_attribute_existence,
-    )
-    validate_argument_invocability(
-        exception_provider, 'exception_provider',
-        create_interception_decorator )
-    validate_attribute_existence(
-        'is_permissible_exception', exception_provider )
-    # TODO: Validate attribute invocability.
+        * ``exception_factory_provider``, which must be a callable object that
+          takes the name of a canonical exception factory for an argument and
+          returns a corresponding factory which presents an appropriate
+          interface
+
+        * ``exception_permitter``, which must be a callable object that takes
+          an exception for an argument and returns ``False`` if the exception
+          would be considered a fugitive if it passes an API boundary
+
+        Or, ``exception_controller`` can be a nullary callable object which
+        returns such an object as described above. '''
+    _validate_exception_controller(
+        exception_controller, create_interception_decorator )
 
     def intercept( invocation ):
         ''' Decorates function to intercept fugitive exceptions. '''
-        validate_argument_invocability( invocation, 'invocation', intercept )
+        from ._base import provide_exception_controller
+        from .validators import validate_argument_invocability
+        validate_argument_invocability(
+            provide_exception_controller, invocation, 'invocation', intercept )
         from inspect import signature as scan_signature
         signature = scan_signature( invocation )
         from functools import wraps
@@ -76,18 +76,46 @@ def create_interception_decorator( exception_provider ):
             # Validate that arguments correspond to function signature.
             try: signature.bind( *things, **sundry )
             except TypeError as exc:
-                from .exception_factories import (
-                    create_invocation_validation_exception,
-                )
-                raise create_invocation_validation_exception(
-                    invocation, exc ) from exc
+                raise _excoriate_excc(
+                    exception_controller, invocation ).provide_factory(
+                        'invocation_validation' )( invocation, exc ) from exc
             # Invoke function. Apprehend fugitives as necessary.
             try: return invocation( *things, **sundry )
             except BaseException as exc: # pylint: disable=broad-except
-                if exception_provider.is_permissible_exception( exc ): raise
-                # TODO: Validate returned exception class.
-                raise exception_provider( 'FugitiveException' ) from exc
+                behavior, propagand = _excoriate_excc(
+                    exception_controller, invocation ).apprehend_fugitive(
+                        exc, invocation )
+                # TODO: Use 'match' statement once Python 3.10 is baseline.
+                if 'propagate-at-liberty' == behavior: raise
+                if 'return' == behavior: return exc
+                # TODO: Validate that propagand is exception.
+                #       Use 'provide_exception_controller'.
+                if 'propagate-in-custody' == behavior: raise propagand from exc
+                if 'silence-and-except' == behavior: raise propagand from None
+                return propagand
 
         return interception_invoker
 
     return intercept
+
+
+def _excoriate_excc( controller, invocation ):
+    ''' Unwrap exception controller if it is invocable. '''
+    return (
+        _validate_exception_controller( controller( ), invocation )
+        if callable( controller ) else controller )
+
+
+def _validate_exception_controller( controller, invocation ):
+    ''' Runs validators against alleged exception controller. '''
+    from ._base import provide_exception_controller
+    from .validators import validate_argument_invocability
+    if callable( controller ):
+        validate_argument_invocability(
+            provide_exception_controller,
+            controller, 'exception_controller',
+            invocation )
+        # TODO: Verify that callable is nullary.
+        return controller
+    from ._exceptionality import validate_exception_controller
+    return validate_exception_controller( controller )
