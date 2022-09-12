@@ -446,6 +446,7 @@ def _test( context, version = None ):
     context_options = __.derive_venv_context_options( version = version )
     context_options[ 'env' ].update( dict(
         HYPOTHESIS_STORAGE_DIRECTORY = __.paths.caches.hypothesis,
+        PYTHONUNBUFFERED = 'TRUE', # Ensure complete crash output.
     ) )
     context.run(
         f"coverage run --source {__.project_name}",
