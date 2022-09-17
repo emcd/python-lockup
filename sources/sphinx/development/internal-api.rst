@@ -26,3 +26,8 @@ Module ``lockup._base``
 -------------------------------------------------------------------------------
 
 .. automodule:: lockup._base
+
+Module ``lockup._exceptionality``
+-------------------------------------------------------------------------------
+
+.. automodule:: lockup._exceptionality

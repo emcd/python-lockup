@@ -69,7 +69,7 @@ properties are true:
     >>> import getpass
     >>> def steal_password( prompt = 'Password: ', stream = None ):
     ...     pwned = getpass.getpass( prompt = prompt, stream = stream )
-    ...     # Send host address, username, and password to dark web collector.
+    ...     # Send host address, username, and password to Dark Web collector.
     ...     return pwned
     ...
     >>> import lockup
@@ -88,10 +88,10 @@ properties are true:
     ...
     lockup.exceptions.ImpermissibleAttributeOperation: Attempt to assign immutable attribute 'some_constant' on class 'lockup.Namespace'.
 
-* Non-public attributes are **concealed**. Concealment means that functions,
-  such as `dir <https://docs.python.org/3/library/functions.html#dir>`_, can
-  report a subset of attributes that are intended for programmers to use
-  (without directly exposing internals).
+* Non-public attributes are **concealed**. Concealment means that the
+  `dir <https://docs.python.org/3/library/functions.html#dir>`_ function will
+  report a subset of attributes that are intended for programmers to use...
+  without exposing internals.
 
   .. code-block:: python
 
@@ -103,6 +103,12 @@ properties are true:
     ...
     >>> dir( Demo )
     ['hello']
+
+In addition to the above, the package also provides the ability to apprehend
+"fugitive" exceptions attempting to cross API boundaries. Various auxiliary
+functionalities are provided as well; these are used internally within the
+package but are deemed useful enough for public consumption. Please see the
+documentation for more details.
 
 Quick Tour
 ===============================================================================
@@ -271,39 +277,16 @@ part of the module API, for example:
 
 The above technique is used internally within this package itself.
 
-Reflection
+Interception
 -------------------------------------------------------------------------------
 
-Have you ever wondered how the type of `type
-<https://docs.python.org/3/library/functions.html#type>`_ can be type_ itself?
-Have you ever had a need to make a class with a similar behavior?
-
-.. code-block:: python
-
-    >>> type( type )
-    <class 'type'>
-
-Well, we can:
-
-.. code-block:: python
-
-    >>> class Class( type ): pass
-    ...
-    >>> type( Class )
-    <class 'type'>
-    >>> import lockup.reflection
-    >>> lockup.reflection.reflect_class_factory_per_se( Class, assert_implementation = False )
-    <class '__main__.Class'>
-    >>> type( Class )  # doctest: +SKIP
-    <class '__main__.Class'>
-
-The above technique is used internally within this package itself.
-
-.. note::
-   This function only works on some flavors of Python, such as the reference
-   implementation (CPython) and Pyston, at present. You can still use this
-   package on other flavors of Python, but the reflection operation may not be
-   implemented.
+If a particular exceptional condition is not anticipated in Python code, a
+"fugitive" exception can escape across the boundary of a published API. If you
+have told the consumers of the API that it will only emit certain classes of
+exceptions, then consumers might not handle exceptions outside of the expected
+classes, i.e., fugitive exceptions. If you apprehend all fugitives at the API
+boundary, then you can guarantee to your consumers that they will only need to
+anticipate certain classes of exceptions.
 
 Compatibility
 ===============================================================================
@@ -316,6 +299,7 @@ This package has been verified to work on the following Python implementations:
 
 It likely works on others as well, but please report if it does not.
 
+.. TODO: https://github.com/facebookincubator/cinder
 .. TODO: https://github.com/oracle/graalpython
 .. TODO: https://github.com/IronLanguages/ironpython3
 .. TODO: https://github.com/RustPython/RustPython
