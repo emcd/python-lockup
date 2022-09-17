@@ -19,7 +19,7 @@
 Changelog
 ===============================================================================
 
-v2.0.0 (not released)
+v2.0.0 (not released yet)
 -------------------------------------------------------------------------------
 
 API
@@ -29,6 +29,11 @@ API
   decorators that apprehend "fugitive" exceptions before they escape across the
   boundary of a public API. Fugitive exceptions are exceptions which are
   unexpected and which should have been caught internally.
+
+* Provide ``ExceptionController`` for use with
+  ``create_interception_decorator`` and the validaton utilities. This allows
+  you to define custom behaviors for how to handle fugitive exceptions and also
+  to plug your own exception factories into the validator utilities.
 
 * Provide ``reflect_class_factory_per_se`` function which allows for a class
   factory class ("metaclass") to be made into its own factory, similar to how
@@ -53,11 +58,6 @@ API
   This package uses the utilities internally to conceal non-public attributes
   on classes, modules, and namespaces. But, they can be put to other purposes
   as well.
-
-* Provide ``ExceptionController`` for use with
-  ``create_interception_decorator`` and the validaton utilities. This allows
-  you to define custom behaviors for how to handle fugitive exceptions and also
-  to plug your own exception factories into the validator utilities.
 
 Python Support
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
