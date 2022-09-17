@@ -18,13 +18,59 @@
 #============================================================================#
 
 
-''' Ensure correctness of package API. '''
+''' Ensure elements of package API. '''
 
 
-# from pytest import mark, raises
+from pytest import mark
 
 from lockup import NamespaceClass as _NamespaceClass
 class __( metaclass = _NamespaceClass ):
     ''' Internal namespace. '''
 
-# TODO: Validate that public members of package root module are as expected.
+    import lockup
+
+
+def test_101_ensure_public_attributes( ):
+    ''' Only expected public attributes are presented. '''
+    expected_attributes = (
+        'Class',
+        'ExceptionController',
+        'Module',
+        'NamespaceClass',
+        'class_factories',
+        'create_interception_decorator',
+        'create_namespace',
+        'exception_factories',
+        'exceptionality',
+        'exceptions',
+        'interception',
+        'module',
+        'nomenclature',
+        'reclassify_module',
+        'reflection',
+        'validators',
+        'visibility',
+    )
+    assert expected_attributes == tuple( dir( __.lockup ) )
+
+
+@mark.parametrize(
+    'module_name',
+    (
+        'class_factories',
+        'exception_factories',
+        'exceptionality',
+        'exceptions',
+        'interception',
+        'module',
+        'nomenclature',
+        'reflection',
+        'validators',
+        'visibility',
+    )
+)
+def test_111_validate_public_module_classification( module_name ):
+    ''' Public modules are of the proper class. '''
+    assert isinstance(
+        getattr( __.lockup, module_name ),
+        __.lockup.Module )
