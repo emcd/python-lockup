@@ -56,7 +56,7 @@ def test_001_package_public_interface( ):
     assert not any( map( lambda a: a.startswith( '_' ), dir( package ) ) )
 
 
-@given( from_regex( r'[_\w][_\w\d]*', fullmatch = True ) )
+@given( from_regex( r'[\w][\w\d]*', fullmatch = True ) )
 @ht_settings
 def test_002_package_immutable_vs_assignment( attribute_name ):
     ''' Package is immutable versus attribute assignment. '''
@@ -95,25 +95,27 @@ def test_011_module_public_interface( module_name ):
     module = import_module( f".{module_name}", package_name )
     assert not any( map( lambda a: a.startswith( '_' ), dir( module ) ) )
 
+# Note: The following tests are probably overkill. Ensuring that the root
+#       module of the package is protected should be sufficient.
 
-@mark.parametrize( 'module_name', module_names )
-@given( from_regex( r'[_\w][_\w\d]*', fullmatch = True ) )
-@ht_settings
-def test_012_module_immutable_vs_assignment( module_name, attribute_name ):
-    ''' Module is immutable versus attribute assignment. '''
-    module = import_module( f".{module_name}", package_name )
-    with raises( Exception ): setattr( module, attribute_name, True )
-
-
-@mark.parametrize( 'module_name,attribute_name', attributes_by_module )
-def test_013_module_immutable_vs_reassignment( module_name, attribute_name ):
-    ''' Module is immutable versus attribute reassignment. '''
-    module = import_module( f".{module_name}", package_name )
-    with raises( Exception ): setattr( module, attribute_name, True )
+#@mark.parametrize( 'module_name', module_names )
+#@given( from_regex( r'[\w][\w\d]*', fullmatch = True ) )
+#@ht_settings
+#def test_012_module_immutable_vs_assignment( module_name, attribute_name ):
+#    ''' Module is immutable versus attribute assignment. '''
+#    module = import_module( f".{module_name}", package_name )
+#    with raises( Exception ): setattr( module, attribute_name, True )
 
 
-@mark.parametrize( 'module_name,attribute_name', attributes_by_module )
-def test_014_module_immutable_vs_deletion( module_name, attribute_name ):
-    ''' Module is immutable versus attribute deletion. '''
-    module = import_module( f".{module_name}", package_name )
-    with raises( Exception ): delattr( module, attribute_name )
+#@mark.parametrize( 'module_name,attribute_name', attributes_by_module )
+#def test_013_module_immutable_vs_reassignment( module_name, attribute_name ):
+#    ''' Module is immutable versus attribute reassignment. '''
+#    module = import_module( f".{module_name}", package_name )
+#    with raises( Exception ): setattr( module, attribute_name, True )
+
+
+#@mark.parametrize( 'module_name,attribute_name', attributes_by_module )
+#def test_014_module_immutable_vs_deletion( module_name, attribute_name ):
+#    ''' Module is immutable versus attribute deletion. '''
+#    module = import_module( f".{module_name}", package_name )
+#    with raises( Exception ): delattr( module, attribute_name )
