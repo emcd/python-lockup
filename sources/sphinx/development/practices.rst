@@ -112,3 +112,69 @@ Some tips:
   library. The convenience of legibility outweighs the inconvenience of
   mistyping underscores or letters around them, as code should be read more
   than it is written.
+
+Importation
+===============================================================================
+
+Locality
+-------------------------------------------------------------------------------
+
+Although :PEP:`8` encourages imports near the top of module source code, this
+has a number of drawbacks:
+
+* Increases number of globals in module. And, to remember which ones are
+  available, one must look at the top of the module source code or use an
+  integrated development environment with code completion.
+
+* Inhibits refactoring of classes and functions between modules, because any
+  imports on which they depend must either be duplicated or moved too.
+
+* Without aliasing via the ``as`` keyword, the imports will be part of the
+  public interface of the module, which creates noise that competes with the
+  actual interface being provided.
+
+* Import cycles are more likely as the imports are evaluated at module
+  initialization time.
+
+The PEP provides no arguments to support its recommendation. By contrast, if
+you import what you need within a function, then you can readily recall what is
+available without having to jump to another part of the source code. Also, the
+imports will travel with the function during a refactor to another module. And,
+the imports will be concealed and not part of the public interface of the
+module. And, last but not least, you can often avoid import cycles, due to the
+deferred nature of function evaluation.
+
+However, there are some extenuating circumstances, where importation outside of
+functions is preferable. Examples include:
+
+* Heavy use of the same imported module attribute across many functions in the
+  module, such that separate imports would cause a significant increase in the
+  number of lines of code or present a maintenance problem.
+
+* Hot path code where even the retrieval of an attribute from an
+  already-imported module could negatively impact performance.
+
+* If the module being imported has a custom ``__getattribute__`` method, which
+  is assigned to the module after module initialization and which could
+  introduce an import cycle with a deferred import in another module that might
+  invoke it.
+
+So, please prefer function-local imports, but keep an eye out for special cases
+and use good judgment.
+
+Order
+-------------------------------------------------------------------------------
+
+In most other respects, the recommendations of :PEP:`8` are quite reasonable
+and one should adhere to them whenever possible. This includes the
+recommendation on import order, which is as follows. Imports should be grouped
+in the following order:
+
+1. Standard library imports.
+2. Related third-party imports.
+3. Local application-/library-specific imports.
+
+Each group should be separated by a blank line. Also, the order of imports
+within each group should follow a lexicographical order from the cardinal
+values of the characters of the `standard ASCII table
+<https://www.asciitable.com/>`_.

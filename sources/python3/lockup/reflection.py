@@ -18,7 +18,32 @@
 #============================================================================#
 
 
-''' Class reflection facilities. '''
+''' Class reflection facilities.
+
+    The type of :py:class:`type` is :py:class:`type`:
+
+    >>> type( type ).__name__
+    'type'
+
+    You can imbue a class with similar behavior, if necessary:
+
+    >>> class Class( type ): pass
+    ...
+    >>> type( Class ).__name__
+    'type'
+    >>> import lockup.reflection
+    >>> lockup.reflection.reflect_class_factory_per_se( Class, assert_implementation = False )  # doctest: +SKIP
+    ...
+    >>> type( Class ).__name__  # doctest: +SKIP
+    'Class'
+
+    The above technique is used internally within this package itself.
+
+    .. note::
+       This function only works on some flavors of Python, such as the
+       reference implementation (CPython) and Pyston, at present. You can still
+       use this package on other flavors of Python, but the reflection
+       operation may not be implemented. ''' # pylint: disable=line-too-long
 
 
 # Initialization Dependencies: (none)
