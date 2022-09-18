@@ -157,8 +157,9 @@ def calculate_attribute_label( attribute, label_base ):
 @_intercept
 def calculate_argument_label( name, signature ):
     ''' Produces human-comprehensible label for argument. '''
-    from inspect import Signature
-    if not isinstance( signature, Signature ):
+    from inspect import Signature, signature as scan_signature
+    if callable( signature ): signature = scan_signature( signature )
+    elif not isinstance( signature, Signature ):
         from ._exceptionality import exception_controller
         raise exception_controller.provide_factory( 'argument_validation' )(
             'signature', calculate_argument_label,

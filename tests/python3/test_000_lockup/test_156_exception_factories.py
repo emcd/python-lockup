@@ -21,7 +21,7 @@
 ''' Ensure correctness of exception factories and their produce. '''
 
 
-from pytest import mark
+from pytest import mark, raises
 
 from lockup import NamespaceClass as _NamespaceClass
 class __( metaclass = _NamespaceClass ):
@@ -34,6 +34,7 @@ class __( metaclass = _NamespaceClass ):
         IncorrectData,
     )
     from lockup.exception_factories import (
+        ExtraData,
         create_argument_validation_exception,
         create_implementation_absence_exception,
     )
@@ -47,38 +48,65 @@ _invocables = (
 )
 
 
-@mark.parametrize( 'argument', _invocables )
-def test_011_argument_validation_exception( argument ):
+def test_011_argument_validation_exception( ):
     ''' Validation exception is created from argument. '''
+    expectation = 'special integer'
     def tester( argument ): return argument
-    assert isinstance(
-        __.exception_controller.provide_factory( 'argument_validation' )(
-            'argument', tester, type( argument ) ), __.IncorrectData )
-
-
-def test_012_argument_validation_exception_with_label( ):
-    ''' Validation exception with special label is created from argument. '''
-    label = 'special integer'
-    def tester( argument ): return argument
+    extra_data = __.ExtraData(
+        nominative_arguments = dict( exception_labels = { } ) )
     result = __.exception_controller.provide_factory( 'argument_validation' )(
-        'argument', tester, label )
+        'argument', tester, expectation, extra_data = extra_data )
     assert isinstance( result, __.IncorrectData )
-    assert label in str( result )
+    assert expectation in str( result )
+
+
+@mark.parametrize( 'provider', ( 123, 'ph00b4r' * 5 ) )
+def test_012_argument_validation_exception_invalid_provider( provider ):
+    ''' Cannot create validation exception because of invalid provider. '''
+    def tester( argument ): return argument
+    with raises( __.IncorrectData ):
+        __.create_argument_validation_exception(
+            provider, 'argument', tester, 'whatever' )
+
+
+@mark.parametrize( 'invocation', ( 123, 'ph00b4r' * 5 ) )
+def test_013_argument_validation_exception_invalid_invocation( invocation ):
+    ''' Cannot create validation exception because of invalid invocation. '''
+    with raises( __.IncorrectData ):
+        __.exception_controller.provide_factory( 'argument_validation' )(
+            'argument', invocation, 'whatever' )
+
+
+@mark.parametrize( 'expectation', ( 123, lambda: None ) )
+def test_014_argument_validation_exception_invalid_expectation( expectation ):
+    ''' Cannot create validation exception because of invalid expectation. '''
+    def tester( argument ): return argument
+    with raises( __.IncorrectData ):
+        __.exception_controller.provide_factory( 'argument_validation' )(
+            'argument', tester, expectation )
 
 
 @mark.parametrize(
     'trial_function',
     ( sorted, lambda iterable: iterable, lambda *iterable: len( iterable ),
       lambda iterable = 1: iterable, lambda **iterable: len( iterable ) ) )
-def test_013_argument_validation_exceptions( trial_function ):
+def test_016_argument_validation_exceptions( trial_function ):
     ''' Validation exception with different categories of arguments. '''
     assert isinstance(
         __.exception_controller.provide_factory( 'argument_validation' )(
-            'iterable', trial_function, object ), __.IncorrectData )
+            'iterable', trial_function, 'function' ), __.IncorrectData )
+
+
+def test_021_invocation_validation_exception( ):
+    ''' Validation exception is created from arguments. '''
+    def tester( argument ): return argument
+    assert isinstance(
+        __.exception_controller.provide_factory( 'invocation_validation' )(
+            tester, 'mismatched arguments' ), __.IncorrectData )
 
 
 @mark.parametrize( 'argument', _invocables )
-def test_021_implementation_absence_exception( argument ):
+def test_031_implementation_absence_exception( argument ):
     ''' Validation exception is created from argument. '''
     assert isinstance(
         __.exception_controller.provide_factory( 'implementation_absence' )(
