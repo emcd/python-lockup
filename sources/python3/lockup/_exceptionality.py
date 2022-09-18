@@ -58,6 +58,7 @@ def _apprehend_fugitive( exception, invocation ):
             exception, invocation ) )
 
 
+# TODO: Move to exception factories.
 def _provide_exception( name ):
     ''' Returns exception by name. '''
     return _exceptions[ name ]
