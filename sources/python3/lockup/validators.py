@@ -27,6 +27,17 @@
 # pylint: disable=cyclic-import
 
 
+def validate_argument_class(
+    exception_controller, argument, classes, name, invocation
+):
+    ''' Validates argument as an instance of one or more classes. '''
+    if isinstance( argument, classes ): return argument
+    from .nomenclature import calculate_class_label
+    expectation = calculate_class_label( classes )
+    raise _excoriate_and_validate_excc( exception_controller ).provide_factory(
+        'argument_validation' )( name, invocation, expectation )
+
+
 def validate_argument_invocability(
     exception_controller, argument, name, invocation
 ):

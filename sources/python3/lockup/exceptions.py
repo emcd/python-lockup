@@ -62,13 +62,16 @@ from .class_factories import Class as _Class
 class Exception0( BaseException, metaclass = _Class ):
     ''' Base for all exceptions in the package. '''
 
-    def __init__( self, *things, tags = None, **sundry ):
+    def __init__( self, *posargs, exception_labels = None, **nomargs ):
         from collections.abc import Mapping as Dictionary
         from types import MappingProxyType as DictionaryProxy
-        self.tags = (
-            DictionaryProxy( tags ) if isinstance( tags, Dictionary )
+        self.exception_labels = (
+            DictionaryProxy( exception_labels )
+            if isinstance( exception_labels, Dictionary )
             else DictionaryProxy( { } ) )
-        super( ).__init__( *things, **sundry )
+        super( ).__init__( *posargs, **nomargs )
+
+    # TODO: __repr__ which includes exception labels
 
 
 #------------------------------ Object Interface -----------------------------#
@@ -114,17 +117,16 @@ class IncorrectData( InvalidOperation, TypeError, ValueError ):
 
 
 class InvalidState( Exception0, Exception ):
-    ''' Alert about invalid internal state in the package.
+    ''' Alert about invalid internal state in the package. '''
 
-        Owner of problem: maintainers of this package. '''
-
-    def __init__( self, supplement = None ):
-        from ._base import package_name
-        super( ).__init__( ' '.join( filter( None, (
-            f"Invalid internal state encountered "
-            f"in package '{package_name}'.",
-            supplement,
-            f"Please report this error to the package maintainers." ) ) ) )
+    # TODO: Implement factory for this.
+    #def __init__( self, supplement = None ):
+    #    from ._base import package_name
+    #    super( ).__init__( ' '.join( filter( None, (
+    #        f"Invalid internal state encountered "
+    #        f"in package '{package_name}'.",
+    #        supplement,
+    #        f"Please report this error to the package maintainers." ) ) ) )
 
 
 class FugitiveException( InvalidState, RuntimeError ):
