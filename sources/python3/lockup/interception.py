@@ -40,31 +40,15 @@ def create_interception_decorator( exception_controller ): # pylint: disable=too
         chains the fugitive to its ``cause`` before propagating across the API
         boundary. A list of permissible exceptions is consulted to determine
         whether an exception is permissible, and thus allowed to propagate
-        freely, or if it is a fugitive.
-
-        The ``exception_controller`` argument must be an object, which has the
-        following attributes:
-
-        * ``exception_factory_provider``, which must be a callable object that
-          takes the name of a canonical exception factory for an argument and
-          returns a corresponding factory which presents an appropriate
-          interface
-
-        * ``exception_permitter``, which must be a callable object that takes
-          an exception for an argument and returns ``False`` if the exception
-          would be considered a fugitive if it passes an API boundary
-
-        Or, ``exception_controller`` can be a nullary callable object which
-        returns such an object as described above. '''
-    _validate_exception_controller(
-        exception_controller, create_interception_decorator )
+        freely, or if it is a fugitive. '''
+    _validate_exception_controller( exception_controller )
 
     def intercept( invocation ):
         ''' Decorates function to intercept fugitive exceptions. '''
-        from ._base import provide_exception_controller
+        from ._base import exception_controller as our_exception_controller
         from .validators import validate_argument_invocability
         validate_argument_invocability(
-            provide_exception_controller, invocation, 'invocation', intercept )
+            our_exception_controller, invocation, 'invocation', intercept )
         from inspect import signature as scan_signature
         signature = scan_signature( invocation )
         from functools import wraps
@@ -76,20 +60,18 @@ def create_interception_decorator( exception_controller ): # pylint: disable=too
             # Validate that arguments correspond to function signature.
             try: signature.bind( *things, **sundry )
             except TypeError as exc:
-                raise _excoriate_excc(
-                    exception_controller, invocation ).provide_factory(
-                        'invocation_validation' )( invocation, exc ) from exc
+                raise exception_controller.provide_factory(
+                    'invocation_validation' )( invocation, exc ) from exc
             # Invoke function. Apprehend fugitives as necessary.
             try: return invocation( *things, **sundry )
             except BaseException as exc: # pylint: disable=broad-except
-                behavior, propagand = _excoriate_excc(
-                    exception_controller, invocation ).apprehend_fugitive(
-                        exc, invocation )
+                behavior, propagand = exception_controller.apprehend_fugitive(
+                    exc, invocation )
                 # TODO: Use 'match' statement once Python 3.10 is baseline.
                 if 'propagate-at-liberty' == behavior: raise
                 if 'return' == behavior: return exc
                 # TODO: Validate that propagand is exception.
-                #       Use 'provide_exception_controller'.
+                #       Use 'our_exception_controller'.
                 if 'propagate-in-custody' == behavior: raise propagand from exc
                 if 'silence-and-except' == behavior: raise propagand from None
                 return propagand
@@ -99,23 +81,13 @@ def create_interception_decorator( exception_controller ): # pylint: disable=too
     return intercept
 
 
-def _excoriate_excc( controller, invocation ):
-    ''' Unwrap exception controller if it is invocable. '''
-    return (
-        _validate_exception_controller( controller( ), invocation )
-        if callable( controller ) else controller )
+# TODO: Take invocation argument.
+def _validate_exception_controller( controller ):
+    ''' Validates alleged exception controller.
 
-
-def _validate_exception_controller( controller, invocation ):
-    ''' Runs validators against alleged exception controller. '''
-    from ._base import provide_exception_controller
-    from .validators import validate_argument_invocability
-    if callable( controller ):
-        validate_argument_invocability(
-            provide_exception_controller,
-            controller, 'exception_controller',
-            invocation )
-        # TODO: Verify that callable is nullary.
-        return controller
-    from ._exceptionality import validate_exception_controller
+        Gives a free pass if it is the early internal exception controller.
+        This is to prevent import cycles. '''
+    from ._base import exception_controller as our_exception_controller
+    if controller is our_exception_controller: return controller
+    from .exceptionality import validate_exception_controller
     return validate_exception_controller( controller )

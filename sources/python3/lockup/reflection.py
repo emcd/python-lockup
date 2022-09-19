@@ -61,10 +61,11 @@ def reflect_class_factory_per_se( factory, assert_implementation = True ):
         If ``assert_implementation`` is true, then an exception will be raised
         if no reflector is implemented for the executing flavor of Python. '''
     from inspect import isclass as is_class
-    from ._exceptionality import exception_controller
+    from .exceptionality import our_exception_controller
     if not is_class( factory ) or not issubclass( factory, type ):
-        raise exception_controller.provide_factory( 'argument_validation' )(
-            'factory', reflect_class_factory_per_se, "subclass of 'type'" )
+        raise our_exception_controller.provide_factory(
+            'argument_validation' )(
+                'factory', reflect_class_factory_per_se, "subclass of 'type'" )
     from sys import implementation as python_implementation
     python_name = python_implementation.name
     if python_name in ( # pragma: no branch
@@ -73,9 +74,10 @@ def reflect_class_factory_per_se( factory, assert_implementation = True ):
     # TODO: pypy
     # Note: Update corresponding tests as Python flavors become supported.
     if assert_implementation: # pragma: no cover
-        raise exception_controller.provide_factory( 'implementation_absence' )(
-            reflect_class_factory_per_se,
-            f"Python implementation: {python_name}" )
+        raise our_exception_controller.provide_factory(
+            'implementation_absence' )(
+                reflect_class_factory_per_se,
+                f"Python implementation: {python_name}" )
     return factory # pragma: no cover
 
 

@@ -35,7 +35,7 @@ class __( metaclass = _NamespaceClass ):
     from collections.abc import Sequence, Mapping as Dictionary
     from types import MappingProxyType as DictionaryProxy
 
-    from ._base import intercept, provide_exception_controller as excc
+    from ._base import intercept, exception_controller as excc
     from .class_factories import Class
     # 'calculate_label' needs to be imported early to prevent cycles between
     # 'Module.__getattribute__', which may raise 'AttributeError' as a normal
@@ -266,16 +266,6 @@ def create_invocation_validation_exception(
             extra_data, { 'failure class': 'invocation validation' } ) )
 
 
-# TODO? Remove.
-def create_nonexcoriable_exception_controller_exception(
-    exception_provider, controller
-):
-    ''' Creates error about non-excoriable exception controller. '''
-    label = __.calculate_label( controller )
-    return exception_provider( 'IncorrectData' )(
-        f"Impossible to excoriate exception controller from {label}." )
-
-
 def _validate_standard_arguments( invocation, exception_provider, extra_data ):
     ''' Validates standard arguments to exception factory. '''
     _validate_exception_provider( exception_provider, invocation )
@@ -287,7 +277,7 @@ def _validate_exception_provider( provider, invocation ):
     ''' Validates exception provider invocability and signature. '''
     # TODO: Validate signature.
     if callable( provider ): return provider
-    raise _provide_our_factory( 'argument_validation' )(
+    raise __.excc.provide_factory( 'argument_validation' )(
         'exception_provider', invocation, 'exception provider' )
 
 
@@ -303,8 +293,3 @@ def _inject_exception_labels( extra_data, exception_labels ):
     extra_arguments[ 'exception_labels' ] = exception_labels
     extra_arguments[ 'exception_labels' ].update( extra_data.exception_labels )
     return extra_arguments
-
-
-def _provide_our_factory( name ):
-    ''' Provides factory from package-internal exception controller. '''
-    return __.excc( ).provide_factory( name )
