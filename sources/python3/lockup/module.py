@@ -53,10 +53,10 @@ class __( metaclass = _NamespaceClass ):
 
     from types import ModuleType as Module # type: ignore
 
-    from . import _base as base, _exceptionality as exceptionality
+    from . import _base as base
     from ._base import intercept
-    from ._exceptionality import exception_controller
     from .class_factories import Class
+    from .exceptionality import our_exception_controller
     from .validators import (
         validate_attribute_existence,
         validate_attribute_name,
@@ -91,20 +91,21 @@ class Module( __.Module, metaclass = __.Class ):
         if '__dict__' == name: return dict( super( ).__getattribute__( name ) )
         try: return super( ).__getattribute__( name )
         except AttributeError as exc:
-            raise __.exception_controller.provide_factory(
+            raise __.our_exception_controller.provide_factory(
                 'attribute_nonexistence' )( name, self ) from exc
 
     @__.intercept # type: ignore
     def __setattr__( self, name, value ):
-        __.validate_attribute_name( __.exception_controller, name )
-        raise __.exception_controller.provide_factory(
+        __.validate_attribute_name( __.our_exception_controller, name )
+        raise __.our_exception_controller.provide_factory(
             'attribute_immutability' )( name, self )
 
     @__.intercept # type: ignore
     def __delattr__( self, name ):
-        __.validate_attribute_name( __.exception_controller, name )
-        __.validate_attribute_existence( __.exception_controller, name, self )
-        raise __.exception_controller.provide_factory(
+        __.validate_attribute_name( __.our_exception_controller, name )
+        __.validate_attribute_existence(
+            __.our_exception_controller, name, self )
+        raise __.our_exception_controller.provide_factory(
             'attribute_indelibility' )( name, self )
 
     @__.intercept # type: ignore
@@ -123,11 +124,12 @@ def reclassify_module( module ):
         module = modules.get( module )
     from inspect import ismodule as is_module
     if None is module or not is_module( module ):
-        raise __.exception_controller.provide_factory( 'argument_validation' )(
-            'module', reclassify_module,
-            'module or name of module in Python loaded modules dictionary' )
+        raise __.our_exception_controller.provide_factory(
+            'argument_validation' )(
+                'module', reclassify_module,
+                'module or name of module in Python loaded modules dictionary'
+        )
     module.__class__ = Module
 
 
 reclassify_module( __.base )
-reclassify_module( __.exceptionality )
