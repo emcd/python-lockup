@@ -65,9 +65,10 @@ def calculate_module_label( module, attribute_label = None ):
     ''' Produces human-comprehensible label for module. '''
     from inspect import ismodule as is_module
     if not is_module( module ):
-        from ._exceptionality import exception_controller
-        raise exception_controller.provide_factory( 'argument_validation' )(
-            'module', calculate_module_label, 'module' )
+        from .exceptionality import our_exception_controller
+        raise our_exception_controller.provide_factory(
+            'argument_validation' )(
+                'module', calculate_module_label, 'module' )
     label = f"module '{module.__name__}'"
     if None is not attribute_label: return f"{attribute_label} on {label}"
     return label
@@ -88,11 +89,10 @@ def calculate_invocable_label( invocable ):
 
         An invocable object may be a function, bound method, class,
         or invocable instance of a class. '''
-    from ._base import provide_exception_controller
+    from ._base import exception_controller
     from .validators import validate_argument_invocability
     validate_argument_invocability(
-        provide_exception_controller,
-        invocable, 'invocable',
+        exception_controller, invocable, 'invocable',
         calculate_invocable_label )
     from inspect import isclass as is_class, isroutine as is_routine
     if is_routine( invocable ): return calculate_routine_label( invocable )
@@ -107,12 +107,10 @@ def calculate_invocable_label( invocable ):
 @_intercept
 def calculate_routine_label( routine ):
     ''' Produces human-comprehensible label for routine. '''
-    from ._base import provide_exception_controller
+    from ._base import exception_controller
     from .validators import validate_argument_invocability
     validate_argument_invocability(
-        provide_exception_controller,
-        routine, 'routine',
-        calculate_routine_label )
+        exception_controller, routine, 'routine', calculate_routine_label )
     # We assume that decorations have had 'functools.wraps' applied,
     # because inspecting '__closure__' cells is guesswork that we avoid.
     qname = routine.__qualname__
@@ -137,14 +135,14 @@ def calculate_routine_label( routine ):
 @_intercept
 def calculate_attribute_label( attribute, label_base ):
     ''' Produces human-comprehensible label for attribute. '''
-    from ._base import provide_exception_controller
+    from ._base import exception_controller
     from .validators import validate_attribute_existence
     validate_attribute_existence(
-        provide_exception_controller, '__module__', attribute )
+        exception_controller, '__module__', attribute )
     validate_attribute_existence(
-        provide_exception_controller, '__name__', attribute )
+        exception_controller, '__name__', attribute )
     validate_attribute_existence(
-        provide_exception_controller, '__qualname__', attribute )
+        exception_controller, '__qualname__', attribute )
     mname = attribute.__module__
     name, qname = attribute.__name__, attribute.__qualname__
     alabel = f"{label_base} '{name}'"
@@ -160,14 +158,16 @@ def calculate_argument_label( name, signature ):
     from inspect import Signature, signature as scan_signature
     if callable( signature ): signature = scan_signature( signature )
     elif not isinstance( signature, Signature ):
-        from ._exceptionality import exception_controller
-        raise exception_controller.provide_factory( 'argument_validation' )(
-            'signature', calculate_argument_label,
-            "instance of class 'inspect.Signature'" )
+        from .exceptionality import our_exception_controller
+        raise our_exception_controller.provide_factory(
+            'argument_validation' )(
+                'signature', calculate_argument_label,
+                "instance of class 'inspect.Signature'" )
     if not isinstance( name, str ) or name not in signature.parameters:
-        from ._exceptionality import exception_controller
-        raise exception_controller.provide_factory( 'argument_validation' )(
-            'name', calculate_argument_label, 'name of valid argument' )
+        from .exceptionality import our_exception_controller
+        raise our_exception_controller.provide_factory(
+            'argument_validation' )(
+                'name', calculate_argument_label, 'name of valid argument' )
     species = signature.parameters[ name ].kind
     from inspect import Parameter as Variate
     if Variate.POSITIONAL_ONLY is species:
@@ -204,8 +204,8 @@ def module_qualify_class_name( class_ ):
         class_qname = class_[ '__qualname__' ]
         return f"{module_name}.{class_qname}"
     except ( KeyError, TypeError, ): pass
-    from ._exceptionality import exception_controller
-    raise exception_controller.provide_factory( 'argument_validation' )(
+    from .exceptionality import our_exception_controller
+    raise our_exception_controller.provide_factory( 'argument_validation' )(
         'class_', module_qualify_class_name,
         'class or class namespace dictionary' )
 

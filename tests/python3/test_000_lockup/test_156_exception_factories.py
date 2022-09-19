@@ -28,7 +28,6 @@ class __( metaclass = _NamespaceClass ):
     ''' Internal namespace. '''
 
     from lockup._base import intercept
-    from lockup._exceptionality import exception_controller
     from lockup.exceptions import (
         AbsentImplementation,
         IncorrectData,
@@ -38,6 +37,7 @@ class __( metaclass = _NamespaceClass ):
         create_argument_validation_exception,
         create_implementation_absence_exception,
     )
+    from lockup.exceptionality import our_exception_controller
 
 
 from .invocables import InvocableObject as _InvocableObject
@@ -54,8 +54,9 @@ def test_011_argument_validation_exception( ):
     def tester( argument ): return argument
     extra_data = __.ExtraData(
         nominative_arguments = dict( exception_labels = { } ) )
-    result = __.exception_controller.provide_factory( 'argument_validation' )(
-        'argument', tester, expectation, extra_data = extra_data )
+    result = __.our_exception_controller.provide_factory(
+        'argument_validation' )(
+            'argument', tester, expectation, extra_data = extra_data )
     assert isinstance( result, __.IncorrectData )
     assert expectation in str( result )
 
@@ -73,7 +74,7 @@ def test_012_argument_validation_exception_invalid_provider( provider ):
 def test_013_argument_validation_exception_invalid_invocation( invocation ):
     ''' Cannot create validation exception because of invalid invocation. '''
     with raises( __.IncorrectData ):
-        __.exception_controller.provide_factory( 'argument_validation' )(
+        __.our_exception_controller.provide_factory( 'argument_validation' )(
             'argument', invocation, 'whatever' )
 
 
@@ -82,7 +83,7 @@ def test_014_argument_validation_exception_invalid_expectation( expectation ):
     ''' Cannot create validation exception because of invalid expectation. '''
     def tester( argument ): return argument
     with raises( __.IncorrectData ):
-        __.exception_controller.provide_factory( 'argument_validation' )(
+        __.our_exception_controller.provide_factory( 'argument_validation' )(
             'argument', tester, expectation )
 
 
@@ -93,7 +94,7 @@ def test_014_argument_validation_exception_invalid_expectation( expectation ):
 def test_016_argument_validation_exceptions( trial_function ):
     ''' Validation exception with different categories of arguments. '''
     assert isinstance(
-        __.exception_controller.provide_factory( 'argument_validation' )(
+        __.our_exception_controller.provide_factory( 'argument_validation' )(
             'iterable', trial_function, 'function' ), __.IncorrectData )
 
 
@@ -101,7 +102,7 @@ def test_021_invocation_validation_exception( ):
     ''' Validation exception is created from arguments. '''
     def tester( argument ): return argument
     assert isinstance(
-        __.exception_controller.provide_factory( 'invocation_validation' )(
+        __.our_exception_controller.provide_factory( 'invocation_validation' )(
             tester, 'mismatched arguments' ), __.IncorrectData )
 
 
@@ -109,6 +110,6 @@ def test_021_invocation_validation_exception( ):
 def test_031_implementation_absence_exception( argument ):
     ''' Validation exception is created from argument. '''
     assert isinstance(
-        __.exception_controller.provide_factory( 'implementation_absence' )(
-            argument, 'something' ),
+        __.our_exception_controller.provide_factory(
+            'implementation_absence' )( argument, 'something' ),
         __.AbsentImplementation )

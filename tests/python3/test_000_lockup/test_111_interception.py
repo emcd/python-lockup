@@ -32,8 +32,10 @@ class __( metaclass = _NamespaceClass ):
 
     from lockup import exception_factories, exceptions
     from lockup._base import intercept
-    from lockup._exceptionality import exception_controller
-    from lockup.exceptionality import ExceptionController
+    from lockup.exceptionality import (
+        ExceptionController,
+        our_exception_controller,
+    )
     from lockup.interception import create_interception_decorator
     from lockup.visibility import is_public_name
 
@@ -108,7 +110,7 @@ _return_replacement_ec = __.ExceptionController(
 
 def test_011_create_interception_decorator( ):
     ''' Interception decorator receives invocable and returns invocable. '''
-    decorator = __.create_interception_decorator( __.exception_controller )
+    decorator = __.create_interception_decorator( __.our_exception_controller )
     assert callable( decorator )
 
 

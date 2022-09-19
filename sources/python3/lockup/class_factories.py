@@ -59,23 +59,23 @@ class Class( type ):
 
     @_intercept
     def __setattr__( class_, name, value ):
-        from ._exceptionality import exception_controller
+        from .exceptionality import our_exception_controller
         from .validators import validate_attribute_name
-        validate_attribute_name( exception_controller, name )
-        raise exception_controller.provide_factory( 'attribute_immutability' )(
-            name, class_ )
+        validate_attribute_name( our_exception_controller, name )
+        raise our_exception_controller.provide_factory(
+            'attribute_immutability' )( name, class_ )
 
     @_intercept
     def __delattr__( class_, name ):
-        from ._exceptionality import exception_controller
+        from .exceptionality import our_exception_controller
         from .validators import (
             validate_attribute_name,
             validate_attribute_existence,
         )
-        validate_attribute_name( exception_controller, name )
-        validate_attribute_existence( exception_controller, name, class_ )
-        raise exception_controller.provide_factory( 'attribute_indelibility' )(
-            name, class_ )
+        validate_attribute_name( our_exception_controller, name )
+        validate_attribute_existence( our_exception_controller, name, class_ )
+        raise our_exception_controller.provide_factory(
+            'attribute_indelibility' )( name, class_ )
 
     @_intercept
     def __dir__( class_ ):
@@ -103,12 +103,12 @@ class NamespaceClass( Class, metaclass = Class ):
         for aname in namespace:
             if aname in ( '__doc__', '__module__', '__qualname__', ): continue
             if _is_public_name( aname ): continue
-            from ._exceptionality import exception_controller
-            raise exception_controller.provide_factory(
+            from .exceptionality import our_exception_controller
+            raise our_exception_controller.provide_factory(
                 'class_attribute_rejection' )( aname, namespace )
         def __new__( kind, *posargs, **nomargs ): # pylint: disable=unused-argument
-            from ._exceptionality import exception_controller
-            raise exception_controller.provide_factory(
+            from .exceptionality import our_exception_controller
+            raise our_exception_controller.provide_factory(
                 'impermissible_instantiation' )( kind )
         namespace[ '__new__' ] = __new__
         return super( ).__new__( factory, name, bases, namespace )
