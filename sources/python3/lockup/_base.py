@@ -33,7 +33,6 @@ from .interception import (
 )
 
 
-# TODO: Reflect metaclass to Class.
 class LatentExceptionController:
     ''' Presents uniform interface for exception control.
 
