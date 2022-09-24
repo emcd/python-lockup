@@ -108,6 +108,17 @@ _return_replacement_ec = __.ExceptionController(
     fugitive_apprehender = _return_replacement )
 
 
+def _return_invalid_replacement( exception, invocation ):
+    ''' Apprehends fugitive exceptions at API boundary. '''
+    if isinstance( exception, tuple( _exceptions.values( ) ) ):
+        return 'propagate-at-liberty', None
+    return 'return-replacement', invocation
+
+_return_invalid_replacement_ec = __.ExceptionController(
+    factory_provider = _provide_exception_factory,
+    fugitive_apprehender = _return_invalid_replacement )
+
+
 def test_011_create_interception_decorator( ):
     ''' Interception decorator receives invocable and returns invocable. '''
     decorator = __.create_interception_decorator( __.our_exception_controller )
@@ -193,3 +204,13 @@ def test_023_intercept_and_return_replacement( ):
     @__.create_interception_decorator( _return_replacement_ec )
     def release_fugitive( ): return 1 / 0
     assert isinstance( release_fugitive( ), __.exceptions.FugitiveException )
+
+
+def test_026_intercept_and_check_invalid_replacement( ):
+    ''' Inteception decorator checks invalid propagands for fugitives. '''
+    @__.create_interception_decorator( _return_invalid_replacement_ec )
+    def release_fugitive( ): return 1 / 0
+    with raises( __.exceptions.InvalidState ): release_fugitive( )
+    try: release_fugitive( )
+    except __.exceptions.InvalidState as exc:
+        assert 'return validation' == exc.exception_labels[ 'failure class' ]
