@@ -63,15 +63,14 @@ def create_interception_decorator( exception_controller ): # pylint: disable=too
                 raise exception_controller.provide_factory(
                     'invocation_validation' )( invocation, exc ) from exc
             # Invoke function. Apprehend fugitives as necessary.
+            apprehender = exception_controller.apprehend_fugitive
             try: return invocation( *things, **sundry )
             except BaseException as exc: # pylint: disable=broad-except
-                behavior, propagand = exception_controller.apprehend_fugitive(
-                    exc, invocation )
-                # TODO: Use 'match' statement once Python 3.10 is baseline.
+                behavior, propagand = apprehender( exc, invocation )
+                # TODO? Python 3.10: Use 'match' statement.
                 if 'propagate-at-liberty' == behavior: raise
                 if 'return' == behavior: return exc
-                # TODO: Validate that propagand is exception.
-                #       Use 'our_exception_controller'.
+                _validate_propagand( propagand, apprehender )
                 if 'propagate-in-custody' == behavior: raise propagand from exc
                 if 'silence-and-except' == behavior: raise propagand from None
                 return propagand
@@ -79,6 +78,17 @@ def create_interception_decorator( exception_controller ): # pylint: disable=too
         return interception_invoker
 
     return intercept
+
+
+def _validate_propagand( propagand, apprehender ):
+    ''' Validates propagand from fugitive apprehension invocation. '''
+    if isinstance( propagand, BaseException ): return propagand
+    from ._base import exception_controller as our_exception_controller
+    from .nomenclature import calculate_class_label
+    expectation = "instance of {class_label}".format(
+        class_label = calculate_class_label( BaseException ) )
+    raise our_exception_controller.provide_factory( 'return_validation' )(
+        apprehender, expectation )
 
 
 # TODO: Take invocation argument.
