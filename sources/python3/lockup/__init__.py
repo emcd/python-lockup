@@ -47,11 +47,7 @@ from .interception import create_interception_decorator
 from .module import Module, reclassify_module
 
 
-# If Python implementation does not support class reflection,
-# we can still provide functionality without the extra protection.
-reflection.reflect_class_factory_per_se( Class, assert_implementation = False )
-
-
+# Spray the package modules with a monkey-patch-resistant coating.
 reclassify_module( class_factories )
 reclassify_module( exception_factories )
 reclassify_module( exceptionality )
