@@ -40,17 +40,35 @@ class __( metaclass = _NamespaceClass ):
     from .visibility import is_public_name
 
 
+_ec_attribute_names = ( 'apprehend_fugitive', 'provide_factory', )
+
+
 class ExceptionController( metaclass = __.Class ):
     ''' Presents uniform interface for exception control. '''
 
     def __init__( self, factory_provider, fugitive_apprehender ):
-        # TODO: Validate arguments.
         self.provide_factory = factory_provider
         self.apprehend_fugitive = fugitive_apprehender
         validate_exception_controller( self )
 
-    # TODO: Protect against attribute mutation and deletion
-    #       after initialization.
+    def __setattr__( self, name, value ):
+        # Allow assignment during initialization.
+        if name in _ec_attribute_names and not hasattr( self, name ):
+            return super( ).__setattr__( name, value )
+        from .validators import validate_attribute_name
+        validate_attribute_name( our_exception_controller, name )
+        raise our_exception_controller.provide_factory(
+            'attribute_immutability' )( name, self )
+
+    def __delattr__( self, name ):
+        from .validators import (
+            validate_attribute_name,
+            validate_attribute_existence,
+        )
+        validate_attribute_name( our_exception_controller, name )
+        validate_attribute_existence( our_exception_controller, name, self )
+        raise our_exception_controller.provide_factory(
+            'attribute_indelibility' )( name, self )
 
 
 # Cannot wildcard import 'exceptions' module into a namespace,
@@ -73,7 +91,9 @@ def our_fugitive_apprehender( exception, invocation ):
 
 def our_exception_provider( name ):
     ''' Returns exception by name. '''
-    return _our_exceptions[ name ]
+    if name in _our_exceptions: return _our_exceptions[ name ]
+    raise our_exception_controller.provide_factory( 'entry_absence' )(
+        name, _our_exceptions, 'table of available exceptions' )
 
 
 # Cannot wildcard import 'exception_factories' module into a namespace,
@@ -87,10 +107,14 @@ _our_exception_factories = __.DictionaryProxy( {
 
 def our_exception_factory_provider( name ):
     ''' Returns exception factory by name with wired-up exception provider. '''
-    # TODO: Validate presence of name in dictionary.
-    return __.partial_function(
-        _our_exception_factories[ f"create_{name}_exception" ],
-        our_exception_provider )
+    function_name = f"create_{name}_exception"
+    if function_name in _our_exception_factories:
+        return __.partial_function(
+            _our_exception_factories[ function_name ], our_exception_provider )
+    raise our_exception_controller.provide_factory( 'entry_absence' )(
+        function_name,
+        _our_exception_factories,
+        'table of available exception factories' )
 
 
 # TODO: Take an invocation argument.
@@ -98,7 +122,7 @@ def validate_exception_controller( controller ):
     ''' Validates alleged exception controller by attributes. '''
     from ._base import exception_controller
     from .validators import validate_attribute_invocability
-    for aname in ( 'apprehend_fugitive', 'provide_factory', ):
+    for aname in _ec_attribute_names:
         validate_attribute_invocability(
             exception_controller, aname, controller )
     return controller

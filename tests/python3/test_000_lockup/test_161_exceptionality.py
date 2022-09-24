@@ -28,17 +28,66 @@ from lockup import NamespaceClass as _NamespaceClass
 class __( metaclass = _NamespaceClass ):
     ''' Internal namespace. '''
 
-    from lockup import exceptions
+    from lockup import exception_factories, exceptions
     from lockup.exceptionality import (
         ExceptionController,
+        our_exception_factory_provider,
+        our_exception_provider,
+        our_fugitive_apprehender,
         validate_exception_controller,
     )
 
 
-def test_011_validate_noninvocable_attribute_exception_controller( ):
+def test_011_provide_exception_class( ):
+    ''' Can provide existent exception class. '''
+    assert (
+        __.exceptions.Exception0
+        is __.our_exception_provider( 'Exception0' ) )
+
+
+def test_012_error_on_provide_nonexistent_exception_class( ):
+    ''' Error on attempt to provide nonexistent exception class. '''
+    with raises( __.exceptions.IncorrectData ):
+        __.our_exception_provider( 123 )
+
+
+def test_021_provide_exception_factory( ):
+    ''' Can provide existent exception factory. '''
+    assert (
+        __.exception_factories.create_entry_absence_exception
+        is __.our_exception_factory_provider( 'entry_absence' ).func )
+
+
+def test_022_error_on_provide_nonexistent_exception_factory( ):
+    ''' Error on attempt to provide nonexistent exception factory. '''
+    with raises( __.exceptions.IncorrectData ):
+        __.our_exception_factory_provider( 123 )
+
+
+def test_111_validate_noninvocable_attribute_exception_controller( ):
     ''' Exception controller has illegal non-invocable attribute. '''
     with raises( __.exceptions.InvalidOperation ):
         __.validate_exception_controller( __.ExceptionController(
             factory_provider = 42,
             fugitive_apprehender = 43,
         ) )
+
+
+def test_116_validate_excc_setattr_protection( ):
+    ''' Exception controller attributes are immutable. '''
+    excc = __.ExceptionController(
+        factory_provider = __.our_exception_factory_provider,
+        fugitive_apprehender = __.our_fugitive_apprehender,
+    )
+    with raises( __.exceptions.ImpermissibleAttributeOperation ):
+        excc.apprehend_fugitive = lambda exc, inv: ( None, exc )
+
+
+def test_117_validate_excc_delattr_protection( ):
+    ''' Exception controller attributes are indelible. '''
+    excc = __.ExceptionController(
+        factory_provider = __.our_exception_factory_provider,
+        fugitive_apprehender = __.our_fugitive_apprehender,
+    )
+    with raises( __.exceptions.ImpermissibleAttributeOperation ):
+        del excc.provide_factory
