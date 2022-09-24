@@ -183,6 +183,20 @@ def create_class_attribute_rejection_exception(
 
 
 @__.intercept # type: ignore[has-type]
+def create_entry_absence_exception(
+    exception_provider, index, table, table_name, extra_data = ExtraData( ),
+):
+    ''' Creates error with context about absent table entry. '''
+    sui = create_entry_absence_exception
+    __.validate_argument_class( __.excc, table, __.Dictionary, 'table', sui )
+    __.validate_argument_class( __.excc, table_name, str, 'table_name', sui )
+    return _produce_exception(
+        exception_provider, sui, 'IncorrectData',
+        f"No entry at index {index!r} in {table_name}.",
+        extra_data )
+
+
+@__.intercept # type: ignore[has-type]
 def create_fugitive_apprehension_exception(
     exception_provider, fugitive, invocation, extra_data = ExtraData( ),
 ):
