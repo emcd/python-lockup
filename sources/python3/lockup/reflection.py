@@ -32,7 +32,7 @@
     >>> type( Class ).__name__
     'type'
     >>> import lockup.reflection
-    >>> lockup.reflection.reflect_class_factory_per_se( Class, assert_implementation = False )  # doctest: +SKIP
+    >>> lockup.reflection.reassign_class_factory( Class, Class, assert_implementation = False )  # doctest: +SKIP
     ...
     >>> type( Class ).__name__  # doctest: +SKIP
     'Class'
@@ -50,8 +50,8 @@
 # Latent Dependencies: (no cycles)
 
 
-def reflect_class_factory_per_se( factory, assert_implementation = True ):
-    ''' Turns a class factory class into the factory for itself.
+def reassign_class_factory( class_, factory, assert_implementation = True ):
+    ''' Assigns new class factory (metaclass) to class.
 
         This technique is a way to overcome the problem of infinite regress
         when a class needs behaviors that it could otherwise only get from
@@ -62,26 +62,30 @@ def reflect_class_factory_per_se( factory, assert_implementation = True ):
         if no reflector is implemented for the executing flavor of Python. '''
     from inspect import isclass as is_class
     from .exceptionality import our_exception_controller
+    if not is_class( class_ ):
+        raise our_exception_controller.provide_factory(
+            'argument_validation' )(
+                'class_', reassign_class_factory, 'class' )
     if not is_class( factory ) or not issubclass( factory, type ):
         raise our_exception_controller.provide_factory(
             'argument_validation' )(
-                'factory', reflect_class_factory_per_se, "subclass of 'type'" )
+                'factory', reassign_class_factory, "subclass of 'type'" )
     from sys import implementation as python_implementation
     python_name = python_implementation.name
     if python_name in ( # pragma: no branch
         'cpython', 'pyston',
-    ): return _reflect_cpython_class_factory_per_se( factory )
+    ): return _reassign_cpython_class_factory( class_, factory )
     # TODO: pypy
     # Note: Update corresponding tests as Python flavors become supported.
     if assert_implementation: # pragma: no cover
         raise our_exception_controller.provide_factory(
             'implementation_absence' )(
-                reflect_class_factory_per_se,
+                reassign_class_factory,
                 f"Python implementation: {python_name}" )
     return factory # pragma: no cover
 
 
-def _reflect_cpython_class_factory_per_se( factory ): # pragma: no cover
+def _reassign_cpython_class_factory( class_, factory ): # pragma: no cover
     ''' Performs pointer surgery on Python object struct. '''
     from ctypes import Structure, c_ssize_t, c_void_p
     import sys
@@ -95,13 +99,12 @@ def _reflect_cpython_class_factory_per_se( factory ): # pragma: no cover
             ( 'ob_refcnt', c_ssize_t ),
             ( 'ob_type', c_void_p )
         ) ) )
-    f_pointer = id( factory )
-    f_struct = PyObject.from_address( f_pointer )
-    f_struct.ob_type = c_void_p( f_pointer )
-    return factory
+    f_struct = PyObject.from_address( id( class_ ) )
+    f_struct.ob_type = c_void_p( id( factory ) )
+    return class_
 
 
-def _reflect_pypy_class_factory_per_se( factory ): # pragma: no cover
+def _reassign_pypy_class_factory( class_, factory ): # pragma: no cover
     ''' Performs pointer surgery and updates class cache. '''
     # TODO: Find the secret sauce to make PyPy honor the metaclass change.
     #       Need to investigate, in more detail, how type lookups work in PyPy.
@@ -120,7 +123,21 @@ def _reflect_pypy_class_factory_per_se( factory ): # pragma: no cover
     # Although there are admonitions against relying upon 'id'
     # to get the address of an object in PyPy, the class address from 'id'
     # _seems_ stable and reliable.
-    f_pointer = id( factory )
-    f_struct = PyObject.from_address( f_pointer )
-    f_struct.ob_type = c_void_p( f_pointer )
+    f_struct = PyObject.from_address( id( class_ ) )
+    f_struct.ob_type = c_void_p( id( factory ) )
     #releaseall( )
+
+
+def _reassign_class_factories( ):
+    ''' Reassigns class factories for internal classes.
+
+        If Python implementation does not support class reflection,
+        we can still provide functionality without the extra protection. '''
+    from ._base import LatentExceptionController
+    from .class_factories import Class
+    reassign_class_factory(
+        Class, Class, assert_implementation = False )
+    reassign_class_factory(
+        LatentExceptionController, Class, assert_implementation = False )
+
+_reassign_class_factories( )
