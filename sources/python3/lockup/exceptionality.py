@@ -117,14 +117,14 @@ def our_exception_factory_provider( name ):
         'table of available exception factories' )
 
 
-# TODO: Take an invocation argument.
-def validate_exception_controller( controller ):
+def validate_exception_controller( controller, extra_context = None ):
     ''' Validates alleged exception controller by attributes. '''
     from ._base import exception_controller
     from .validators import validate_attribute_invocability
     for aname in _ec_attribute_names:
         validate_attribute_invocability(
-            exception_controller, aname, controller )
+            exception_controller, aname, controller,
+            extra_context = extra_context )
     return controller
 
 
