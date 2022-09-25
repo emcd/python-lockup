@@ -25,7 +25,7 @@
 #   class_factories -> _base
 #   class_factories -> visibility
 # Latent Dependencies:
-#   class_factories -> exception_factories -> exceptions -> class_factories
+#   class_factories -> exceptionality -> class_factories
 # pylint: disable=cyclic-import
 
 
@@ -48,8 +48,6 @@ class Class( type ):
            Only class attributes are immutable. Instances of immutable classes
            will have mutable attributes without additional intervention beyond
            the scope of this package. '''
-
-    __module__ = _package_name
 
     __slots__ = ( )
 
@@ -96,8 +94,6 @@ class NamespaceClass( Class, metaclass = Class ):
            attribute errors when accessed. However, these are a fairly rare
            case and are probably not needed on namespaces, in general. '''
 
-    __module__ = _package_name
-
     @_intercept
     def __new__( factory, name, bases, namespace ):
         for aname in namespace:
@@ -133,3 +129,27 @@ def create_namespace( **nomargs ):
         '__module__': _package_name, '__qualname__': 'Namespace' }
     namespace.update( nomargs )
     return NamespaceClass( 'Namespace', ( ), namespace )
+
+
+def _reassign_class_factories( ):
+    ''' Reassigns class factories for internal classes.
+
+        If Python implementation does not support class reflection,
+        we can still provide functionality without the extra protection. '''
+    from inspect import isclass as is_class
+    from . import exceptions
+    from ._base import LatentExceptionController
+    from .reflection import reassign_class_factory
+    reassign_class_factory(
+        Class, Class, assert_implementation = False )
+    for aname in dir( exceptions ):
+        attribute = getattr( exceptions, aname )
+        if not is_class( attribute ): continue
+        if not issubclass( attribute, BaseException ): # pragma: no cover
+            continue
+        reassign_class_factory(
+            attribute, Class, assert_implementation = False )
+    reassign_class_factory(
+        LatentExceptionController, Class, assert_implementation = False )
+
+_reassign_class_factories( )
