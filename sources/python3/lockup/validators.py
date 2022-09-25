@@ -56,21 +56,28 @@ def validate_attribute_name( exception_controller, name ):
         'attribute_name_illegality' )( name )
 
 
-def validate_attribute_existence( exception_controller, name, object_ ):
+def validate_attribute_existence(
+    exception_controller, name, object_, extra_context = None
+):
     ''' Validates attribute existence on object. '''
     if hasattr( object_, name ): return name
     raise _validate_excc( exception_controller ).provide_factory(
-        'attribute_nonexistence' )( name, object_ )
+        'attribute_nonexistence' )(
+            name, object_, extra_context = extra_context )
 
 
-def validate_attribute_invocability( exception_controller, name, object_ ):
+def validate_attribute_invocability(
+    exception_controller, name, object_, extra_context = None
+):
     ''' Validates attribute invocability on object.
 
         Implies attribute existence validation. '''
-    validate_attribute_existence( exception_controller, name, object_ )
+    validate_attribute_existence(
+        exception_controller, name, object_, extra_context = extra_context )
     if callable( getattr( object_, name ) ): return name
     raise _validate_excc( exception_controller ).provide_factory(
-        'attribute_noninvocability' )( name, object_ )
+        'attribute_noninvocability' )(
+            name, object_, extra_context = extra_context )
 
 
 def _validate_excc( controller ):

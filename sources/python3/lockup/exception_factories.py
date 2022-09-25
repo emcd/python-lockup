@@ -142,12 +142,17 @@ def create_attribute_name_illegality_exception(
 
 @__.intercept # type: ignore[has-type]
 def create_attribute_nonexistence_exception(
-    exception_provider, name, object_, extra_data = ExtraData( ),
+    exception_provider, name, object_,
+    extra_context = None, extra_data = ExtraData( ),
 ):
     ''' Creates error with context about nonexistent attribute. '''
     sui = create_attribute_nonexistence_exception
     __.validate_argument_class( __.excc, name, str, 'name', sui )
     label = __.calculate_label( object_, f"attribute '{name}'" )
+    if extra_context:
+        __.validate_argument_class(
+            __.excc, extra_context, str, 'extra_context', sui )
+        label = f"{label} {extra_context}"
     return _produce_exception(
         exception_provider, sui, 'InaccessibleAttribute',
         f"Attempt to access nonexistent {label}.",
@@ -156,12 +161,17 @@ def create_attribute_nonexistence_exception(
 
 @__.intercept # type: ignore[has-type]
 def create_attribute_noninvocability_exception(
-    exception_provider, name, object_, extra_data = ExtraData( ),
+    exception_provider, name, object_,
+    extra_context = None, extra_data = ExtraData( ),
 ):
     ''' Creates error with context about noninvocable attribute. '''
     sui = create_attribute_noninvocability_exception
     __.validate_argument_class( __.excc, name, str, 'name', sui )
     label = __.calculate_label( object_, f"attribute '{name}'" )
+    if extra_context:
+        __.validate_argument_class(
+            __.excc, extra_context, str, 'extra_context', sui )
+        label = f"{label} {extra_context}"
     return _produce_exception(
         exception_provider, sui, 'InvalidOperation',
         f"Attempt to invoke noninvocable {label}.",
@@ -296,8 +306,12 @@ def _validate_standard_arguments( invocation, exception_provider, extra_data ):
 
 def _validate_exception_provider( provider, invocation ):
     ''' Validates exception provider invocability and signature. '''
-    # TODO: Validate signature.
-    if callable( provider ): return provider
+    valid = callable( provider )
+    if valid:
+        from inspect import signature as scan_signature
+        signature = scan_signature( provider )
+        valid = 1 == len( signature.parameters )
+    if valid: return provider
     raise __.excc.provide_factory( 'argument_validation' )(
         'exception_provider', invocation, 'exception provider' )
 

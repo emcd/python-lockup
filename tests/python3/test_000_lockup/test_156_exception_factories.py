@@ -31,6 +31,7 @@ class __( metaclass = _NamespaceClass ):
     from lockup.exceptions import (
         AbsentImplementation,
         IncorrectData,
+        InvalidOperation,
     )
     from lockup.exception_factories import (
         ExtraData,
@@ -98,7 +99,20 @@ def test_016_argument_validation_exceptions( trial_function ):
             'iterable', trial_function, 'function' ), __.IncorrectData )
 
 
-def test_021_invocation_validation_exception( ):
+def test_021_attribute_noninvocability_exception( ):
+    ''' Validation exception is created from arguments. '''
+    class Object: ''' Trivial test class. '''
+    object_ = Object( )
+    object_.attribute = 1 # pylint: disable=attribute-defined-outside-init
+    tracer = 'ph00b4r' * 5
+    result = __.our_exception_controller.provide_factory(
+        'attribute_noninvocability' )(
+            'attribute', object_, extra_context = tracer )
+    assert isinstance( result, __.InvalidOperation )
+    assert tracer in str( result )
+
+
+def test_031_invocation_validation_exception( ):
     ''' Validation exception is created from arguments. '''
     def tester( argument ): return argument
     assert isinstance(
@@ -107,7 +121,7 @@ def test_021_invocation_validation_exception( ):
 
 
 @mark.parametrize( 'argument', _invocables )
-def test_031_implementation_absence_exception( argument ):
+def test_041_implementation_absence_exception( argument ):
     ''' Validation exception is created from argument. '''
     assert isinstance(
         __.our_exception_controller.provide_factory(
