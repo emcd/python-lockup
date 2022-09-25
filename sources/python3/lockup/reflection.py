@@ -101,6 +101,7 @@ def _reassign_cpython_class_factory( class_, factory ): # pragma: no cover
         ) ) )
     f_struct = PyObject.from_address( id( class_ ) )
     f_struct.ob_type = c_void_p( id( factory ) )
+    # TODO? Increment reference count on factory.
     return class_
 
 
@@ -125,19 +126,5 @@ def _reassign_pypy_class_factory( class_, factory ): # pragma: no cover
     # _seems_ stable and reliable.
     f_struct = PyObject.from_address( id( class_ ) )
     f_struct.ob_type = c_void_p( id( factory ) )
+    # TODO? Increment reference count on factory.
     #releaseall( )
-
-
-def _reassign_class_factories( ):
-    ''' Reassigns class factories for internal classes.
-
-        If Python implementation does not support class reflection,
-        we can still provide functionality without the extra protection. '''
-    from ._base import LatentExceptionController
-    from .class_factories import Class
-    reassign_class_factory(
-        Class, Class, assert_implementation = False )
-    reassign_class_factory(
-        LatentExceptionController, Class, assert_implementation = False )
-
-_reassign_class_factories( )

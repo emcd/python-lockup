@@ -49,17 +49,13 @@
 
 # Initialization Dependencies:
 #   exceptions -> _base
-#   exceptions -> class_factories
-# Latent Dependencies:
-#   exceptions -> class_factories -> exceptions
-# pylint: disable=cyclic-import
+# Latent Dependencies: (no cycles)
 
 
 # pylint: disable=too-many-ancestors
 
 
-from .class_factories import Class as _Class
-class Exception0( BaseException, metaclass = _Class ):
+class Exception0( BaseException ):
     ''' Base for all exceptions in the package. '''
 
     def __init__( self, *posargs, exception_labels = None, **nomargs ):
@@ -72,6 +68,8 @@ class Exception0( BaseException, metaclass = _Class ):
         super( ).__init__( *posargs, **nomargs )
 
     # TODO: __repr__ which includes exception labels
+
+    # TODO: Attribute protection.
 
 
 #------------------------------ Object Interface -----------------------------#

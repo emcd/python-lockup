@@ -244,7 +244,7 @@ Now, let us compare those behaviors to an immutable namespace:
     >>> ns.run( )
     42
     >>> type( ns )
-    <class 'lockup.NamespaceClass'>
+    <class 'lockup.class_factories.NamespaceClass'>
     >>> ns.__dict__
     mappingproxy({...})
     >>> type( ns.run )
