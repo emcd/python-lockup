@@ -86,7 +86,7 @@ def reassign_class_factory( class_, factory, assert_implementation = True ):
 
 
 def _reassign_cpython_class_factory( class_, factory ): # pragma: no cover
-    ''' Performs pointer surgery on Python object struct. '''
+    ''' CPython et al.: Assigns new class factory to class. '''
     from ctypes import Structure, c_ssize_t, c_void_p
     import sys
     # Detect if compiled with the 'TRACE_REFS' macro.
@@ -99,16 +99,12 @@ def _reassign_cpython_class_factory( class_, factory ): # pragma: no cover
             ( 'ob_refcnt', c_ssize_t ),
             ( 'ob_type', c_void_p )
         ) ) )
-    f_pointer = id( factory )
-    o_struct = PyObject.from_address( id( class_ ) )
-    o_struct.ob_type = c_void_p( f_pointer )
-    f_struct = PyObject.from_address( f_pointer )
-    f_struct.ob_refcnt += 1 # pylint: disable=no-member
+    _perform_c_struct_surgery( PyObject, class_, factory )
     return class_
 
 
 def _reassign_pypy_class_factory( class_, factory ): # pragma: no cover
-    ''' Performs pointer surgery and updates class cache. '''
+    ''' PyPy: Assigns new class factory to class. '''
     # TODO: Find the secret sauce to make PyPy honor the metaclass change.
     #       Need to investigate, in more detail, how type lookups work in PyPy.
     #       Possible code of interest:
@@ -118,18 +114,27 @@ def _reassign_pypy_class_factory( class_, factory ): # pragma: no cover
     #releaseall( )
     class PyObject( Structure ):
         ''' Structural representation of :c:struct:`PyObject`. '''
-        _fields_ = tuple( (
+        _fields_ = (
             ( 'ob_refcnt', c_ssize_t ),
             ( 'ob_pypy_link', c_ssize_t ),
             ( 'ob_type', c_void_p )
-        ) )
+        )
     # Although there are admonitions against relying upon 'id'
     # to get the address of an object in PyPy, the class address from 'id'
     # _seems_ stable and reliable.
-    f_pointer = id( factory )
-    o_struct = PyObject.from_address( id( class_ ) )
-    o_struct.ob_type = c_void_p( f_pointer )
-    f_struct = PyObject.from_address( f_pointer )
-    f_struct.ob_refcnt += 1 # pylint: disable=no-member
+    _perform_c_struct_surgery( PyObject, class_, factory )
     #releaseall( )
     return class_
+
+
+def _perform_c_struct_surgery( struct_class, class_, factory ):
+    ''' Performs pointer and refernece count surgery on C structs. '''
+    from ctypes import c_void_p
+    nf_pointer = id( factory )
+    o_struct = struct_class.from_address( id( class_ ) )
+    of_pointer = o_struct.ob_type
+    o_struct.ob_type = c_void_p( nf_pointer )
+    nf_struct = struct_class.from_address( nf_pointer )
+    nf_struct.ob_refcnt += 1 # pylint: disable=no-member
+    of_struct = struct_class.from_address( of_pointer )
+    of_struct.ob_refcnt -= 1 # pylint: disable=no-member
