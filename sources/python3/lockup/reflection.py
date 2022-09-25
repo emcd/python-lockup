@@ -99,9 +99,11 @@ def _reassign_cpython_class_factory( class_, factory ): # pragma: no cover
             ( 'ob_refcnt', c_ssize_t ),
             ( 'ob_type', c_void_p )
         ) ) )
-    f_struct = PyObject.from_address( id( class_ ) )
-    f_struct.ob_type = c_void_p( id( factory ) )
-    # TODO? Increment reference count on factory.
+    f_pointer = id( factory )
+    o_struct = PyObject.from_address( id( class_ ) )
+    o_struct.ob_type = c_void_p( f_pointer )
+    f_struct = PyObject.from_address( f_pointer )
+    f_struct.ob_refcnt += 1 # pylint: disable=no-member
     return class_
 
 
@@ -124,7 +126,10 @@ def _reassign_pypy_class_factory( class_, factory ): # pragma: no cover
     # Although there are admonitions against relying upon 'id'
     # to get the address of an object in PyPy, the class address from 'id'
     # _seems_ stable and reliable.
-    f_struct = PyObject.from_address( id( class_ ) )
-    f_struct.ob_type = c_void_p( id( factory ) )
-    # TODO? Increment reference count on factory.
+    f_pointer = id( factory )
+    o_struct = PyObject.from_address( id( class_ ) )
+    o_struct.ob_type = c_void_p( f_pointer )
+    f_struct = PyObject.from_address( f_pointer )
+    f_struct.ob_refcnt += 1 # pylint: disable=no-member
     #releaseall( )
+    return class_
