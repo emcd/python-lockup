@@ -41,7 +41,8 @@ def create_interception_decorator( exception_controller ): # pylint: disable=too
         boundary. A list of permissible exceptions is consulted to determine
         whether an exception is permissible, and thus allowed to propagate
         freely, or if it is a fugitive. '''
-    _validate_exception_controller( exception_controller )
+    _validate_exception_controller(
+        exception_controller, create_interception_decorator )
 
     def intercept( invocation ):
         ''' Decorates function to intercept fugitive exceptions. '''
@@ -91,8 +92,7 @@ def _validate_propagand( propagand, apprehender ):
         apprehender, expectation )
 
 
-# TODO: Take invocation argument.
-def _validate_exception_controller( controller ):
+def _validate_exception_controller( controller, invocation ):
     ''' Validates alleged exception controller.
 
         Gives a free pass if it is the early internal exception controller.
@@ -100,4 +100,8 @@ def _validate_exception_controller( controller ):
     from ._base import exception_controller as our_exception_controller
     if controller is our_exception_controller: return controller
     from .exceptionality import validate_exception_controller
-    return validate_exception_controller( controller )
+    from .nomenclature import calculate_argument_label
+    argument_label = calculate_argument_label(
+        'exception_controller', invocation )
+    return validate_exception_controller(
+        controller, extra_context = f"as {argument_label}" )
