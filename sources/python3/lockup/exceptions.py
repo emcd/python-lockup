@@ -47,11 +47,6 @@
     ''' # pylint: disable=line-too-long
 
 
-# Initialization Dependencies:
-#   exceptions -> _base
-# Latent Dependencies: (no cycles)
-
-
 # pylint: disable=too-many-ancestors
 
 

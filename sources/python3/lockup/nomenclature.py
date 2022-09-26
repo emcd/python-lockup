@@ -21,18 +21,28 @@
 ''' Nomenclatural utilities. '''
 
 
-# Initialization Dependencies:
-#   nomenclature -> _base
+# Initialization Dependencies: (none)
 # Latent Dependencies:
 #   nomenclature -> exception_factories -> nomenclature
-#   nomenclature -> validators -> nomenclature
 # pylint: disable=cyclic-import
 
 
-from ._base import intercept as _intercept
+# TODO: Use imported function. Temporary implementation.
+def _provide_exception( name ):
+    ''' Provides package-internal exception. '''
+    from . import exceptions
+    return getattr( exceptions, name )
+
+# TODO: Use imported function. Temporary implementation.
+def _provide_exception_factory( name ):
+    ''' Provides package-internal exception factory. '''
+    from functools import partial as partial_function
+    from . import exception_factories
+    return partial_function(
+        getattr( exception_factories, f"create_{name}_exception" ),
+        _provide_exception )
 
 
-@_intercept
 def calculate_label( object_, attribute_label = None ):
     ''' Produces human-comprehensible label, based on classification. '''
     from inspect import isclass as is_class, ismodule as is_module
@@ -43,7 +53,6 @@ def calculate_label( object_, attribute_label = None ):
     return calculate_instance_label( object_, attribute_label )
 
 
-@_intercept
 def calculate_class_label( classes, attribute_label = None ):
     ''' Produces human-comprehensible label for class or tuple of classes.
 
@@ -56,44 +65,46 @@ def calculate_class_label( classes, attribute_label = None ):
     label = ' or '.join( map(
         lambda class_: "class '{}'".format(
             module_qualify_class_name( class_ ) ), classes ) )
-    if None is not attribute_label: return f"{attribute_label} on {label}"
-    return label
+    if not attribute_label: return label
+    if not isinstance( attribute_label, str ):
+        raise _provide_exception_factory( 'argument_validation' )(
+            'attribute_label', calculate_class_label, 'string' )
+    return f"{attribute_label} on {label}"
 
 
-@_intercept
 def calculate_module_label( module, attribute_label = None ):
     ''' Produces human-comprehensible label for module. '''
     from inspect import ismodule as is_module
     if not is_module( module ):
-        from .exceptionality import our_exception_controller
-        raise our_exception_controller.provide_factory(
-            'argument_validation' )(
-                'module', calculate_module_label, 'module' )
+        raise _provide_exception_factory( 'argument_validation' )(
+            'module', calculate_module_label, 'module' )
     label = f"module '{module.__name__}'"
-    if None is not attribute_label: return f"{attribute_label} on {label}"
-    return label
+    if not attribute_label: return label
+    if not isinstance( attribute_label, str ):
+        raise _provide_exception_factory( 'argument_validation' )(
+            'attribute_label', calculate_module_label, 'string' )
+    return f"{attribute_label} on {label}"
 
 
-@_intercept
 def calculate_instance_label( object_, attribute_label = None ):
     ''' Produces human-comprehensible label for instance of class. '''
     class_mqname = module_qualify_class_name( type( object_ ) )
     label = f"instance of class '{class_mqname}'"
-    if None is not attribute_label: return f"{attribute_label} on {label}"
-    return label
+    if not attribute_label: return label
+    if not isinstance( attribute_label, str ):
+        raise _provide_exception_factory( 'argument_validation' )(
+            'attribute_label', calculate_instance_label, 'string' )
+    return f"{attribute_label} on {label}"
 
 
-@_intercept
 def calculate_invocable_label( invocable ):
     ''' Produces human-comprehensible label for invocable object.
 
         An invocable object may be a function, bound method, class,
         or invocable instance of a class. '''
-    from ._base import exception_controller
-    from .validators import validate_argument_invocability
-    validate_argument_invocability(
-        exception_controller, invocable, 'invocable',
-        calculate_invocable_label )
+    if not callable( invocable ):
+        raise _provide_exception_factory( 'argument_validation' )(
+            'invocable', calculate_invocable_label, 'invocable object' )
     from inspect import isclass as is_class, isroutine as is_routine
     if is_routine( invocable ): return calculate_routine_label( invocable )
     if is_class( invocable ): return calculate_class_label( invocable )
@@ -104,13 +115,19 @@ def calculate_invocable_label( invocable ):
         invocable, 'invocable attribute' ) # pragma: no cover
 
 
-@_intercept
 def calculate_routine_label( routine ):
     ''' Produces human-comprehensible label for routine. '''
-    from ._base import exception_controller
-    from .validators import validate_argument_invocability
-    validate_argument_invocability(
-        exception_controller, routine, 'routine', calculate_routine_label )
+    if not callable( routine ):
+        raise _provide_exception_factory( 'argument_validation' )(
+            'routine', calculate_routine_label, 'routine' )
+    argument_label = calculate_argument_label(
+        'routine', calculate_routine_label )
+    if not hasattr( routine, '__module__' ): # pragma: no cover
+        raise _provide_exception_factory( 'attribute_nonexistence' )(
+            '__module__', routine, extra_context = argument_label )
+    if not hasattr( routine, '__name__' ): # pragma: no cover
+        raise _provide_exception_factory( 'attribute_nonexistence' )(
+            '__name__', routine, extra_context = argument_label )
     # We assume that decorations have had 'functools.wraps' applied,
     # because inspecting '__closure__' cells is guesswork that we avoid.
     qname = routine.__qualname__
@@ -132,17 +149,22 @@ def calculate_routine_label( routine ):
     return attribute_label
 
 
-@_intercept
 def calculate_attribute_label( attribute, label_base ):
     ''' Produces human-comprehensible label for attribute. '''
-    from ._base import exception_controller
-    from .validators import validate_attribute_existence
-    validate_attribute_existence(
-        exception_controller, '__module__', attribute )
-    validate_attribute_existence(
-        exception_controller, '__name__', attribute )
-    validate_attribute_existence(
-        exception_controller, '__qualname__', attribute )
+    argument_label = calculate_argument_label(
+        'attribute', calculate_attribute_label )
+    if not hasattr( attribute, '__module__' ): # pragma: no cover
+        raise _provide_exception_factory( 'attribute_nonexistence' )(
+            '__module__', attribute, extra_context = argument_label )
+    if not hasattr( attribute, '__name__' ): # pragma: no cover
+        raise _provide_exception_factory( 'attribute_nonexistence' )(
+            '__name__', attribute, extra_context = argument_label )
+    if not hasattr( attribute, '__qualname__' ): # pragma: no cover
+        raise _provide_exception_factory( 'attribute_nonexistence' )(
+            '__qualname__', attribute, extra_context = argument_label )
+    if not isinstance( label_base, str ):
+        raise _provide_exception_factory( 'argument_validation' )(
+            'label_base', calculate_attribute_label, 'string' )
     mname = attribute.__module__
     name, qname = attribute.__name__, attribute.__qualname__
     alabel = f"{label_base} '{name}'"
@@ -152,22 +174,17 @@ def calculate_attribute_label( attribute, label_base ):
         class_qname = qname.rsplit( '.', maxsplit = 1 )[ 0 ] )
 
 
-@_intercept
 def calculate_argument_label( name, signature ):
     ''' Produces human-comprehensible label for argument. '''
     from inspect import Signature, signature as scan_signature
     if callable( signature ): signature = scan_signature( signature )
     elif not isinstance( signature, Signature ):
-        from .exceptionality import our_exception_controller
-        raise our_exception_controller.provide_factory(
-            'argument_validation' )(
-                'signature', calculate_argument_label,
-                "instance of class 'inspect.Signature'" )
+        raise _provide_exception_factory( 'argument_validation' )(
+            'signature', calculate_argument_label,
+            "instance of class 'inspect.Signature' or invocable object" )
     if not isinstance( name, str ) or name not in signature.parameters:
-        from .exceptionality import our_exception_controller
-        raise our_exception_controller.provide_factory(
-            'argument_validation' )(
-                'name', calculate_argument_label, 'name of valid argument' )
+        raise _provide_exception_factory( 'argument_validation' )(
+            'name', calculate_argument_label, 'name of valid argument' )
     species = signature.parameters[ name ].kind
     from inspect import Parameter as Variate
     if Variate.POSITIONAL_ONLY is species:
@@ -183,7 +200,7 @@ def calculate_argument_label( name, signature ):
     if Variate.VAR_KEYWORD is species:
         return f"dictionary of extra nominative arguments '{name}'"
     from .exceptions import InvalidState # pragma: no cover
-    raise InvalidState
+    raise InvalidState # TODO: Use factory here.
 
 def _locate_argument_position( name, signature ):
     ''' Locates position of argument in signature of invocable. '''
@@ -192,7 +209,6 @@ def _locate_argument_position( name, signature ):
         in enumerate( signature.parameters ) if name_ == name )
 
 
-@_intercept
 def module_qualify_class_name( class_ ):
     ''' Concatenates module name and qualified name of class.
 
@@ -204,8 +220,7 @@ def module_qualify_class_name( class_ ):
         class_qname = class_[ '__qualname__' ]
         return f"{module_name}.{class_qname}"
     except ( KeyError, TypeError, ): pass
-    from .exceptionality import our_exception_controller
-    raise our_exception_controller.provide_factory( 'argument_validation' )(
+    raise _provide_exception_factory( 'argument_validation' )(
         'class_', module_qualify_class_name,
         'class or class namespace dictionary' )
 
