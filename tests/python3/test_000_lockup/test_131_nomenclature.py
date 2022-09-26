@@ -35,10 +35,13 @@ class __( metaclass = _NamespaceClass ):
     from lockup.exceptions import IncorrectData
     from lockup.nomenclature import (
         calculate_argument_label,
+        calculate_attribute_label,
         calculate_class_label,
+        calculate_instance_label,
         calculate_invocable_label,
         calculate_label,
         calculate_module_label,
+        calculate_routine_label,
         module_qualify_class_name,
     )
 
@@ -83,11 +86,6 @@ def test_021_calculate_label( object_, expectation ):
     assert expectation == __.calculate_label( object_ )
 
 
-def test_022_calculate_label_on_invalid_module( ):
-    ''' Invalid module raises exception for label calculation. '''
-    with raises( __.IncorrectData ): __.calculate_module_label( 123 )
-
-
 def test_031_calculate_class_label( ):
     ''' Calculate correct label for class object. '''
     assert ( f"class '{_invocables.__name__}.InvocableObject'"
@@ -119,6 +117,44 @@ def test_034_calculate_class_attribute_label( ):
             _InvocableObject, "function 'a_method'" ) )
 
 
+def test_036_error_calculate_invalid_class_attribute_label( ):
+    ''' Error on invalid attribute label for class. '''
+    with raises( __.IncorrectData ):
+        __.calculate_class_label( _InvocableObject, 123 )
+
+
+def test_041_calculate_module_label( ):
+    ''' Calculate correct label for module. '''
+    import lockup
+    assert f"module 'lockup'" == __.calculate_module_label( lockup )
+
+
+def test_046_error_invalid_module( ):
+    ''' Error on invalid module for label calculation. '''
+    with raises( __.IncorrectData ):
+        __.calculate_module_label( 123 )
+
+
+def test_047_error_calculate_invalid_module_attribute_label( ):
+    ''' Error on invalid attribute label for module. '''
+    import lockup
+    with raises( __.IncorrectData ):
+        __.calculate_module_label( lockup, 123 )
+
+
+def test_051_calculate_instance_label( ):
+    ''' Calculate correct label for instance of class. '''
+    assert (
+        f"instance of class '{_invocables.__name__}.InvocableObject'"
+        == __.calculate_instance_label( _invocable_object ) )
+
+
+def test_056_error_calculate_invalid_instance_attribute_label( ):
+    ''' Error on invalid attribute label for instance of class. '''
+    with raises( __.IncorrectData ):
+        __.calculate_instance_label( _invocable_object, 123 )
+
+
 @mark.parametrize(
     'invocable, expectation',
     (
@@ -148,9 +184,27 @@ def test_034_calculate_class_attribute_label( ):
         ( sorted, "builtin function 'sorted' on module 'builtins'" ),
     )
 )
-def test_041_calculate_invocable_label( invocable, expectation ):
+def test_061_calculate_invocable_label( invocable, expectation ):
     ''' Calculate correct label for invocable object. '''
     assert expectation == __.calculate_invocable_label( invocable )
+
+
+def test_066_error_invalid_invocable( ):
+    ''' Error on invalid invocable for label calculation. '''
+    with raises( __.IncorrectData ):
+        __.calculate_invocable_label( 123 )
+
+
+def test_076_error_invalid_routine( ):
+    ''' Error on invalid routine for label calculation. '''
+    with raises( __.IncorrectData ):
+        __.calculate_routine_label( 123 )
+
+
+def test_086_error_invalid_attribute_label_base( ):
+    ''' Error on invalid label base for attribute label calculation. '''
+    with raises( __.IncorrectData ):
+        __.calculate_attribute_label( _InvocableObject, 123 )
 
 
 @mark.parametrize(
@@ -165,25 +219,25 @@ def test_041_calculate_invocable_label( invocable, expectation ):
           "dictionary of extra nominative arguments 'foo'" ),
     )
 )
-def test_051_calculate_argument_label( invocable, expectation ):
+def test_091_calculate_argument_label( invocable, expectation ):
     ''' Calculate correct argument label for invocation signature. '''
     signature = __.scan_signature( invocable )
     assert expectation == __.calculate_argument_label( 'foo', signature )
 
 @mark.parametrize( 'name', ( 123, 'ph00b4r' * 5 ) )
-def test_052_calculate_argument_label_with_invalid_name( name ):
+def test_092_calculate_argument_label_with_invalid_name( name ):
     ''' Error on attempt to calculate argument label for invalid name. '''
     signature = __.scan_signature( lambda foo: None )
     with raises( __.IncorrectData ):
         __.calculate_argument_label( name, signature )
 
-def test_053_calculate_argument_label_with_nonexistent_name( ):
+def test_093_calculate_argument_label_with_nonexistent_name( ):
     ''' Error on attempt to calculate argument label for nonexistent name. '''
     signature = __.scan_signature( lambda foo: None )
     with raises( __.IncorrectData ):
         __.calculate_argument_label( 'bar', signature )
 
-def test_054_calculate_argument_label_with_invalid_signature( ):
+def test_094_calculate_argument_label_with_invalid_signature( ):
     ''' Error on attempt to calculate argument label for invalid signature. '''
     with raises( __.IncorrectData ):
         __.calculate_argument_label( 'bar', None )
