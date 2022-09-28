@@ -32,7 +32,6 @@ __version__ = '2.0a202209250051'
 from . import (
     class_factories,
     exception_factories,
-    exceptionality,
     exceptions,
     interception,
     module,
@@ -42,7 +41,6 @@ from . import (
     visibility,
 )
 from .class_factories import Class, NamespaceClass, create_namespace
-from .exceptionality import ExceptionController
 from .interception import create_interception_decorator
 from .module import Module, reclassify_module
 
@@ -50,7 +48,6 @@ from .module import Module, reclassify_module
 # Spray the package modules with a monkey-patch-resistant coating.
 reclassify_module( class_factories )
 reclassify_module( exception_factories )
-reclassify_module( exceptionality )
 reclassify_module( exceptions )
 reclassify_module( interception )
 reclassify_module( module )

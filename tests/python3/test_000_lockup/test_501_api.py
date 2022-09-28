@@ -34,14 +34,12 @@ def test_101_ensure_public_attributes( ):
     ''' Only expected public attributes are presented. '''
     expected_attributes = (
         'Class',
-        'ExceptionController',
         'Module',
         'NamespaceClass',
         'class_factories',
         'create_interception_decorator',
         'create_namespace',
         'exception_factories',
-        'exceptionality',
         'exceptions',
         'interception',
         'module',
@@ -59,7 +57,6 @@ def test_101_ensure_public_attributes( ):
     (
         'class_factories',
         'exception_factories',
-        'exceptionality',
         'exceptions',
         'interception',
         'module',
