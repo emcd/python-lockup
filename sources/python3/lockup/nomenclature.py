@@ -21,26 +21,15 @@
 ''' Nomenclatural utilities. '''
 
 
-# Initialization Dependencies: (none)
 # Latent Dependencies:
 #   nomenclature -> exception_factories -> nomenclature
 # pylint: disable=cyclic-import
 
 
-# TODO: Use imported function. Temporary implementation.
-def _provide_exception( name ):
-    ''' Provides package-internal exception. '''
-    from . import exceptions
-    return getattr( exceptions, name )
-
-# TODO: Use imported function. Temporary implementation.
 def _provide_exception_factory( name ):
     ''' Provides package-internal exception factory. '''
-    from functools import partial as partial_function
-    from . import exception_factories
-    return partial_function(
-        getattr( exception_factories, f"create_{name}_exception" ),
-        _provide_exception )
+    from .exception_factories import our_exception_factory_provider
+    return our_exception_factory_provider( name )
 
 
 def calculate_label( object_, attribute_label = None ):

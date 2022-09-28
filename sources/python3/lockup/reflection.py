@@ -61,15 +61,13 @@ def reassign_class_factory( class_, factory, assert_implementation = True ):
         If ``assert_implementation`` is true, then an exception will be raised
         if no reflector is implemented for the executing flavor of Python. '''
     from inspect import isclass as is_class
-    from .exceptionality import our_exception_controller
+    from .exception_factories import our_exception_factory_provider
     if not is_class( class_ ):
-        raise our_exception_controller.provide_factory(
-            'argument_validation' )(
-                'class_', reassign_class_factory, 'class' )
+        raise our_exception_factory_provider( 'argument_validation' )(
+            'class_', reassign_class_factory, 'class' )
     if not is_class( factory ) or not issubclass( factory, type ):
-        raise our_exception_controller.provide_factory(
-            'argument_validation' )(
-                'factory', reassign_class_factory, "subclass of 'type'" )
+        raise our_exception_factory_provider( 'argument_validation' )(
+            'factory', reassign_class_factory, "subclass of 'type'" )
     from sys import implementation as python_implementation
     python_name = python_implementation.name
     if python_name in ( # pragma: no branch
@@ -78,10 +76,8 @@ def reassign_class_factory( class_, factory, assert_implementation = True ):
     # TODO: pypy
     # Note: Update corresponding tests as Python flavors become supported.
     if assert_implementation: # pragma: no cover
-        raise our_exception_controller.provide_factory(
-            'implementation_absence' )(
-                reassign_class_factory,
-                f"Python implementation: {python_name}" )
+        raise our_exception_factory_provider( 'implementation_absence' )(
+            reassign_class_factory, f"Python implementation: {python_name}" )
     return factory # pragma: no cover
 
 

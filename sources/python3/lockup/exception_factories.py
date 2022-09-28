@@ -22,74 +22,94 @@
 
 
 # Initialization Dependencies:
-#   exception_factories -> _base
 #   exception_factories -> nomenclature
 #   exception_factories -> validators
 # Latent Dependencies: (no cycles)
 
 
-from .class_factories import NamespaceClass as _NamespaceClass
-class __( metaclass = _NamespaceClass ):
-    ''' Internal namespace. '''
-
-    from collections.abc import Sequence, Mapping as Dictionary
-    from types import MappingProxyType as DictionaryProxy
-
-    from ._base import intercept, exception_controller as excc
-    from .class_factories import Class
-    # 'calculate_label' needs to be imported early to prevent cycles between
-    # 'Module.__getattribute__', which may raise 'AttributeError' as a normal
-    # part of attribute lookup, and 'create_attribute_nonexistence_exception'.
-    from .nomenclature import (
-        calculate_argument_label,
-        calculate_class_label,
-        calculate_invocable_label,
-        calculate_label,
-    )
-    from .validators import (
-        validate_argument_class,
-        validate_argument_invocability,
-    )
+from types import MappingProxyType as _DictionaryProxy
+# TODO: Move imports into functions now that '__getattribute__' cycle
+#       has been removed.
+# 'calculate_label' needs to be imported early to prevent cycles between
+# 'Module.__getattribute__', which may raise 'AttributeError' as a normal
+# part of attribute lookup, and 'create_attribute_nonexistence_exception'.
+from .nomenclature import (
+    calculate_argument_label as _calculate_argument_label,
+    calculate_class_label as _calculate_class_label,
+    calculate_invocable_label as _calculate_invocable_label,
+    calculate_label as _calculate_label,
+)
+from .validators import (
+    validate_argument_class as _validate_argument_class,
+    validate_argument_invocability as _validate_argument_invocability,
+)
 
 
-class ExtraData( metaclass = __.Class ):
+def our_exception_class_provider( name ):
+    ''' Provides package-internal exception. '''
+    from . import exceptions
+    from .visibility import is_public_name
+    if is_public_name( name ) and hasattr( exceptions, name ):
+        exception_class = getattr( exceptions, name )
+        if issubclass( exception_class, exceptions.Exception0 ): # pragma: no branch
+            return exception_class
+    raise our_exception_factory_provider( 'inaccessible_entity' )(
+        name, 'name of available exception class' )
+
+
+def our_exception_factory_provider( name ):
+    ''' Provides package-internal exception factory. '''
+    complete_name = f"create_{name}_exception"
+    if complete_name in globals( ):
+        # nosemgrep: local.scm-modules.semgrep-rules.python.lang.security.dangerous-globals-use
+        exception_factory = globals( )[ complete_name ]
+        from functools import partial as partial_function
+        return partial_function(
+            exception_factory, our_exception_class_provider )
+    raise our_exception_factory_provider( 'inaccessible_entity' )(
+        complete_name, 'name of available exception factory' )
+
+_excfp = our_exception_factory_provider  # Internal alias.
+
+
+class ExtraData:
     ''' Data transfer object for extra exception data. '''
 
     def __init__(
         self,
         positional_arguments = ( ),
-        nominative_arguments = __.DictionaryProxy( { } ),
-        exception_labels = __.DictionaryProxy( { } ),
+        nominative_arguments = _DictionaryProxy( { } ),
+        exception_labels = _DictionaryProxy( { } ),
     ):
+        from collections.abc import Sequence, Mapping as Dictionary
         self.positional_arguments = tuple(
-            __.validate_argument_class(
-                __.excc,
-                positional_arguments, __.Sequence, 'positional_arguments',
+            _validate_argument_class(
+                our_exception_factory_provider,
+                positional_arguments, Sequence, 'positional_arguments',
                 ExtraData ) )
-        self.nominative_arguments = __.DictionaryProxy(
-            __.validate_argument_class(
-                __.excc,
-                nominative_arguments, __.Dictionary, 'nominative_arguments',
+        self.nominative_arguments = _DictionaryProxy(
+            _validate_argument_class(
+                our_exception_factory_provider,
+                nominative_arguments, Dictionary, 'nominative_arguments',
                 ExtraData ) )
-        self.exception_labels = __.DictionaryProxy(
-            __.validate_argument_class(
-                __.excc,
-                exception_labels, __.Dictionary, 'exception_labels',
+        self.exception_labels = _DictionaryProxy(
+            _validate_argument_class(
+                our_exception_factory_provider,
+                exception_labels, Dictionary, 'exception_labels',
                 ExtraData ) )
 
 
-@__.intercept # type: ignore[has-type]
 def create_argument_validation_exception(
     exception_provider, name, invocation, expectation,
     extra_data = ExtraData( ),
 ):
     ''' Creates error with context about invalid argument. '''
     sui = create_argument_validation_exception
-    __.validate_argument_class( __.excc, name, str, 'name', sui )
-    __.validate_argument_invocability( __.excc, invocation, 'invocation', sui )
-    __.validate_argument_class( __.excc, expectation, str, 'expectation', sui )
-    argument_label = __.calculate_argument_label( name, invocation )
-    invocation_label = __.calculate_invocable_label( invocation )
+    _validate_argument_class( _excfp, name, str, 'name', sui )
+    _validate_argument_invocability( _excfp, invocation, 'invocation', sui )
+    _validate_argument_class( _excfp, expectation, str, 'expectation', sui )
+    argument_label = _calculate_argument_label( name, invocation )
+    invocation_label = _calculate_invocable_label( invocation )
     return _produce_exception(
         exception_provider, sui, 'IncorrectData',
         f"Invalid {argument_label} to {invocation_label}: "
@@ -97,61 +117,57 @@ def create_argument_validation_exception(
         extra_data )
 
 
-@__.intercept # type: ignore[has-type]
 def create_attribute_immutability_exception(
     exception_provider, name, object_, action = 'assign',
     extra_data = ExtraData( ),
 ):
     ''' Creates error with context about immutable attribute. '''
     sui = create_attribute_immutability_exception
-    __.validate_argument_class( __.excc, name, str, 'name', sui )
-    __.validate_argument_class( __.excc, action, str, 'action', sui )
-    label = __.calculate_label( object_, f"attribute '{name}'" )
+    _validate_argument_class( _excfp, name, str, 'name', sui )
+    _validate_argument_class( _excfp, action, str, 'action', sui )
+    label = _calculate_label( object_, f"attribute '{name}'" )
     return _produce_exception(
         exception_provider, sui, 'ImpermissibleAttributeOperation',
         f"Attempt to {action} immutable {label}.",
         extra_data )
 
 
-@__.intercept # type: ignore[has-type]
 def create_attribute_indelibility_exception(
     exception_provider, name, object_, extra_data = ExtraData( ),
 ):
     ''' Creates error with context about indelible attribute. '''
     sui = create_attribute_indelibility_exception
-    __.validate_argument_class( __.excc, name, str, 'name', sui )
-    label = __.calculate_label( object_, f"attribute '{name}'" )
+    _validate_argument_class( _excfp, name, str, 'name', sui )
+    label = _calculate_label( object_, f"attribute '{name}'" )
     return _produce_exception(
         exception_provider, sui, 'ImpermissibleAttributeOperation',
         f"Attempt to delete indelible {label}.",
         extra_data )
 
 
-@__.intercept # type: ignore[has-type]
 def create_attribute_name_illegality_exception(
     exception_provider, name, extra_data = ExtraData( ),
 ):
     ''' Creates error about illegal attribute name. '''
     sui = create_attribute_name_illegality_exception
-    __.validate_argument_class( __.excc, name, str, 'name', sui )
+    _validate_argument_class( _excfp, name, str, 'name', sui )
     return _produce_exception(
         exception_provider, sui, 'IncorrectData',
         f"Attempt to access attribute with illegal name '{name}'.",
         extra_data )
 
 
-@__.intercept # type: ignore[has-type]
 def create_attribute_nonexistence_exception(
     exception_provider, name, object_,
     extra_context = None, extra_data = ExtraData( ),
 ):
     ''' Creates error with context about nonexistent attribute. '''
     sui = create_attribute_nonexistence_exception
-    __.validate_argument_class( __.excc, name, str, 'name', sui )
-    label = __.calculate_label( object_, f"attribute '{name}'" )
+    _validate_argument_class( _excfp, name, str, 'name', sui )
+    label = _calculate_label( object_, f"attribute '{name}'" )
     if extra_context:
-        __.validate_argument_class(
-            __.excc, extra_context, str, 'extra_context', sui )
+        _validate_argument_class(
+            _excfp, extra_context, str, 'extra_context', sui )
         label = f"{label} {extra_context}"
     return _produce_exception(
         exception_provider, sui, 'InaccessibleAttribute',
@@ -159,18 +175,17 @@ def create_attribute_nonexistence_exception(
         extra_data )
 
 
-@__.intercept # type: ignore[has-type]
 def create_attribute_noninvocability_exception(
     exception_provider, name, object_,
     extra_context = None, extra_data = ExtraData( ),
 ):
     ''' Creates error with context about noninvocable attribute. '''
     sui = create_attribute_noninvocability_exception
-    __.validate_argument_class( __.excc, name, str, 'name', sui )
-    label = __.calculate_label( object_, f"attribute '{name}'" )
+    _validate_argument_class( _excfp, name, str, 'name', sui )
+    label = _calculate_label( object_, f"attribute '{name}'" )
     if extra_context:
-        __.validate_argument_class(
-            __.excc, extra_context, str, 'extra_context', sui )
+        _validate_argument_class(
+            _excfp, extra_context, str, 'extra_context', sui )
         label = f"{label} {extra_context}"
     return _produce_exception(
         exception_provider, sui, 'InvalidOperation',
@@ -178,45 +193,29 @@ def create_attribute_noninvocability_exception(
         extra_data )
 
 
-@__.intercept # type: ignore[has-type]
 def create_class_attribute_rejection_exception(
     exception_provider, name, class_, extra_data = ExtraData( ),
 ):
     ''' Creates error with context about class attribute rejection. '''
     sui = create_class_attribute_rejection_exception
-    __.validate_argument_class( __.excc, name, str, 'name', sui )
-    label = __.calculate_class_label( class_, f"attribute '{name}'" )
+    _validate_argument_class( _excfp, name, str, 'name', sui )
+    label = _calculate_class_label( class_, f"attribute '{name}'" )
     return _produce_exception(
         exception_provider, sui, 'ImpermissibleOperation',
         f"Rejection of extant definition of {label}.",
         extra_data )
 
 
-@__.intercept # type: ignore[has-type]
-def create_entry_absence_exception(
-    exception_provider, index, table, table_name, extra_data = ExtraData( ),
-):
-    ''' Creates error with context about absent table entry. '''
-    sui = create_entry_absence_exception
-    __.validate_argument_class( __.excc, table, __.Dictionary, 'table', sui )
-    __.validate_argument_class( __.excc, table_name, str, 'table_name', sui )
-    return _produce_exception(
-        exception_provider, sui, 'IncorrectData',
-        f"No entry at index {index!r} in {table_name}.",
-        extra_data )
-
-
-@__.intercept # type: ignore[has-type]
 def create_fugitive_apprehension_exception(
     exception_provider, fugitive, invocation, extra_data = ExtraData( ),
 ):
     ''' Creates error with context about fugitive exception apprehension. '''
     sui = create_fugitive_apprehension_exception
-    __.validate_argument_class(
-        __.excc, fugitive, BaseException, 'fugitive', sui )
-    __.validate_argument_invocability( __.excc, invocation, 'invocation', sui )
-    exception_class_label = __.calculate_class_label( type( fugitive ) )
-    invocation_label = __.calculate_invocable_label( invocation )
+    _validate_argument_class(
+        _excfp, fugitive, BaseException, 'fugitive', sui )
+    _validate_argument_invocability( _excfp, invocation, 'invocation', sui )
+    exception_class_label = _calculate_class_label( type( fugitive ) )
+    invocation_label = _calculate_invocable_label( invocation )
     return _produce_exception(
         exception_provider, sui, 'FugitiveException',
         f"Apprehension of fugitive exception of {exception_class_label} "
@@ -224,59 +223,69 @@ def create_fugitive_apprehension_exception(
         extra_data )
 
 
-@__.intercept # type: ignore[has-type]
 def create_impermissible_instantiation_exception(
     exception_provider, class_, extra_data = ExtraData( ),
 ):
     ''' Creates error with context about impermissible instantiation. '''
     sui = create_impermissible_instantiation_exception
-    label = __.calculate_class_label( class_ )
+    label = _calculate_class_label( class_ )
     return _produce_exception(
         exception_provider, sui, 'ImpermissibleOperation',
         f"Impermissible instantiation of {label}.",
         extra_data )
 
 
-@__.intercept # type: ignore[has-type]
 def create_implementation_absence_exception(
     exception_provider, invocation, variant_name, extra_data = ExtraData( ),
 ):
     ''' Creates error about absent implementation of invocable. '''
     sui = create_implementation_absence_exception
-    __.validate_argument_invocability( __.excc, invocation, 'invocation', sui )
-    __.validate_argument_class(
-        __.excc, variant_name, str, 'variant_name', sui )
-    invocation_label = __.calculate_invocable_label( invocation )
+    _validate_argument_invocability( _excfp, invocation, 'invocation', sui )
+    _validate_argument_class(
+        _excfp, variant_name, str, 'variant_name', sui )
+    invocation_label = _calculate_invocable_label( invocation )
     return _produce_exception(
         exception_provider, sui, 'AbsentImplementation',
         f"No implementation of {invocation_label} exists for {variant_name}.",
         extra_data )
 
 
-@__.intercept # type: ignore[has-type]
+def create_inaccessible_entity_exception(
+    exception_provider, name, expectation, extra_data = ExtraData( ),
+):
+    ''' Creates error with context about inaccessible entity. '''
+    sui = create_inaccessible_entity_exception
+    _validate_argument_class( _excfp, name, str, 'name', sui )
+    _validate_argument_class( _excfp, expectation, str, 'expectation', sui )
+    return _produce_exception(
+        exception_provider, sui, 'InvalidOperation',
+        f"Impermissible attempt to access entity '{name}': "
+        f"must access {expectation}",
+        extra_data )
+
+
 def create_invocation_validation_exception(
     exception_provider, invocation, cause, extra_data = ExtraData( ),
 ):
     ''' Creates error with context about invalid invocation. '''
-    sui = create_implementation_absence_exception
-    __.validate_argument_invocability( __.excc, invocation, 'invocation', sui )
-    __.validate_argument_class( __.excc, cause, str, 'cause', sui )
-    label = __.calculate_invocable_label( invocation )
+    sui = create_invocation_validation_exception
+    _validate_argument_invocability( _excfp, invocation, 'invocation', sui )
+    _validate_argument_class( _excfp, cause, str, 'cause', sui )
+    label = _calculate_invocable_label( invocation )
     return _produce_exception(
         exception_provider, sui, 'IncorrectData',
         f"Incompatible arguments for invocation of {label}: {cause}",
         extra_data )
 
 
-@__.intercept # type: ignore[has-type]
 def create_return_validation_exception(
     exception_provider, invocation, expectation, extra_data = ExtraData( ),
 ):
     ''' Creates error with context about invalid return value. '''
     sui = create_return_validation_exception
-    __.validate_argument_invocability( __.excc, invocation, 'invocation', sui )
-    __.validate_argument_class( __.excc, expectation, str, 'expectation', sui )
-    invocation_label = __.calculate_invocable_label( invocation )
+    _validate_argument_invocability( _excfp, invocation, 'invocation', sui )
+    _validate_argument_class( _excfp, expectation, str, 'expectation', sui )
+    invocation_label = _calculate_invocable_label( invocation )
     return _produce_exception(
         exception_provider, sui, 'InvalidState',
         f"Invalid return value from {invocation_label}: "
@@ -284,36 +293,133 @@ def create_return_validation_exception(
         extra_data )
 
 
+def intercept_exception_factory_provider( provider, invocation ):
+    ''' Encloses exception factory provider with interceptor. '''
+    # TODO: Validate invocation.
+    signature = _validate_exception_factory_provider( provider, invocation )
+    from functools import wraps
+
+    @wraps( provider )
+    def invoker( *posargs, **nomargs ):
+        ''' Ensures provider returns exception factory. '''
+        # Validate that arguments correspond to signature.
+        try: signature.bind( *posargs, **nomargs )
+        except TypeError as exc:
+            raise our_exception_factory_provider( 'invocation_validation' )(
+                provider, str( exc ) ) from exc
+        try: factory = provider( *posargs, **nomargs )
+        except BaseException as exc:
+            raise our_exception_factory_provider( 'fugitive_apprehension' )(
+                exc, provider ) from exc
+        return _intercept_exception_factory( factory, provider )
+
+    return invoker
+
+
+def _validate_exception_factory_provider( provider, invocation ):
+    ''' Validates exception factory provider as invocation argument. '''
+    from inspect import signature as scan_signature
+    valid = callable( provider )
+    if valid:
+        signature = scan_signature( provider )
+        valid = 1 == len( signature.parameters )
+    if valid: return signature
+    raise our_exception_factory_provider( 'argument_validation' )(
+        'exception_factory_provider',
+        invocation,
+        'exception factory provider' )
+
+
+def _intercept_exception_factory( factory, invocation ):
+    ''' Encloses exception factory with interceptor. '''
+    signature = _validate_exception_factory( factory, invocation )
+    from functools import wraps
+
+    @wraps( factory )
+    def invoker( *posargs, **nomargs ):
+        ''' Ensures exception factory returns exception. '''
+        # Validate that arguments correspond to signature.
+        try: signature.bind( *posargs, **nomargs )
+        except TypeError as exc:
+            raise our_exception_factory_provider( 'invocation_validation' )(
+                factory, str( exc ) ) from exc
+        # Ensure factory returns exception without raising exception.
+        try: exception = factory( *posargs, **nomargs )
+        except BaseException as exc:
+            raise our_exception_factory_provider( 'fugitive_apprehension' )(
+                exc, factory ) from exc
+        if not isinstance( exception, BaseException ):
+            raise our_exception_factory_provider( 'return_validation' )(
+                factory, 'instance of exception class' )
+        return exception
+
+    return invoker
+
+
+def _validate_exception_factory( factory, invocation ):
+    ''' Validates exception factory provider as invocation argument. '''
+    from inspect import signature as scan_signature
+    if callable( factory ): return scan_signature( factory )
+    raise our_exception_factory_provider( 'argument_validation' )(
+        'exception_factory', invocation, 'exception factory' )
+
+
 def _produce_exception(
-    exception_provider, invocation, name, message, extra_data
+    exception_class_provider, invocation, name, message, extra_data
 ):
     ''' Produces exception by provider with message and failure class. '''
-    _validate_standard_arguments( invocation, exception_provider, extra_data )
+    exception_class_provider = intercept_exception_class_provider(
+        exception_class_provider, invocation )
+    _validate_argument_class(
+        _excfp, extra_data, ExtraData, 'extra_data', invocation )
     failure_class = ' '.join( invocation.__name__.split( '_' )[ 1 : -1 ] )
-    return exception_provider( name )(
+    return exception_class_provider( name )(
         message,
         *extra_data.positional_arguments,
         **_inject_exception_labels(
             extra_data, { 'failure class': failure_class } ) )
 
 
-def _validate_standard_arguments( invocation, exception_provider, extra_data ):
-    ''' Validates standard arguments to exception factory. '''
-    _validate_exception_provider( exception_provider, invocation )
-    __.validate_argument_class(
-        __.excc, extra_data, ExtraData, 'extra_data', invocation )
+def intercept_exception_class_provider( provider, invocation ):
+    ''' Encloses exception class provider with interceptor. '''
+    # TODO: Validate invocation.
+    signature = _validate_exception_class_provider( provider, invocation )
+    from functools import wraps
+
+    @wraps( provider )
+    def invoker( *posargs, **nomargs ):
+        ''' Ensures exception class provider returns exception class. '''
+        # Validate that arguments correspond to signature.
+        try: signature.bind( *posargs, **nomargs )
+        except TypeError as exc:
+            raise our_exception_factory_provider( 'invocation_validation' )(
+                provider, str( exc ) ) from exc
+        # Ensure provider returns exception class without raising exception.
+        try: exception_class = provider( *posargs, **nomargs )
+        except BaseException as exc:
+            raise our_exception_factory_provider( 'fugitive_apprehension' )(
+                exc, provider ) from exc
+        from inspect import isclass as is_class
+        valid = is_class( exception_class )
+        valid = valid and issubclass( exception_class, BaseException )
+        if not valid:
+            raise our_exception_factory_provider( 'return_validation' )(
+                provider, 'exception class' )
+        return exception_class
+
+    return invoker
 
 
-def _validate_exception_provider( provider, invocation ):
+def _validate_exception_class_provider( provider, invocation ):
     ''' Validates exception provider invocability and signature. '''
+    from inspect import signature as scan_signature
     valid = callable( provider )
     if valid:
-        from inspect import signature as scan_signature
         signature = scan_signature( provider )
         valid = 1 == len( signature.parameters )
-    if valid: return provider
-    raise __.excc.provide_factory( 'argument_validation' )(
-        'exception_provider', invocation, 'exception provider' )
+    if valid: return signature
+    raise our_exception_factory_provider( 'argument_validation' )(
+        'exception_class_provider', invocation, 'exception class provider' )
 
 
 def _inject_exception_labels( extra_data, exception_labels ):
