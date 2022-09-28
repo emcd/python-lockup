@@ -21,42 +21,16 @@
 ''' Ensure correctness of internal base. '''
 
 
-from pytest import raises
+#from pytest import raises
 
 
 from lockup import NamespaceClass as _NamespaceClass
 class __( metaclass = _NamespaceClass ):
     ''' Internal namespace. '''
 
-    from lockup import exceptions
-    from lockup._base import (
-        LatentExceptionController,
-        exception_controller,
-        package_name,
-    )
-    from lockup.exceptionality import validate_exception_controller
+    from lockup._base import package_name
 
 
 def test_001_validate_package_name( ):
     ''' Package name is correct. '''
     assert 'lockup' == __.package_name
-
-
-def test_016_validate_excc_setattr_protection( ):
-    ''' Exception controller attributes are immutable. '''
-    excc = __.LatentExceptionController( )
-    with raises( __.exceptions.ImpermissibleAttributeOperation ):
-        excc.apprehend_fugitive = lambda exc, inv: ( None, exc )
-
-
-def test_017_validate_excc_delattr_protection( ):
-    ''' Exception controller attributes are indelible. '''
-    excc = __.LatentExceptionController( )
-    with raises( __.exceptions.ImpermissibleAttributeOperation ):
-        del excc.provide_factory
-
-
-def test_101_validate_exception_controller( ):
-    ''' Exception controller is valid. '''
-    assert __.exception_controller is __.validate_exception_controller(
-        __.exception_controller )

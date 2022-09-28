@@ -27,133 +27,86 @@ from lockup import NamespaceClass as _NamespaceClass
 class __( metaclass = _NamespaceClass ):
     ''' Internal namespace. '''
 
-    from functools import partial as partial_function
-    from types import MappingProxyType as DictionaryProxy
-
-    from lockup import exception_factories, exceptions
-    from lockup._base import intercept
-    from lockup.exceptionality import (
-        ExceptionController,
-        our_exception_controller,
+    from lockup import exceptions
+    from lockup.exception_factories import (
+        our_exception_factory_provider,
     )
-    from lockup.interception import create_interception_decorator
-    from lockup.visibility import is_public_name
+    from lockup.interception import (
+        create_interception_decorator,
+        intercept_fugitive_exception_apprehender,
+        our_fugitive_exception_apprehender,
+        our_interceptor,
+    )
 
 
-# Cannot wildcard import 'exceptions' module into a namespace,
-# so we use immutable dictionary instead.
-_exceptions = __.DictionaryProxy( {
-    aname: getattr( __.exceptions, aname ) for aname in dir( __.exceptions )
-    if __.is_public_name( aname )
-} )
+def test_011_intercept_apprehender( ):
+    ''' Ensures validation and decoration of apprehender. '''
+    apprehender = __.intercept_fugitive_exception_apprehender(
+        __.our_fugitive_exception_apprehender,
+        test_011_intercept_apprehender )
+    assert callable( apprehender )
+    exc = __.exceptions.Exception0( 'test' )
+    assert ( exc, None ) == apprehender( exc, test_011_intercept_apprehender )
 
 
-def _provide_exception( name ):
-    ''' Returns exception by name. '''
-    return _exceptions[ name ]
+def test_016_error_invalid_argument_vector_for_apprehender( ):
+    ''' Expect error on invalid argument vector for apprehender. '''
+    apprehender = __.intercept_fugitive_exception_apprehender(
+        __.our_fugitive_exception_apprehender,
+        test_016_error_invalid_argument_vector_for_apprehender )
+    with raises( __.exceptions.InvalidOperation ): apprehender( )
 
 
-# Cannot wildcard import 'exception_factories' module into a namespace,
-# so we use immutable dictionary instead.
-_exception_factories = __.DictionaryProxy( {
-    aname: getattr( __.exception_factories, aname )
-    for aname in dir( __.exception_factories )
-    if __.is_public_name( aname )
-} )
+def _faulty_apprehender( exception, invocation ):
+    ''' Apprehends fugitive exceptions at API boundary. Not really. '''
+    raise RuntimeError( 'lol' )
+
+def test_017_error_faulty_apprehender( ):
+    ''' Expect error on faulty apprehender. '''
+    apprehender = __.intercept_fugitive_exception_apprehender(
+        _faulty_apprehender, test_017_error_faulty_apprehender )
+    with raises( __.exceptions.InvalidState ):
+        apprehender(
+            __.exceptions.Exception0, test_017_error_faulty_apprehender )
 
 
-def _provide_exception_factory( name ):
-    ''' Returns exception factory by name with wired-up exception provider. '''
-    return __.partial_function(
-        _exception_factories[ f"create_{name}_exception" ],
-        _provide_exception )
-
-
-def _return_fugitive( exception, invocation ): # pylint: disable=unused-argument
-    ''' Apprehends fugitive exceptions at API boundary. '''
-    if isinstance( exception, tuple( _exceptions.values( ) ) ):
-        return 'propagate-at-liberty', None
-    return 'return', None
-
-_return_fugitive_ec = __.ExceptionController(
-    factory_provider = _provide_exception_factory,
-    fugitive_apprehender = _return_fugitive )
-
-
-def _propagate_replacement( exception, invocation ):
-    ''' Apprehends fugitive exceptions at API boundary. '''
-    if isinstance( exception, tuple( _exceptions.values( ) ) ):
-        return 'propagate-at-liberty', None
-    return (
-        'silence-and-except',
-        _provide_exception_factory( 'fugitive_apprehension' )(
-            exception, invocation ) )
-
-_propagate_replacement_ec = __.ExceptionController(
-    factory_provider = _provide_exception_factory,
-    fugitive_apprehender = _propagate_replacement )
-
-
-def _return_replacement( exception, invocation ):
-    ''' Apprehends fugitive exceptions at API boundary. '''
-    if isinstance( exception, tuple( _exceptions.values( ) ) ):
-        return 'propagate-at-liberty', None
-    return (
-        'return-replacement',
-        _provide_exception_factory( 'fugitive_apprehension' )(
-            exception, invocation ) )
-
-_return_replacement_ec = __.ExceptionController(
-    factory_provider = _provide_exception_factory,
-    fugitive_apprehender = _return_replacement )
-
-
-def _return_invalid_replacement( exception, invocation ):
-    ''' Apprehends fugitive exceptions at API boundary. '''
-    if isinstance( exception, tuple( _exceptions.values( ) ) ):
-        return 'propagate-at-liberty', None
-    return 'return-replacement', invocation
-
-_return_invalid_replacement_ec = __.ExceptionController(
-    factory_provider = _provide_exception_factory,
-    fugitive_apprehender = _return_invalid_replacement )
-
-
-def test_011_create_interception_decorator( ):
+def test_021_create_interception_decorator( ):
     ''' Interception decorator receives invocable and returns invocable. '''
-    decorator = __.create_interception_decorator( __.our_exception_controller )
+    decorator = __.create_interception_decorator(
+        __.our_exception_factory_provider,
+        apprehender = __.our_fugitive_exception_apprehender )
     assert callable( decorator )
 
 
-# TODO: Check for wrapped exception controller.
+@mark.parametrize( 'provider', ( 123, 'ph00b4r' * 5, ) )
+def test_022_interceptor_creation_with_invalid_provider( provider ):
+    ''' Interception decorator creation fails on invalid provider. '''
+    with raises( __.exceptions.IncorrectData ):
+        __.create_interception_decorator(
+            provider, apprehender = __.our_fugitive_exception_apprehender )
 
 
-@mark.parametrize( 'controller', ( 123, 'ph00b4r' * 5, ) )
-def test_012_interceptor_creation_with_invalid_exception_controller(
-    controller
-):
-    ''' Interception decorator fails on invalid invocable. '''
-    with raises( __.exceptions.InaccessibleAttribute ):
-        __.create_interception_decorator( controller )
-
-
-# TODO: Check that exception controller is tested
-#       for its attributes and that they are invocable.
+@mark.parametrize( 'apprehender', ( 123, 'ph00b4r' * 5, ) )
+def test_023_interceptor_creation_with_invalid_apprehender( apprehender ):
+    ''' Interception decorator creation fails on invalid apprehender. '''
+    with raises( __.exceptions.IncorrectData ):
+        __.create_interception_decorator(
+            __.our_exception_factory_provider, apprehender = apprehender )
 
 
 @mark.parametrize(
     'value', ( None, 42, 'test', Exception, Exception( ), ( ), [ 42 ], )
 )
-def test_016_intercept_normal_return( value ):
+def test_026_intercept_normal_return( value ):
     ''' Returns across API boundary without alteration. '''
-    @__.intercept
+    @__.our_interceptor
     def return_per_normal( value ): return value
     assert value == return_per_normal( value )
 
 
-def test_017_translate_fugitive_with_interceptor( ):
+def test_027_translate_fugitive_with_interceptor( ):
     ''' Interception decorator intercepts and translates fugitives. '''
-    @__.intercept
+    @__.our_interceptor
     def release_fugitive( ): return 1 / 0
     with raises( __.exceptions.FugitiveException ): release_fugitive( )
     try: release_fugitive( )
@@ -167,31 +120,50 @@ def test_017_translate_fugitive_with_interceptor( ):
         __.exceptions.InvalidState,
     )
 )
-def test_018_relay_permissible_with_interceptor( exception_class ):
+def test_028_relay_permissible_with_interceptor( exception_class ):
     ''' Interception decorator relays permissible exceptions. '''
-    @__.intercept
+    @__.our_interceptor
     def raise_permissible_exception( ): raise exception_class
     with raises( exception_class ): raise_permissible_exception( )
 
 
-def test_019_intercept_invalid_invocation( ):
+def test_029_intercept_invalid_invocation( ):
     ''' Special report on invalid invocation arguments. '''
-    @__.intercept
+    @__.our_interceptor
     def a_function( ): pass
     with raises( __.exceptions.IncorrectData ):
         a_function( 123 ) # pylint: disable=too-many-function-args
 
 
-def test_021_intercept_and_return_fugitive( ):
+def _return_fugitive( exception, invocation ): # pylint: disable=unused-argument
+    ''' Apprehends fugitive exceptions at API boundary. '''
+    if isinstance( exception, __.exceptions.Exception0 ):
+        return exception, None
+    return None, None
+
+def test_031_intercept_and_return_fugitive( ):
     ''' Interception decorator returns apprehended fugitives. '''
-    @__.create_interception_decorator( _return_fugitive_ec )
+    @__.create_interception_decorator(
+        __.our_exception_factory_provider,
+        apprehender = _return_fugitive )
     def release_fugitive( ): return 1 / 0
     assert isinstance( release_fugitive( ), ZeroDivisionError )
 
 
-def test_022_intercept_and_propagate_replacement( ):
+def _propagate_replacement( exception, invocation ):
+    ''' Apprehends fugitive exceptions at API boundary. '''
+    if isinstance( exception, __.exceptions.Exception0 ):
+        return exception, None
+    return (
+        None,
+        __.our_exception_factory_provider( 'fugitive_apprehension' )(
+            exception, invocation ) )
+
+def test_032_intercept_and_propagate_replacement( ):
     ''' Interception decorator propagates replacements for fugitives. '''
-    @__.create_interception_decorator( _propagate_replacement_ec )
+    @__.create_interception_decorator(
+        __.our_exception_factory_provider,
+        apprehender = _propagate_replacement )
     def release_fugitive( ): return 1 / 0
     with raises( __.exceptions.FugitiveException ): release_fugitive( )
     try: release_fugitive( )
@@ -199,16 +171,35 @@ def test_022_intercept_and_propagate_replacement( ):
         assert None is exc.__cause__
 
 
-def test_023_intercept_and_return_replacement( ):
-    ''' Interception decorator returns replacements for fugitives. '''
-    @__.create_interception_decorator( _return_replacement_ec )
+def _propagate_invalid_origin( exception, invocation ):
+    ''' Apprehends fugitive exceptions at API boundary. '''
+    if isinstance( exception, __.exceptions.Exception0 ):
+        return exception, None
+    return invocation, None
+
+def test_036_intercept_and_check_invalid_origin( ):
+    ''' Inteception decorator checks invalid custodian for fugitives. '''
+    @__.create_interception_decorator(
+        __.our_exception_factory_provider,
+        apprehender = _propagate_invalid_origin )
     def release_fugitive( ): return 1 / 0
-    assert isinstance( release_fugitive( ), __.exceptions.FugitiveException )
+    with raises( __.exceptions.InvalidState ): release_fugitive( )
+    try: release_fugitive( )
+    except __.exceptions.InvalidState as exc:
+        assert 'return validation' == exc.exception_labels[ 'failure class' ]
 
 
-def test_026_intercept_and_check_invalid_replacement( ):
-    ''' Inteception decorator checks invalid propagands for fugitives. '''
-    @__.create_interception_decorator( _return_invalid_replacement_ec )
+def _propagate_invalid_custodian( exception, invocation ):
+    ''' Apprehends fugitive exceptions at API boundary. '''
+    if isinstance( exception, __.exceptions.Exception0 ):
+        return exception, None
+    return None, invocation
+
+def test_037_intercept_and_check_invalid_custodian( ):
+    ''' Inteception decorator checks invalid custodian for fugitives. '''
+    @__.create_interception_decorator(
+        __.our_exception_factory_provider,
+        apprehender = _propagate_invalid_custodian )
     def release_fugitive( ): return 1 / 0
     with raises( __.exceptions.InvalidState ): release_fugitive( )
     try: release_fugitive( )

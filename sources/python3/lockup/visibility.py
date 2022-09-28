@@ -18,21 +18,17 @@
 #============================================================================#
 
 
-''' Package foundation. Internal constants and functions. '''
+''' Functions for controlling and determining attribute visibility. '''
 
 
-# Initialization Dependencies:
-#   visibility -> _base
 # Latent Dependencies: (no cycles)
 
 
 from inspect import isclass as _is_class
 
-from ._base import intercept as _intercept
 from .nomenclature import is_python_identifier as _is_python_identifier
 
 
-@_intercept
 def select_public_attributes(
     class_, object_, *, includes = ( ), excludes = ( )
 ):
@@ -41,6 +37,7 @@ def select_public_attributes(
         Can optionally include specific attributes that would not be selected
         under normal operation and can exclude specific attributes that would
         selected under normal operation. '''
+    # TODO: Wrap in exception handler.
     names = (
           # Slotted object might not have '__dict__' attribute.
           getattr( object_, '__dict__', { } ).keys( )

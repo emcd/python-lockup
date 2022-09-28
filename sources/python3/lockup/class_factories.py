@@ -24,15 +24,12 @@
 # Initialization Dependencies:
 #   class_factories -> _base
 #   class_factories -> visibility
-# Latent Dependencies:
-#   class_factories -> exceptionality -> class_factories
-# pylint: disable=cyclic-import
+# Latent Dependencies: (no cycles)
+# pylint: enable=cyclic-import
 
 
-from ._base import (
-    intercept as _intercept,
-    package_name as _package_name,
-)
+from ._base import package_name as _package_name
+from .interception import our_interceptor as _our_interceptor
 from .visibility import (
     is_public_name as _is_public_name,
     select_public_attributes as _select_public_attributes,
@@ -51,31 +48,32 @@ class Class( type ):
 
     __slots__ = ( )
 
-    @_intercept
+    @_our_interceptor
     def __new__( factory, name, bases, namespace ):
         return super( ).__new__( factory, name, bases, namespace )
 
-    @_intercept
+    @_our_interceptor
     def __setattr__( class_, name, value ):
-        from .exceptionality import our_exception_controller
+        from .exception_factories import our_exception_factory_provider
         from .validators import validate_attribute_name
-        validate_attribute_name( our_exception_controller, name )
-        raise our_exception_controller.provide_factory(
+        validate_attribute_name( our_exception_factory_provider, name )
+        raise our_exception_factory_provider(
             'attribute_immutability' )( name, class_ )
 
-    @_intercept
+    @_our_interceptor
     def __delattr__( class_, name ):
-        from .exceptionality import our_exception_controller
+        from .exception_factories import our_exception_factory_provider
         from .validators import (
             validate_attribute_name,
             validate_attribute_existence,
         )
-        validate_attribute_name( our_exception_controller, name )
-        validate_attribute_existence( our_exception_controller, name, class_ )
-        raise our_exception_controller.provide_factory(
+        validate_attribute_name( our_exception_factory_provider, name )
+        validate_attribute_existence(
+            our_exception_factory_provider, name, class_ )
+        raise our_exception_factory_provider(
             'attribute_indelibility' )( name, class_ )
 
-    @_intercept
+    @_our_interceptor
     def __dir__( class_ ):
         return _select_public_attributes( __class__, class_ )
 
@@ -94,22 +92,22 @@ class NamespaceClass( Class, metaclass = Class ):
            attribute errors when accessed. However, these are a fairly rare
            case and are probably not needed on namespaces, in general. '''
 
-    @_intercept
+    @_our_interceptor
     def __new__( factory, name, bases, namespace ):
         for aname in namespace:
             if aname in ( '__doc__', '__module__', '__qualname__', ): continue
             if _is_public_name( aname ): continue
-            from .exceptionality import our_exception_controller
-            raise our_exception_controller.provide_factory(
+            from .exception_factories import our_exception_factory_provider
+            raise our_exception_factory_provider(
                 'class_attribute_rejection' )( aname, namespace )
         def __new__( kind, *posargs, **nomargs ): # pylint: disable=unused-argument
-            from .exceptionality import our_exception_controller
-            raise our_exception_controller.provide_factory(
+            from .exception_factories import our_exception_factory_provider
+            raise our_exception_factory_provider(
                 'impermissible_instantiation' )( kind )
         namespace[ '__new__' ] = __new__
         return super( ).__new__( factory, name, bases, namespace )
 
-    @_intercept
+    @_our_interceptor
     def __repr__( kind ):
         namespace = {
             '__module__': kind.__module__, '__qualname__': kind.__qualname__ }
@@ -138,7 +136,7 @@ def _reassign_class_factories( ):
         we can still provide functionality without the extra protection. '''
     from inspect import isclass as is_class
     from . import exceptions
-    from ._base import LatentExceptionController
+    from .exception_factories import ExtraData
     from .reflection import reassign_class_factory
     reassign_class_factory(
         Class, Class, assert_implementation = False )
@@ -149,7 +147,6 @@ def _reassign_class_factories( ):
             continue
         reassign_class_factory(
             attribute, Class, assert_implementation = False )
-    reassign_class_factory(
-        LatentExceptionController, Class, assert_implementation = False )
+    reassign_class_factory( ExtraData, Class, assert_implementation = False )
 
 _reassign_class_factories( )

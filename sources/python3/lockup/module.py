@@ -54,9 +54,8 @@ class __( metaclass = _NamespaceClass ):
     from types import ModuleType as Module # type: ignore
 
     from . import _base as base
-    from ._base import intercept
     from .class_factories import Class
-    from .exceptionality import our_exception_controller
+    from .exception_factories import our_exception_factory_provider
     from .validators import (
         validate_attribute_existence,
         validate_attribute_name,
@@ -79,36 +78,28 @@ class Module( __.Module, metaclass = __.Class ):
            such as :py:mod:`doctest`. Ideally, these would be immutable,
            but cannot be as of this writing. '''
 
-    # Note: Cannot wrap the '__getattribute__' method with an interceptor
-    #       because the import machinery may throw 'AttributeError' as a normal
-    #       part of operation and the 'exceptions' module in this package will
-    #       be imported to check the exception class, which will lead to
-    #       infinite recursion, as its class is our 'Module' class after being
-    #       reclassified. Also, there is a performance hit with wrapping this
-    #       particular method, because it is on the hot path for module
-    #       attribute access. And, it is mostly proof against exception leaks.
     def __getattribute__( self, name ):
         if '__dict__' == name: return dict( super( ).__getattribute__( name ) )
-        try: return super( ).__getattribute__( name )
-        except AttributeError as exc:
-            raise __.our_exception_controller.provide_factory(
-                'attribute_nonexistence' )( name, self ) from exc
+        # Note: Ideally, we would intercept 'AttributeError'
+        #       and use an exception factory. However, standard Python import
+        #       machinery invokes this method on modules and that results in
+        #       significant fragility around the importation of some package
+        #       internals, especially as 'AttributeError' exceptions are a part
+        #       of the _normal_ operation of the import machinery.
+        return super( ).__getattribute__( name )
 
-    @__.intercept # type: ignore
     def __setattr__( self, name, value ):
-        __.validate_attribute_name( __.our_exception_controller, name )
-        raise __.our_exception_controller.provide_factory(
+        __.validate_attribute_name( __.our_exception_factory_provider, name )
+        raise __.our_exception_factory_provider(
             'attribute_immutability' )( name, self )
 
-    @__.intercept # type: ignore
     def __delattr__( self, name ):
-        __.validate_attribute_name( __.our_exception_controller, name )
+        __.validate_attribute_name( __.our_exception_factory_provider, name )
         __.validate_attribute_existence(
-            __.our_exception_controller, name, self )
-        raise __.our_exception_controller.provide_factory(
+            __.our_exception_factory_provider, name, self )
+        raise __.our_exception_factory_provider(
             'attribute_indelibility' )( name, self )
 
-    @__.intercept # type: ignore
     def __dir__( self ): return __.select_public_attributes( __class__, self )
 
 
@@ -124,11 +115,9 @@ def reclassify_module( module ):
         module = modules.get( module )
     from inspect import ismodule as is_module
     if None is module or not is_module( module ):
-        raise __.our_exception_controller.provide_factory(
-            'argument_validation' )(
-                'module', reclassify_module,
-                'module or name of module in Python loaded modules dictionary'
-        )
+        raise __.our_exception_factory_provider( 'argument_validation' )(
+            'module', reclassify_module,
+            'module or name of module in Python loaded modules dictionary' )
     module.__class__ = Module
 
 

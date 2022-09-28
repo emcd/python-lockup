@@ -31,7 +31,6 @@ class __( metaclass = _NamespaceClass ):
     from functools import wraps
     from inspect import signature as scan_signature
 
-    from lockup._base import intercept
     from lockup.exceptions import IncorrectData
     from lockup.nomenclature import (
         calculate_argument_label,
