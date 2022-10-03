@@ -41,10 +41,10 @@ Module ``lockup.exceptions``
 Auxiliary API Documentation
 ===============================================================================
 
-Module ``lockup.exception_factories``
+Module ``lockup.exceptionality``
 -------------------------------------------------------------------------------
 
-.. automodule:: lockup.exception_factories
+.. automodule:: lockup.exceptionality
 
 Module ``lockup.nomenclature``
 -------------------------------------------------------------------------------
