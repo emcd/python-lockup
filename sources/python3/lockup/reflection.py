@@ -61,7 +61,7 @@ def reassign_class_factory( class_, factory, assert_implementation = True ):
         If ``assert_implementation`` is true, then an exception will be raised
         if no reflector is implemented for the executing flavor of Python. '''
     from inspect import isclass as is_class
-    from .exception_factories import our_exception_factory_provider
+    from .exceptionality import our_exception_factory_provider
     if not is_class( class_ ):
         raise our_exception_factory_provider( 'argument_validation' )(
             'class_', reassign_class_factory, 'class' )

@@ -28,7 +28,7 @@ class __( metaclass = _NamespaceClass ):
     ''' Internal namespace. '''
 
     from lockup import exceptions
-    from lockup.exception_factories import (
+    from lockup.exceptionality import (
         our_exception_factory_provider,
     )
     from lockup.interception import (

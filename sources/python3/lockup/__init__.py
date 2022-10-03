@@ -30,9 +30,9 @@ __version__ = '2.0a202210030010'
 
 # Public API
 from . import (
-    class_factories,
-    exception_factories,
+    exceptionality,
     exceptions,
+    factories,
     interception,
     module,
     nomenclature,
@@ -40,15 +40,15 @@ from . import (
     validators,
     visibility,
 )
-from .class_factories import Class, NamespaceClass, create_namespace
+from .factories import Class, NamespaceClass, create_namespace
 from .interception import create_interception_decorator
 from .module import Module, reclassify_module
 
 
 # Spray the package modules with a monkey-patch-resistant coating.
-reclassify_module( class_factories )
-reclassify_module( exception_factories )
+reclassify_module( exceptionality )
 reclassify_module( exceptions )
+reclassify_module( factories )
 reclassify_module( interception )
 reclassify_module( module )
 reclassify_module( nomenclature )

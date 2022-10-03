@@ -21,9 +21,6 @@
 ''' Functions for controlling and determining attribute visibility. '''
 
 
-# Latent Dependencies: (no cycles)
-
-
 from inspect import isclass as _is_class
 
 from .nomenclature import is_python_identifier as _is_python_identifier

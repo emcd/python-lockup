@@ -21,10 +21,9 @@
 ''' Factories to produce exceptions with standard message formats. '''
 
 
-# Initialization Dependencies:
-#   exception_factories -> nomenclature
-#   exception_factories -> validators
-# Latent Dependencies: (no cycles)
+# Latent Dependencies:
+#   exceptionality -> nomenclature -> validators -> exceptionality
+#   exceptionality -> validators -> exceptionality
 
 
 from types import MappingProxyType as _DictionaryProxy
@@ -33,13 +32,13 @@ from types import MappingProxyType as _DictionaryProxy
 # 'calculate_label' needs to be imported early to prevent cycles between
 # 'Module.__getattribute__', which may raise 'AttributeError' as a normal
 # part of attribute lookup, and 'create_attribute_nonexistence_exception'.
-from .nomenclature import (
+from ..nomenclature import (
     calculate_argument_label as _calculate_argument_label,
     calculate_class_label as _calculate_class_label,
     calculate_invocable_label as _calculate_invocable_label,
     calculate_label as _calculate_label,
 )
-from .validators import (
+from ..validators import (
     validate_argument_class as _validate_argument_class,
     validate_argument_invocability as _validate_argument_invocability,
 )
@@ -47,8 +46,8 @@ from .validators import (
 
 def our_exception_class_provider( name ):
     ''' Provides package-internal exception. '''
-    from . import exceptions
-    from .visibility import is_public_name
+    from .. import exceptions
+    from ..visibility import is_public_name
     if is_public_name( name ) and hasattr( exceptions, name ):
         exception_class = getattr( exceptions, name )
         if issubclass( exception_class, exceptions.Exception0 ): # pragma: no branch
