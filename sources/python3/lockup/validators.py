@@ -21,8 +21,8 @@
 ''' Validation functions. '''
 
 
-# Module Execution Dependencies:
-#   validators -> exception_factories -> validators
+# Latent Dependencies:
+#   validators -> exceptionality -> validators
 #   validators -> nomenclature -> validators
 # pylint: disable=cyclic-import
 
@@ -87,5 +87,5 @@ def validate_attribute_invocability(
 
 def _intercept_exception_factory_provider( provider, invocation ):
     ''' Encloses exception factory provider with interceptor. '''
-    from .exception_factories import intercept_exception_factory_provider
+    from .exceptionality import intercept_exception_factory_provider
     return intercept_exception_factory_provider( provider, invocation )

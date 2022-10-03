@@ -21,13 +21,6 @@
 ''' Concealment and immutability of class and namespace attributes. '''
 
 
-# Initialization Dependencies:
-#   class_factories -> _base
-#   class_factories -> visibility
-# Latent Dependencies: (no cycles)
-# pylint: enable=cyclic-import
-
-
 from ._base import package_name as _package_name
 from .interception import our_interceptor as _our_interceptor
 from .visibility import (
@@ -54,7 +47,7 @@ class Class( type ):
 
     @_our_interceptor
     def __setattr__( class_, name, value ):
-        from .exception_factories import our_exception_factory_provider
+        from .exceptionality import our_exception_factory_provider
         from .validators import validate_attribute_name
         validate_attribute_name( our_exception_factory_provider, name )
         raise our_exception_factory_provider(
@@ -62,7 +55,7 @@ class Class( type ):
 
     @_our_interceptor
     def __delattr__( class_, name ):
-        from .exception_factories import our_exception_factory_provider
+        from .exceptionality import our_exception_factory_provider
         from .validators import (
             validate_attribute_name,
             validate_attribute_existence,
@@ -97,11 +90,11 @@ class NamespaceClass( Class, metaclass = Class ):
         for aname in namespace:
             if aname in ( '__doc__', '__module__', '__qualname__', ): continue
             if _is_public_name( aname ): continue
-            from .exception_factories import our_exception_factory_provider
+            from .exceptionality import our_exception_factory_provider
             raise our_exception_factory_provider(
                 'class_attribute_rejection' )( aname, namespace )
         def __new__( kind, *posargs, **nomargs ): # pylint: disable=unused-argument
-            from .exception_factories import our_exception_factory_provider
+            from .exceptionality import our_exception_factory_provider
             raise our_exception_factory_provider(
                 'impermissible_instantiation' )( kind )
         namespace[ '__new__' ] = __new__
@@ -136,7 +129,7 @@ def _reassign_class_factories( ):
         we can still provide functionality without the extra protection. '''
     from inspect import isclass as is_class
     from . import exceptions
-    from .exception_factories import ExtraData
+    from .exceptionality import ExtraData
     from .reflection import reassign_class_factory
     reassign_class_factory(
         Class, Class, assert_implementation = False )

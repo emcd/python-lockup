@@ -38,24 +38,15 @@
     ''' # pylint: disable=line-too-long
 
 
-# Initialization Dependencies:
-#   module -> _base
-#   module -> class_factories
-#   module -> exception_factories
-#   module -> validators
-#   module -> visibility
-# Latent Dependencies: (no cycles)
-
-
-from .class_factories import NamespaceClass as _NamespaceClass
+from .factories import NamespaceClass as _NamespaceClass
 class __( metaclass = _NamespaceClass ):
     ''' Internal namespace. '''
 
     from types import ModuleType as Module # type: ignore
 
     from . import _base as base
-    from .class_factories import Class
-    from .exception_factories import our_exception_factory_provider
+    from .factories import Class
+    from .exceptionality import our_exception_factory_provider
     from .validators import (
         validate_attribute_existence,
         validate_attribute_name,

@@ -22,13 +22,13 @@
 
 
 # Latent Dependencies:
-#   nomenclature -> exception_factories -> nomenclature
+#   nomenclature -> exceptionality -> nomenclature
 # pylint: disable=cyclic-import
 
 
 def _provide_exception_factory( name ):
     ''' Provides package-internal exception factory. '''
-    from .exception_factories import our_exception_factory_provider
+    from .exceptionality import our_exception_factory_provider
     return our_exception_factory_provider( name )
 
 

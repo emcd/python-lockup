@@ -21,7 +21,7 @@
 ''' Invocation boundary protection. '''
 
 
-from .exception_factories import (
+from .exceptionality import (
     our_exception_factory_provider as _our_exception_factory_provider,
 )
 
@@ -44,7 +44,7 @@ def create_interception_decorator(
         boundary. A list of permissible exceptions is consulted to determine
         whether an exception is permissible, and thus allowed to propagate
         freely, or if it is a fugitive. '''
-    from .exception_factories import intercept_exception_factory_provider
+    from .exceptionality import intercept_exception_factory_provider
     exception_factory_provider = intercept_exception_factory_provider(
         exception_factory_provider, create_interception_decorator )
     apprehender = intercept_fugitive_exception_apprehender(

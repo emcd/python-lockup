@@ -28,7 +28,7 @@ class __( metaclass = _NamespaceClass ):
     ''' Internal namespace. '''
 
     from lockup import exceptions
-    from lockup.exception_factories import (
+    from lockup.exceptionality import (
         ExtraData,
         create_argument_validation_exception,
         create_implementation_absence_exception,
@@ -46,6 +46,20 @@ _invocables = (
     lambda: None, __.our_interceptor, _InvocableObject,
     _invocable_object, _invocable_object.a_method,
 )
+
+
+# TODO: Index in proper location.
+def test_006_error_on_provide_nonexistent_exception_class( ):
+    ''' Error on attempt to provide nonexistent exception class. '''
+    with raises( __.exceptions.InvalidOperation ):
+        __.our_exception_class_provider( 123 )
+
+
+# TODO: Index in proper location.
+def test_007_error_on_provide_nonexistent_exception_factory( ):
+    ''' Error on attempt to provide nonexistent exception factory. '''
+    with raises( __.exceptions.InvalidOperation ):
+        __.our_exception_factory_provider( 123 )
 
 
 def test_011_intercept_factory_provider( ):
