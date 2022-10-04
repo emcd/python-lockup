@@ -31,8 +31,10 @@ class __( metaclass = _NamespaceClass ):
     from functools import wraps
     from inspect import signature as scan_signature
 
+    from lockup import exceptionality
     from lockup.exceptions import IncorrectData
     from lockup.nomenclature import (
+        calculate_apex_package_name,
         calculate_argument_label,
         calculate_attribute_label,
         calculate_class_label,
@@ -49,6 +51,23 @@ from . import invocables as _invocables
 from .invocables import InvocableObject as _InvocableObject
 _invocable_object = _InvocableObject( )
 _inner_object = _InvocableObject.Inner( )
+
+
+def test_011_calculate_apex_package_name_from_module_object( ):
+    ''' Ensure correct apex package name from module object. '''
+    assert 'lockup' == __.calculate_apex_package_name( __.exceptionality )
+
+
+def test_012_calculate_apex_package_name_from_complete_package_name( ):
+    ''' Ensure correct apex package name from complete package name. '''
+    assert 'ph00' == __.calculate_apex_package_name( 'ph00.b4r.d33p' )
+
+
+@mark.parametrize( 'source', ( 123, None, _invocable_object, ) )
+def test_016_error_calculate_apex_package_name_invalid_source( source ):
+    ''' Error if source for apex package name is invalid. '''
+    with raises( __.IncorrectData ):
+        __.calculate_apex_package_name( source )
 
 
 @mark.parametrize(

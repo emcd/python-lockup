@@ -26,10 +26,16 @@
 # pylint: disable=cyclic-import
 
 
-def _provide_exception_factory( name ):
-    ''' Provides package-internal exception factory. '''
-    from .exceptionality import our_exception_factory_provider
-    return our_exception_factory_provider( name )
+def calculate_apex_package_name( source ):
+    ''' Calculates name of apex package from module object or package name. '''
+    from inspect import ismodule as is_module
+    if is_module( source ): package_name = source.__package__
+    elif isinstance( source, str ): package_name = source
+    else:
+        raise _provide_exception_factory( 'argument_validation' )(
+            'source', calculate_apex_package_name,
+            'module object or complete package name' )
+    return package_name.split( '.', maxsplit = 1 )[ 0 ]
 
 
 def calculate_label( object_, attribute_label = None ):
@@ -220,3 +226,9 @@ def is_python_identifier( name ):
     return (    isinstance( name, str )
             and name.isidentifier( )
             and not is_keyword( name ) )
+
+
+def _provide_exception_factory( name ):
+    ''' Provides package-internal exception factory. '''
+    from .exceptionality import our_exception_factory_provider
+    return our_exception_factory_provider( name )
