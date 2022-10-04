@@ -21,7 +21,6 @@
 ''' Concealment and immutability of class and namespace attributes. '''
 
 
-from ._base import package_name as _package_name
 from .interception import our_interceptor as _our_interceptor
 from .visibility import (
     is_public_name as _is_public_name,
@@ -116,8 +115,10 @@ class NamespaceClass( Class, metaclass = Class ):
 
 def create_namespace( **nomargs ):
     ''' Creates immutable namespaces from nominative arguments. '''
+    from .nomenclature import calculate_apex_package_name
     namespace = {
-        '__module__': _package_name, '__qualname__': 'Namespace' }
+        '__module__': calculate_apex_package_name( __package__ ),
+        '__qualname__': 'Namespace' }
     namespace.update( nomargs )
     return NamespaceClass( 'Namespace', ( ), namespace )
 

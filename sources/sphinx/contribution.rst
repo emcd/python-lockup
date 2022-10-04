@@ -85,5 +85,4 @@ Development
    development/environment
    development/requirements
    development/common-tasks
-   development/internal-api
    development/practices
