@@ -44,7 +44,6 @@ class __( metaclass = _NamespaceClass ):
 
     from types import ModuleType as Module # type: ignore
 
-    from . import _base as base
     from .factories import Class
     from .exceptionality import our_exception_factory_provider
     from .validators import (
@@ -110,6 +109,3 @@ def reclassify_module( module ):
             'module', reclassify_module,
             'module or name of module in Python loaded modules dictionary' )
     module.__class__ = Module
-
-
-reclassify_module( __.base )
