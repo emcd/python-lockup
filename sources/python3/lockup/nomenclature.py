@@ -194,8 +194,8 @@ def calculate_argument_label( name, signature ):
         return f"argument '{name}'"
     if Variate.VAR_KEYWORD is species:
         return f"dictionary of extra nominative arguments '{name}'"
-    from .exceptions import InvalidState # pragma: no cover
-    raise InvalidState # TODO: Use factory here.
+    raise _provide_exception_factory( 'invalid_state' )( # pragma: no cover
+        f"No recognition of argument species '{species}'.", __package__ )
 
 def _locate_argument_position( name, signature ):
     ''' Locates position of argument in signature of invocable. '''

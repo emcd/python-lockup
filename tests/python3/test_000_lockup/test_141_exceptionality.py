@@ -268,7 +268,16 @@ def test_151_attribute_noninvocability_exception( ):
     assert tracer in str( result )
 
 
-def test_161_invocation_validation_exception( ):
+def test_161_invalid_state_exception( ):
+    ''' Invalid state exception is created from arguments. '''
+    tracer = 'ph00b4r' * 5
+    result = __.our_exception_factory_provider( 'invalid_state' )(
+        tracer, __package__ )
+    assert isinstance( result, __.exceptions.InvalidState )
+    assert tracer in str( result )
+
+
+def test_171_invocation_validation_exception( ):
     ''' Validation exception is created from arguments. '''
     def tester( argument ): return argument
     assert isinstance(
@@ -278,7 +287,7 @@ def test_161_invocation_validation_exception( ):
 
 
 @mark.parametrize( 'argument', _invocables )
-def test_171_implementation_absence_exception( argument ):
+def test_181_implementation_absence_exception( argument ):
     ''' Validation exception is created from argument. '''
     assert isinstance(
         __.our_exception_factory_provider( 'implementation_absence' )(
