@@ -27,17 +27,6 @@
 
 
 from types import MappingProxyType as _DictionaryProxy
-# TODO: Move imports into functions now that '__getattribute__' cycle
-#       has been removed.
-# 'calculate_label' needs to be imported early to prevent cycles between
-# 'Module.__getattribute__', which may raise 'AttributeError' as a normal
-# part of attribute lookup, and 'create_attribute_nonexistence_exception'.
-from ..nomenclature import (
-    calculate_argument_label as _calculate_argument_label,
-    calculate_class_label as _calculate_class_label,
-    calculate_invocable_label as _calculate_invocable_label,
-    calculate_label as _calculate_label,
-)
 from ..validators import (
     validate_argument_class as _validate_argument_class,
     validate_argument_invocability as _validate_argument_invocability,
@@ -107,8 +96,12 @@ def create_argument_validation_exception(
     _validate_argument_class( _excfp, name, str, 'name', sui )
     _validate_argument_invocability( _excfp, invocation, 'invocation', sui )
     _validate_argument_class( _excfp, expectation, str, 'expectation', sui )
-    argument_label = _calculate_argument_label( name, invocation )
-    invocation_label = _calculate_invocable_label( invocation )
+    from ..nomenclature import (
+        calculate_argument_label,
+        calculate_invocable_label,
+    )
+    argument_label = calculate_argument_label( name, invocation )
+    invocation_label = calculate_invocable_label( invocation )
     return _produce_exception(
         exception_provider, sui, 'IncorrectData',
         f"Invalid {argument_label} to {invocation_label}: "
@@ -124,7 +117,8 @@ def create_attribute_immutability_exception(
     sui = create_attribute_immutability_exception
     _validate_argument_class( _excfp, name, str, 'name', sui )
     _validate_argument_class( _excfp, action, str, 'action', sui )
-    label = _calculate_label( object_, f"attribute '{name}'" )
+    from ..nomenclature import calculate_label
+    label = calculate_label( object_, f"attribute '{name}'" )
     return _produce_exception(
         exception_provider, sui, 'ImpermissibleAttributeOperation',
         f"Attempt to {action} immutable {label}.",
@@ -137,7 +131,8 @@ def create_attribute_indelibility_exception(
     ''' Creates error with context about indelible attribute. '''
     sui = create_attribute_indelibility_exception
     _validate_argument_class( _excfp, name, str, 'name', sui )
-    label = _calculate_label( object_, f"attribute '{name}'" )
+    from ..nomenclature import calculate_label
+    label = calculate_label( object_, f"attribute '{name}'" )
     return _produce_exception(
         exception_provider, sui, 'ImpermissibleAttributeOperation',
         f"Attempt to delete indelible {label}.",
@@ -163,7 +158,8 @@ def create_attribute_nonexistence_exception(
     ''' Creates error with context about nonexistent attribute. '''
     sui = create_attribute_nonexistence_exception
     _validate_argument_class( _excfp, name, str, 'name', sui )
-    label = _calculate_label( object_, f"attribute '{name}'" )
+    from ..nomenclature import calculate_label
+    label = calculate_label( object_, f"attribute '{name}'" )
     if extra_context:
         _validate_argument_class(
             _excfp, extra_context, str, 'extra_context', sui )
@@ -181,7 +177,8 @@ def create_attribute_noninvocability_exception(
     ''' Creates error with context about noninvocable attribute. '''
     sui = create_attribute_noninvocability_exception
     _validate_argument_class( _excfp, name, str, 'name', sui )
-    label = _calculate_label( object_, f"attribute '{name}'" )
+    from ..nomenclature import calculate_label
+    label = calculate_label( object_, f"attribute '{name}'" )
     if extra_context:
         _validate_argument_class(
             _excfp, extra_context, str, 'extra_context', sui )
@@ -198,7 +195,8 @@ def create_class_attribute_rejection_exception(
     ''' Creates error with context about class attribute rejection. '''
     sui = create_class_attribute_rejection_exception
     _validate_argument_class( _excfp, name, str, 'name', sui )
-    label = _calculate_class_label( class_, f"attribute '{name}'" )
+    from ..nomenclature import calculate_class_label
+    label = calculate_class_label( class_, f"attribute '{name}'" )
     return _produce_exception(
         exception_provider, sui, 'ImpermissibleOperation',
         f"Rejection of extant definition of {label}.",
@@ -213,8 +211,12 @@ def create_fugitive_apprehension_exception(
     _validate_argument_class(
         _excfp, fugitive, BaseException, 'fugitive', sui )
     _validate_argument_invocability( _excfp, invocation, 'invocation', sui )
-    exception_class_label = _calculate_class_label( type( fugitive ) )
-    invocation_label = _calculate_invocable_label( invocation )
+    from ..nomenclature import (
+        calculate_class_label,
+        calculate_invocable_label,
+    )
+    exception_class_label = calculate_class_label( type( fugitive ) )
+    invocation_label = calculate_invocable_label( invocation )
     return _produce_exception(
         exception_provider, sui, 'FugitiveException',
         f"Apprehension of fugitive exception of {exception_class_label} "
@@ -227,7 +229,8 @@ def create_impermissible_instantiation_exception(
 ):
     ''' Creates error with context about impermissible instantiation. '''
     sui = create_impermissible_instantiation_exception
-    label = _calculate_class_label( class_ )
+    from ..nomenclature import calculate_class_label
+    label = calculate_class_label( class_ )
     return _produce_exception(
         exception_provider, sui, 'ImpermissibleOperation',
         f"Impermissible instantiation of {label}.",
@@ -242,7 +245,8 @@ def create_implementation_absence_exception(
     _validate_argument_invocability( _excfp, invocation, 'invocation', sui )
     _validate_argument_class(
         _excfp, variant_name, str, 'variant_name', sui )
-    invocation_label = _calculate_invocable_label( invocation )
+    from ..nomenclature import calculate_invocable_label
+    invocation_label = calculate_invocable_label( invocation )
     return _produce_exception(
         exception_provider, sui, 'AbsentImplementation',
         f"No implementation of {invocation_label} exists for {variant_name}.",
@@ -263,6 +267,22 @@ def create_inaccessible_entity_exception(
         extra_data )
 
 
+def create_invalid_state_exception(
+    exception_provider, message, package_name, extra_data = ExtraData( ),
+):
+    ''' Creates error with context about invalid state. '''
+    sui = create_invalid_state_exception
+    _validate_argument_class( _excfp, message, str, 'message', sui )
+    _validate_argument_class( _excfp, package_name, str, 'package_name', sui )
+    from ..nomenclature import calculate_apex_package_name
+    apex_package_name = calculate_apex_package_name( package_name )
+    return _produce_exception(
+        exception_provider, sui, 'InvalidState',
+        f"Invalid internal state! {message} "
+        f"Please report to the '{apex_package_name}' package maintainers.",
+        extra_data )
+
+
 def create_invocation_validation_exception(
     exception_provider, invocation, cause, extra_data = ExtraData( ),
 ):
@@ -270,7 +290,8 @@ def create_invocation_validation_exception(
     sui = create_invocation_validation_exception
     _validate_argument_invocability( _excfp, invocation, 'invocation', sui )
     _validate_argument_class( _excfp, cause, str, 'cause', sui )
-    label = _calculate_invocable_label( invocation )
+    from ..nomenclature import calculate_invocable_label
+    label = calculate_invocable_label( invocation )
     return _produce_exception(
         exception_provider, sui, 'IncorrectData',
         f"Incompatible arguments for invocation of {label}: {cause}",
@@ -284,7 +305,8 @@ def create_return_validation_exception(
     sui = create_return_validation_exception
     _validate_argument_invocability( _excfp, invocation, 'invocation', sui )
     _validate_argument_class( _excfp, expectation, str, 'expectation', sui )
-    invocation_label = _calculate_invocable_label( invocation )
+    from ..nomenclature import calculate_invocable_label
+    invocation_label = calculate_invocable_label( invocation )
     return _produce_exception(
         exception_provider, sui, 'InvalidState',
         f"Invalid return value from {invocation_label}: "
