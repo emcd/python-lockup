@@ -299,7 +299,8 @@ def create_invocation_validation_exception(
 
 
 def create_return_validation_exception(
-    exception_provider, invocation, expectation, extra_data = ExtraData( ),
+    exception_provider, invocation, expectation, position = None,
+    extra_data = ExtraData( ),
 ):
     ''' Creates error with context about invalid return value. '''
     sui = create_return_validation_exception
@@ -307,9 +308,12 @@ def create_return_validation_exception(
     _validate_argument_class( _excfp, expectation, str, 'expectation', sui )
     from ..nomenclature import calculate_invocable_label
     invocation_label = calculate_invocable_label( invocation )
+    if isinstance( position, ( int, str ) ):
+        return_label = f"return value (position #{position})"
+    else: return_label = "return value"
     return _produce_exception(
         exception_provider, sui, 'InvalidState',
-        f"Invalid return value from {invocation_label}: "
+        f"Invalid {return_label} from {invocation_label}: "
         f"must be {expectation}",
         extra_data )
 

@@ -34,7 +34,6 @@ def select_public_attributes(
         Can optionally include specific attributes that would not be selected
         under normal operation and can exclude specific attributes that would
         selected under normal operation. '''
-    # TODO: Wrap in exception handler.
     names = (
           # Slotted object might not have '__dict__' attribute.
           getattr( object_, '__dict__', { } ).keys( )

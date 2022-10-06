@@ -98,25 +98,25 @@ def intercept_fugitive_exception_apprehender( apprehender, invocation ):
         except TypeError as exc:
             raise _our_exception_factory_provider( 'invocation_validation' )(
                 apprehender, str( exc ) ) from exc
-        # TODO: Validate arguments proper.
         # Ensure apprehender returns valid origin and custodian exceptions
         # without raising exception.
         try: origin, custodian = apprehender( *posargs, **nomargs )
         except BaseException as exc:
             raise _our_exception_factory_provider( 'fugitive_apprehension' )(
                 exc, apprehender ) from exc
-        # TODO: Add position information to return value exceptions.
         valid = None is origin
         valid = valid or (
             isinstance( origin, BaseException )
             and arguments.args[ 0 ] is origin )
         if not valid:
             raise _our_exception_factory_provider( 'return_validation' )(
-                apprehender, 'None or the original exception' )
+                apprehender, 'None or the original exception',
+                position = 0 )
         valid = None is custodian or isinstance( custodian, BaseException )
         if not valid:
             raise _our_exception_factory_provider( 'return_validation' )(
-                apprehender, 'None or instance of exception class' )
+                apprehender, 'None or instance of exception class',
+                position = 1 )
         return origin, custodian
 
     return invoker
