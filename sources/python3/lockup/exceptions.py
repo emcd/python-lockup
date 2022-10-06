@@ -112,15 +112,6 @@ class IncorrectData( InvalidOperation, TypeError, ValueError ):
 class InvalidState( Exception0, Exception ):
     ''' Alert about invalid internal state in the package. '''
 
-    # TODO: Implement factory for this.
-    #def __init__( self, supplement = None ):
-    #    from ._base import package_name
-    #    super( ).__init__( ' '.join( filter( None, (
-    #        f"Invalid internal state encountered "
-    #        f"in package '{package_name}'.",
-    #        supplement,
-    #        f"Please report this error to the package maintainers." ) ) ) )
-
 
 class FugitiveException( InvalidState, RuntimeError ):
     ''' Alert about fugitive exception intercepted at API boundary.
