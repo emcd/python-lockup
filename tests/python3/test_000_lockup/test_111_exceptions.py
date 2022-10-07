@@ -44,17 +44,15 @@ class __( metaclass = _NamespaceClass ):
         ( __.exceptions.ImpermissibleAttributeOperation,
           __.exceptions.ImpermissibleOperation ),
         ( __.exceptions.ImpermissibleAttributeOperation, AttributeError ),
-        ( __.exceptions.InaccessibleEntity, __.exceptions.InvalidOperation ),
         ( __.exceptions.InaccessibleAttribute,
-          __.exceptions.InaccessibleEntity ),
+          __.exceptions.InvalidOperation ),
         ( __.exceptions.InaccessibleAttribute, AttributeError ),
         ( __.exceptions.IncorrectData, __.exceptions.InvalidOperation ),
         ( __.exceptions.IncorrectData, TypeError ),
         ( __.exceptions.IncorrectData, ValueError ),
         ( __.exceptions.InvalidState, __.exceptions.Exception0 ),
-        ( __.exceptions.InvalidState, Exception ),
+        ( __.exceptions.InvalidState, RuntimeError ),
         ( __.exceptions.FugitiveException, __.exceptions.InvalidState ),
-        ( __.exceptions.FugitiveException, RuntimeError ),
     )
 )
 def test_011_ancestry( exception_class, ancestor_class ):
