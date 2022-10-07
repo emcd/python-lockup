@@ -43,7 +43,7 @@
         >>> try: del csv.nonexistent_attribute
         ... except InvalidOperation as exc: type( exc ).mro( )
         ...
-        [<class 'lockup.exceptions.InaccessibleAttribute'>, <class 'lockup.exceptions.InaccessibleEntity'>, <class 'lockup.exceptions.InvalidOperation'>, <class 'lockup.exceptions.Exception0'>, <class 'AttributeError'>, <class 'Exception'>, <class 'BaseException'>, <class 'object'>]
+        [<class 'lockup.exceptions.InaccessibleAttribute'>, <class 'lockup.exceptions.InvalidOperation'>, <class 'lockup.exceptions.Exception0'>, <class 'AttributeError'>, <class 'Exception'>, <class 'BaseException'>, <class 'object'>]
     ''' # pylint: disable=line-too-long
 
 
@@ -63,8 +63,6 @@ class Exception0( BaseException ):
         super( ).__init__( *posargs, **nomargs )
 
     # TODO: __repr__ which includes exception labels
-
-    # TODO: Attribute protection.
 
 
 #------------------------------ Object Interface -----------------------------#
@@ -91,14 +89,10 @@ class ImpermissibleAttributeOperation(
         such as Sphinx Autodoc, expect an :py:exc:`AttributeError`. '''
 
 
-class InaccessibleEntity( InvalidOperation ):
-    ''' Complaint about attempt to retrieve inaccessible entity. '''
-
-
-class InaccessibleAttribute( InaccessibleEntity, AttributeError ):
+class InaccessibleAttribute( InvalidOperation, AttributeError ):
     ''' Complaint about attempt to retrieve inaccessible attribute.
 
-        Cannot use :py:exc:`InaccessibleEntity` because some Python internals
+        Cannot use :py:exc:`InvalidOperation` because some Python internals
         expect an :py:exc:`AttributeError`. '''
 
 
@@ -109,11 +103,11 @@ class IncorrectData( InvalidOperation, TypeError, ValueError ):
 #------------------------------- Internal State ------------------------------#
 
 
-class InvalidState( Exception0, Exception ):
+class InvalidState( Exception0, RuntimeError ):
     ''' Alert about invalid internal state in the package. '''
 
 
-class FugitiveException( InvalidState, RuntimeError ):
+class FugitiveException( InvalidState ):
     ''' Alert about fugitive exception intercepted at API boundary.
 
         An fugitive exception is one which is not intended
