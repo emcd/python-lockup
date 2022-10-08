@@ -28,10 +28,15 @@
 
 def intercept_exception_factory_provider( provider, invocation ):
     ''' Encloses exception factory provider with interceptor. '''
-    # TODO: Validate invocation.
+    from .our_factories import (
+        provide_exception_factory as our_exception_factory_provider,
+    )
+    from ..validators import validate_argument_invocability
+    validate_argument_invocability(
+        our_exception_factory_provider,
+        invocation, 'invocation', intercept_exception_factory_provider )
     signature = _validate_exception_factory_provider( provider, invocation )
     from functools import wraps
-    from .ours import our_exception_factory_provider
 
     @wraps( provider )
     def invoker( *posargs, **nomargs ):
@@ -58,7 +63,9 @@ def _validate_exception_factory_provider( provider, invocation ):
         signature = scan_signature( provider )
         valid = 1 == len( signature.parameters )
     if valid: return signature
-    from .ours import our_exception_factory_provider
+    from .our_factories import (
+        provide_exception_factory as our_exception_factory_provider,
+    )
     raise our_exception_factory_provider( 'argument_validation' )(
         'exception_factory_provider',
         invocation,
@@ -69,7 +76,9 @@ def _intercept_exception_factory( factory, invocation ):
     ''' Encloses exception factory with interceptor. '''
     signature = _validate_exception_factory( factory, invocation )
     from functools import wraps
-    from .ours import our_exception_factory_provider
+    from .our_factories import (
+        provide_exception_factory as our_exception_factory_provider,
+    )
 
     @wraps( factory )
     def invoker( *posargs, **nomargs ):
@@ -96,17 +105,24 @@ def _validate_exception_factory( factory, invocation ):
     ''' Validates exception factory provider as invocation argument. '''
     from inspect import signature as scan_signature
     if callable( factory ): return scan_signature( factory )
-    from .ours import our_exception_factory_provider
+    from .our_factories import (
+        provide_exception_factory as our_exception_factory_provider,
+    )
     raise our_exception_factory_provider( 'argument_validation' )(
         'exception_factory', invocation, 'exception factory' )
 
 
 def intercept_exception_class_provider( provider, invocation ):
     ''' Encloses exception class provider with interceptor. '''
-    # TODO: Validate invocation.
+    from .our_factories import (
+        provide_exception_factory as our_exception_factory_provider,
+    )
+    from ..validators import validate_argument_invocability
+    validate_argument_invocability(
+        our_exception_factory_provider,
+        invocation, 'invocation', intercept_exception_class_provider )
     signature = _validate_exception_class_provider( provider, invocation )
     from functools import wraps
-    from .ours import our_exception_factory_provider
 
     @wraps( provider )
     def invoker( *posargs, **nomargs ):
@@ -140,6 +156,8 @@ def _validate_exception_class_provider( provider, invocation ):
         signature = scan_signature( provider )
         valid = 1 == len( signature.parameters )
     if valid: return signature
-    from .ours import our_exception_factory_provider
+    from .our_factories import (
+        provide_exception_factory as our_exception_factory_provider,
+    )
     raise our_exception_factory_provider( 'argument_validation' )(
         'exception_class_provider', invocation, 'exception class provider' )

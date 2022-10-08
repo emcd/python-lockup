@@ -29,13 +29,13 @@
 # Public API
 from . import (
     general,
-    ours,
+    our_factories,
 )
 from .general import (
     intercept_exception_class_provider,
     intercept_exception_factory_provider,
 )
-from .ours import (
-    our_exception_class_provider,
-    our_exception_factory_provider,
+from .our_factories import (
+    provide_exception_class as our_exception_class_provider,
+    provide_exception_factory as our_exception_factory_provider,
 )
