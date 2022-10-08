@@ -130,7 +130,7 @@ def _reassign_class_factories( ):
         we can still provide functionality without the extra protection. '''
     from inspect import isclass as is_class
     from . import exceptions
-    from .exceptionality import ExtraData
+    from .exceptionality.ours import ExtraData
     from .reflection import reassign_class_factory
     reassign_class_factory(
         Class, Class, assert_implementation = False )

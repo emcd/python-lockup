@@ -46,6 +46,11 @@ Module ``lockup.exceptionality``
 
 .. automodule:: lockup.exceptionality
 
+Module ``lockup.exceptionality.ours``
+-------------------------------------------------------------------------------
+
+.. automodule:: lockup.exceptionality.ours
+
 Module ``lockup.nomenclature``
 -------------------------------------------------------------------------------
 
