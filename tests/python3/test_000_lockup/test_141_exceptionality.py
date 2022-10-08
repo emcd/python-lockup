@@ -50,20 +50,6 @@ _invocables = (
 )
 
 
-# TODO: Index in proper location.
-def test_006_error_on_provide_nonexistent_exception_class( ):
-    ''' Error on attempt to provide nonexistent exception class. '''
-    with raises( __.exceptions.InvalidOperation ):
-        __.our_exception_class_provider( 123 )
-
-
-# TODO: Index in proper location.
-def test_007_error_on_provide_nonexistent_exception_factory( ):
-    ''' Error on attempt to provide nonexistent exception factory. '''
-    with raises( __.exceptions.InvalidOperation ):
-        __.our_exception_factory_provider( 123 )
-
-
 def test_011_intercept_factory_provider( ):
     ''' Ensures validation and decoration of factory provider. '''
     provider = __.intercept_exception_factory_provider(
@@ -197,7 +183,21 @@ def test_039_error_corrupt_class_provider( ):
     with raises( __.exceptions.InvalidState ): provider( 'InvalidOperation' )
 
 
-def test_131_argument_validation_exception( ):
+@mark.parametrize( 'name', ( 'ph00b4r' * 5, 123, ) )
+def test_116_error_invalid_exception_class_name( name ):
+    ''' Error on attempt to provide nonexistent exception class. '''
+    with raises( __.exceptions.InvalidOperation ):
+        __.our_exception_class_provider( name )
+
+
+@mark.parametrize( 'name', ( 'ph00b4r' * 5, 123, ) )
+def test_126_error_invalid_exception_factory_name( name ):
+    ''' Error on attempt to provide nonexistent exception factory. '''
+    with raises( __.exceptions.InvalidOperation ):
+        __.our_exception_factory_provider( name )
+
+
+def test_211_argument_validation_exception( ):
     ''' Validation exception is created from argument. '''
     expectation = 'special integer'
     def tester( argument ): return argument
@@ -209,8 +209,20 @@ def test_131_argument_validation_exception( ):
     assert expectation in str( result )
 
 
+@mark.parametrize(
+    'trial_function',
+    ( sorted, lambda iterable: iterable, lambda *iterable: len( iterable ),
+      lambda iterable = 1: iterable, lambda **iterable: len( iterable ) ) )
+def test_212_argument_validation_exceptions( trial_function ):
+    ''' Validation exception with different categories of arguments. '''
+    assert isinstance(
+        __.our_exception_factory_provider( 'argument_validation' )(
+            'iterable', trial_function, 'function' ),
+        __.exceptions.IncorrectData )
+
+
 @mark.parametrize( 'provider', ( 123, 'ph00b4r' * 5 ) )
-def test_132_argument_validation_exception_invalid_provider( provider ):
+def test_216_argument_validation_exception_invalid_provider( provider ):
     ''' Cannot create validation exception because of invalid provider. '''
     def tester( argument ): return argument
     with raises( __.exceptions.IncorrectData ):
@@ -219,7 +231,7 @@ def test_132_argument_validation_exception_invalid_provider( provider ):
 
 
 @mark.parametrize( 'invocation', ( 123, 'ph00b4r' * 5 ) )
-def test_133_argument_validation_exception_invalid_invocation( invocation ):
+def test_217_argument_validation_exception_invalid_invocation( invocation ):
     ''' Cannot create validation exception because of invalid invocation. '''
     with raises( __.exceptions.IncorrectData ):
         __.our_exception_factory_provider( 'argument_validation' )(
@@ -227,7 +239,7 @@ def test_133_argument_validation_exception_invalid_invocation( invocation ):
 
 
 @mark.parametrize( 'expectation', ( 123, lambda: None ) )
-def test_134_argument_validation_exception_invalid_expectation( expectation ):
+def test_218_argument_validation_exception_invalid_expectation( expectation ):
     ''' Cannot create validation exception because of invalid expectation. '''
     def tester( argument ): return argument
     with raises( __.exceptions.IncorrectData ):
@@ -235,19 +247,7 @@ def test_134_argument_validation_exception_invalid_expectation( expectation ):
             'argument', tester, expectation )
 
 
-@mark.parametrize(
-    'trial_function',
-    ( sorted, lambda iterable: iterable, lambda *iterable: len( iterable ),
-      lambda iterable = 1: iterable, lambda **iterable: len( iterable ) ) )
-def test_136_argument_validation_exceptions( trial_function ):
-    ''' Validation exception with different categories of arguments. '''
-    assert isinstance(
-        __.our_exception_factory_provider( 'argument_validation' )(
-            'iterable', trial_function, 'function' ),
-        __.exceptions.IncorrectData )
-
-
-def test_141_attribute_nonexistence_exception( ):
+def test_251_attribute_nonexistence_exception( ):
     ''' Ensures exception creation. '''
     class Object: ''' Trivial test class. '''
     object_ = Object( )
@@ -258,7 +258,7 @@ def test_141_attribute_nonexistence_exception( ):
     assert tracer in str( result )
 
 
-def test_151_attribute_noninvocability_exception( ):
+def test_261_attribute_noninvocability_exception( ):
     ''' Validation exception is created from arguments. '''
     class Object: ''' Trivial test class. '''
     object_ = Object( )
@@ -270,7 +270,16 @@ def test_151_attribute_noninvocability_exception( ):
     assert tracer in str( result )
 
 
-def test_161_invalid_state_exception( ):
+@mark.parametrize( 'argument', _invocables )
+def test_301_implementation_absence_exception( argument ):
+    ''' Validation exception is created from argument. '''
+    assert isinstance(
+        __.our_exception_factory_provider( 'implementation_absence' )(
+            argument, 'something' ),
+        __.exceptions.AbsentImplementation )
+
+
+def test_321_invalid_state_exception( ):
     ''' Invalid state exception is created from arguments. '''
     tracer = 'ph00b4r' * 5
     result = __.our_exception_factory_provider( 'invalid_state' )(
@@ -279,19 +288,10 @@ def test_161_invalid_state_exception( ):
     assert tracer in str( result )
 
 
-def test_171_invocation_validation_exception( ):
+def test_331_invocation_validation_exception( ):
     ''' Validation exception is created from arguments. '''
     def tester( argument ): return argument
     assert isinstance(
         __.our_exception_factory_provider( 'invocation_validation' )(
             tester, 'mismatched arguments' ),
         __.exceptions.IncorrectData )
-
-
-@mark.parametrize( 'argument', _invocables )
-def test_181_implementation_absence_exception( argument ):
-    ''' Validation exception is created from argument. '''
-    assert isinstance(
-        __.our_exception_factory_provider( 'implementation_absence' )(
-            argument, 'something' ),
-        __.exceptions.AbsentImplementation )
