@@ -35,7 +35,7 @@ class __( metaclass = _NamespaceClass ):
     )
 
 
-def test_006_is_operational_name( ):
+def test_011_is_operational_name( ):
     ''' Verify valid operational Python identifier. '''
     assert __.is_operational_name( '__dict__' )
 
@@ -43,20 +43,21 @@ def test_006_is_operational_name( ):
 @mark.parametrize(
     'name', ( 'public', '_non_public', '__', '__nope', 'if', '123', )
 )
-def test_007_is_not_operational_name( name ):
+def test_016_is_not_operational_name( name ):
     ''' Verify invalid operational Python identifier. '''
     assert not __.is_operational_name( name )
 
 
 @mark.parametrize( 'name', ( 'public', '__dict__', ) )
-def test_011_is_public_or_operational_name( name ):
+def test_021_is_public_or_operational_name( name ):
     ''' Verify valid public or operational Python identifier. '''
     assert __.is_public_or_operational_name( name )
 
 
-# TODO: Test non-string values too.
-@mark.parametrize( 'name', ( '_non_public', '__', '__nope', 'if', '123', ) )
-def test_012_is_not_public_or_operational_name( name ):
+@mark.parametrize(
+    'name', ( '_non_public', '__', '__nope', 'if', '123', 123, None, )
+)
+def test_026_is_not_public_or_operational_name( name ):
     ''' Verify invalid public or operational Python identifier. '''
     assert not __.is_public_or_operational_name( name )
 
@@ -74,7 +75,7 @@ class _C: __slots__ = ( 'blue', 'red', )
       ( _NamespaceClass, _B, ( ), ( ), [ 'blue' ] ),
       ( _C, _C( ), ( ), ( ), [ 'blue', 'red' ] ),
       ( _C, _C( ), ( '__str__', ), ( 'red', ), [ '__str__', 'blue' ] ) ) )
-def test_021_select_public_attributes(
+def test_051_select_public_attributes(
     class_, object_, includes, excludes, expectation
 ):
     ''' Verify selection of public attributes for given class and object. '''

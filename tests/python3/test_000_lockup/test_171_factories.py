@@ -35,33 +35,31 @@ class __( metaclass = _NamespaceClass ):
     )
 
 
-# TODO: Test 'Class'.
+def test_011_produce_class( ):
+    ''' Normal production of class. '''
+    class Object( metaclass = __.Class ): ''' Test class. '''
+    assert isinstance( Object, __.Class )
 
 
 def test_111_produce_namespace( ):
     ''' Normal production of namespace. '''
-
     class Namespace( metaclass = __.NamespaceClass ):
         ''' Test namespace. '''
-
         answer = 42
-
     assert isinstance( Namespace, __.NamespaceClass )
 
 
-def test_112_fail_to_produce_instantiable_namespace( ):
+def test_116_fail_to_produce_instantiable_namespace( ):
     ''' No production of namespace with possible instantiation. '''
-
     with raises( __.exceptions.InvalidOperation ):
-
-        class Namespace( metaclass = __.NamespaceClass ):
+        class Namespace( metaclass = __.NamespaceClass ): # pylint: disable=unused-variable
             ''' Test namespace. '''
-
             def __new__( class_, *pos_arguments, **nom_arguments ):
                 return super( class_, __.NamespaceClass ).__new__(
                     *pos_arguments, **nom_arguments )
 
-        del Namespace
 
-
-# TODO: Test 'create_namespace'.
+def test_151_create_namespace( ):
+    ''' Produce namespace via factory. '''
+    namespace = __.create_namespace( answer = 42 )
+    assert isinstance( namespace, __.NamespaceClass )

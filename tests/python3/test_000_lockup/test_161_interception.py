@@ -79,7 +79,7 @@ def test_021_create_interception_decorator( ):
 
 
 @mark.parametrize( 'provider', ( 123, 'ph00b4r' * 5, ) )
-def test_022_interceptor_creation_with_invalid_provider( provider ):
+def test_026_interceptor_creation_with_invalid_provider( provider ):
     ''' Interception decorator creation fails on invalid provider. '''
     with raises( __.exceptions.IncorrectData ):
         __.create_interception_decorator(
@@ -87,7 +87,7 @@ def test_022_interceptor_creation_with_invalid_provider( provider ):
 
 
 @mark.parametrize( 'apprehender', ( 123, 'ph00b4r' * 5, ) )
-def test_023_interceptor_creation_with_invalid_apprehender( apprehender ):
+def test_027_interceptor_creation_with_invalid_apprehender( apprehender ):
     ''' Interception decorator creation fails on invalid apprehender. '''
     with raises( __.exceptions.IncorrectData ):
         __.create_interception_decorator(
@@ -97,14 +97,14 @@ def test_023_interceptor_creation_with_invalid_apprehender( apprehender ):
 @mark.parametrize(
     'value', ( None, 42, 'test', Exception, Exception( ), ( ), [ 42 ], )
 )
-def test_026_intercept_normal_return( value ):
+def test_031_intercept_normal_return( value ):
     ''' Returns across API boundary without alteration. '''
     @__.our_interceptor
     def return_per_normal( value ): return value
     assert value == return_per_normal( value )
 
 
-def test_027_translate_fugitive_with_interceptor( ):
+def test_032_translate_fugitive_with_interceptor( ):
     ''' Interception decorator intercepts and translates fugitives. '''
     @__.our_interceptor
     def release_fugitive( ): return 1 / 0
@@ -120,14 +120,14 @@ def test_027_translate_fugitive_with_interceptor( ):
         __.exceptions.InvalidState,
     )
 )
-def test_028_relay_permissible_with_interceptor( exception_class ):
+def test_033_relay_permissible_with_interceptor( exception_class ):
     ''' Interception decorator relays permissible exceptions. '''
     @__.our_interceptor
     def raise_permissible_exception( ): raise exception_class
     with raises( exception_class ): raise_permissible_exception( )
 
 
-def test_029_intercept_invalid_invocation( ):
+def test_034_intercept_invalid_invocation( ):
     ''' Special report on invalid invocation arguments. '''
     @__.our_interceptor
     def a_function( ): pass
@@ -141,7 +141,7 @@ def _return_fugitive( exception, invocation ): # pylint: disable=unused-argument
         return exception, None
     return None, None
 
-def test_031_intercept_and_return_fugitive( ):
+def test_035_intercept_and_return_fugitive( ):
     ''' Interception decorator returns apprehended fugitives. '''
     @__.create_interception_decorator(
         __.our_exception_factory_provider,
@@ -159,7 +159,7 @@ def _propagate_replacement( exception, invocation ):
         __.our_exception_factory_provider( 'fugitive_apprehension' )(
             exception, invocation ) )
 
-def test_032_intercept_and_propagate_replacement( ):
+def test_036_intercept_and_propagate_replacement( ):
     ''' Interception decorator propagates replacements for fugitives. '''
     @__.create_interception_decorator(
         __.our_exception_factory_provider,
@@ -177,7 +177,7 @@ def _propagate_invalid_origin( exception, invocation ):
         return exception, None
     return invocation, None
 
-def test_036_intercept_and_check_invalid_origin( ):
+def test_037_intercept_and_check_invalid_origin( ):
     ''' Inteception decorator checks invalid custodian for fugitives. '''
     @__.create_interception_decorator(
         __.our_exception_factory_provider,
@@ -195,7 +195,7 @@ def _propagate_invalid_custodian( exception, invocation ):
         return exception, None
     return None, invocation
 
-def test_037_intercept_and_check_invalid_custodian( ):
+def test_038_intercept_and_check_invalid_custodian( ):
     ''' Inteception decorator checks invalid custodian for fugitives. '''
     @__.create_interception_decorator(
         __.our_exception_factory_provider,
