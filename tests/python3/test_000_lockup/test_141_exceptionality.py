@@ -29,13 +29,15 @@ class __( metaclass = _NamespaceClass ):
 
     from lockup import exceptions
     from lockup.exceptionality import (
-        ExtraData,
-        create_argument_validation_exception,
-        create_implementation_absence_exception,
         intercept_exception_class_provider,
         intercept_exception_factory_provider,
         our_exception_class_provider,
         our_exception_factory_provider,
+    )
+    from lockup.exceptionality.ours import (
+        ExtraData,
+        create_argument_validation_exception,
+        create_implementation_absence_exception,
     )
     from lockup.interception import our_interceptor
 

@@ -47,6 +47,8 @@ from .module import Module, reclassify_module
 
 # Spray the package modules with a monkey-patch-resistant coating.
 reclassify_module( exceptionality )
+reclassify_module( exceptionality.general )
+reclassify_module( exceptionality.ours )
 reclassify_module( exceptions )
 reclassify_module( factories )
 reclassify_module( interception )
