@@ -25,15 +25,19 @@ v2.0.0 (not released yet)
 API
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+* No more separate API for package-internal development. Everything is now
+  exposed as part of an auxiliary public API as opposed to the primary public
+  API.
+
+  .. note::
+
+     Some parts of the auxiliary public API may be refactored into separate
+     packages at a later point.
+
 * Provide ``create_interception_decorator`` function which creates function
   decorators that apprehend "fugitive" exceptions before they escape across the
   boundary of a public API. Fugitive exceptions are exceptions which are
   unexpected and which should have been caught internally.
-
-* Provide ``ExceptionController`` for use with
-  ``create_interception_decorator`` and the validaton utilities. This allows
-  you to define custom behaviors for how to handle fugitive exceptions and also
-  to plug your own exception factories into the validator utilities.
 
 * Provide ``reassign_class_factory`` function which allows for a class to be
   assigned a new factory class ("metaclass"). This can even be used on a class
@@ -42,6 +46,11 @@ API
   package uses it internally, when possible, to allow class factory classes to
   enforce attribute concealment and immutability on themselves and not just
   their instances. But, it can be put to other purposes too.
+
+* Provide exception management utilities, including factories which can inject
+  labels into instances of a single omniexception class as an alternative to
+  working with a class hierarchy. This package internally uses the utilities to
+  create exceptions, which have good descriptions and helpful labels.
 
 * Provide nomenclatural utilities which determine the classification of objects
   that are provided to them. These are useful for the creation of more helpful
@@ -64,7 +73,9 @@ API
 Python Support
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* Drop CPython 3.6.
+* Remove CPython 3.6 because it is past end-of-life.
+
+* Deprecate Pyston because of its new maintenance model.
 
 * Add PyPy 3.9.
 

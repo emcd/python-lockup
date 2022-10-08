@@ -294,8 +294,16 @@ Compatibility
 This package has been verified to work on the following Python implementations:
 
 * `CPython <https://github.com/python/cpython>`_
+
 * `PyPy <https://www.pypy.org/>`_
+
 * `Pyston <https://www.pyston.org/>`_
+
+  .. warning::
+
+     Support for Pyston may disappear in the future as the maintainers have
+     decided to invest in a JIT module for CPython rather than a separate
+     implementation.
 
 It likely works on others as well, but please report if it does not.
 
@@ -303,6 +311,12 @@ It likely works on others as well, but please report if it does not.
 .. TODO: https://github.com/oracle/graalpython
 .. TODO: https://github.com/IronLanguages/ironpython3
 .. TODO: https://github.com/RustPython/RustPython
+
+.. TODO: https://pypi.org/project/Cython/
+.. TODO: https://pypi.org/project/Nuitka/
+.. TODO: https://pypi.org/project/numba/
+.. TODO: https://pypi.org/project/pyston-lite/
+.. TODO: https://pypi.org/project/taichi/
 
 `More Flair <https://www.imdb.com/title/tt0151804/characters/nm0431918>`_
 ===============================================================================
