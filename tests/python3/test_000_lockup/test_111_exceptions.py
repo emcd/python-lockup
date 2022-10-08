@@ -33,10 +33,10 @@ class __( metaclass = _NamespaceClass ):
 @mark.parametrize(
     'exception_class, ancestor_class',
     (
-        ( __.exceptions.Exception0, BaseException ),
-        ( __.exceptions.InvalidOperation, __.exceptions.Exception0 ),
+        ( __.exceptions.Omniexception, BaseException ),
+        ( __.exceptions.InvalidOperation, __.exceptions.Omniexception ),
         ( __.exceptions.InvalidOperation, Exception ),
-        ( __.exceptions.AbsentImplementation, __.exceptions.Exception0 ),
+        ( __.exceptions.AbsentImplementation, __.exceptions.Omniexception ),
         ( __.exceptions.AbsentImplementation, NotImplementedError ),
         ( __.exceptions.ImpermissibleOperation,
           __.exceptions.InvalidOperation ),
@@ -50,7 +50,7 @@ class __( metaclass = _NamespaceClass ):
         ( __.exceptions.IncorrectData, __.exceptions.InvalidOperation ),
         ( __.exceptions.IncorrectData, TypeError ),
         ( __.exceptions.IncorrectData, ValueError ),
-        ( __.exceptions.InvalidState, __.exceptions.Exception0 ),
+        ( __.exceptions.InvalidState, __.exceptions.Omniexception ),
         ( __.exceptions.InvalidState, RuntimeError ),
     )
 )

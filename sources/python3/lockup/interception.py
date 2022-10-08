@@ -138,8 +138,8 @@ def _validate_fugitive_exception_apprehender( apprehender, invocation ):
 
 def our_fugitive_exception_apprehender( exception, invocation ):
     ''' Apprehends fugitive exceptions at API boundary. '''
-    from .exceptions import Exception0
-    if isinstance( exception, Exception0 ): return exception, None
+    from .exceptions import Omniexception
+    if isinstance( exception, Omniexception ): return exception, None
     return (
         exception,
         _our_exception_factory_provider( 'fugitive_apprehension' )(
