@@ -45,7 +45,7 @@ def test_011_intercept_apprehender( ):
         __.our_fugitive_exception_apprehender,
         test_011_intercept_apprehender )
     assert callable( apprehender )
-    exc = __.exceptions.Exception0( 'test' )
+    exc = __.exceptions.Omniexception( 'test' )
     assert ( exc, None ) == apprehender( exc, test_011_intercept_apprehender )
 
 
@@ -67,7 +67,7 @@ def test_017_error_faulty_apprehender( ):
         _faulty_apprehender, test_017_error_faulty_apprehender )
     with raises( __.exceptions.InvalidState ):
         apprehender(
-            __.exceptions.Exception0, test_017_error_faulty_apprehender )
+            __.exceptions.Omniexception, test_017_error_faulty_apprehender )
 
 
 def test_021_create_interception_decorator( ):
@@ -137,7 +137,7 @@ def test_029_intercept_invalid_invocation( ):
 
 def _return_fugitive( exception, invocation ): # pylint: disable=unused-argument
     ''' Apprehends fugitive exceptions at API boundary. '''
-    if isinstance( exception, __.exceptions.Exception0 ):
+    if isinstance( exception, __.exceptions.Omniexception ):
         return exception, None
     return None, None
 
@@ -152,7 +152,7 @@ def test_031_intercept_and_return_fugitive( ):
 
 def _propagate_replacement( exception, invocation ):
     ''' Apprehends fugitive exceptions at API boundary. '''
-    if isinstance( exception, __.exceptions.Exception0 ):
+    if isinstance( exception, __.exceptions.Omniexception ):
         return exception, None
     return (
         None,
@@ -173,7 +173,7 @@ def test_032_intercept_and_propagate_replacement( ):
 
 def _propagate_invalid_origin( exception, invocation ):
     ''' Apprehends fugitive exceptions at API boundary. '''
-    if isinstance( exception, __.exceptions.Exception0 ):
+    if isinstance( exception, __.exceptions.Omniexception ):
         return exception, None
     return invocation, None
 
@@ -191,7 +191,7 @@ def test_036_intercept_and_check_invalid_origin( ):
 
 def _propagate_invalid_custodian( exception, invocation ):
     ''' Apprehends fugitive exceptions at API boundary. '''
-    if isinstance( exception, __.exceptions.Exception0 ):
+    if isinstance( exception, __.exceptions.Omniexception ):
         return exception, None
     return None, invocation
 

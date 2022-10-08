@@ -18,8 +18,16 @@
 #============================================================================#
 
 
-''' :py:exc:`Exception0` is the ancestor of all exceptions from this package.
+''' Classes of exceptions emitted by the functionality of this package.
 
+    :py:exc:`Omniexception` is the ancestor of all the exception classes. It
+    has an ``exception_labels`` attribute which allows instances of it to bear
+    information about exceptions beyond what a class alone can convey. As a
+    principle, we try to avoid class hierarchies and instead use labels.
+    However, sometimes the Python implementation or the test machinery expect
+    exception classes which are explicitly subclassed from certain Python
+    builtin exceptions. So, variants of the omniexception class, which are
+    fused to necessary Python builtin exception classes, are also provided.
     These exceptions can be matched by corresponding builtin exception classes
     or by their ancestral exception classes from this module:
 
@@ -36,21 +44,21 @@
         >>> try: del csv.reader
         ... except AttributeError as exc: type( exc ).mro( )
         ...
-        [<class 'lockup.exceptions.ImpermissibleAttributeOperation'>, <class 'lockup.exceptions.ImpermissibleOperation'>, <class 'lockup.exceptions.InvalidOperation'>, <class 'lockup.exceptions.Exception0'>, <class 'TypeError'>, <class 'AttributeError'>, <class 'Exception'>, <class 'BaseException'>, <class 'object'>]
+        [<class 'lockup.exceptions.ImpermissibleAttributeOperation'>, <class 'lockup.exceptions.ImpermissibleOperation'>, <class 'lockup.exceptions.InvalidOperation'>, <class 'lockup.exceptions.Omniexception'>, <class 'TypeError'>, <class 'AttributeError'>, <class 'Exception'>, <class 'BaseException'>, <class 'object'>]
         >>> try: del csv.reader
         ... except InvalidOperation as exc: pass
         ...
         >>> try: del csv.nonexistent_attribute
         ... except InvalidOperation as exc: type( exc ).mro( )
         ...
-        [<class 'lockup.exceptions.InaccessibleAttribute'>, <class 'lockup.exceptions.InvalidOperation'>, <class 'lockup.exceptions.Exception0'>, <class 'AttributeError'>, <class 'Exception'>, <class 'BaseException'>, <class 'object'>]
+        [<class 'lockup.exceptions.InaccessibleAttribute'>, <class 'lockup.exceptions.InvalidOperation'>, <class 'lockup.exceptions.Omniexception'>, <class 'AttributeError'>, <class 'Exception'>, <class 'BaseException'>, <class 'object'>]
     ''' # pylint: disable=line-too-long
 
 
 # pylint: disable=too-many-ancestors
 
 
-class Exception0( BaseException ):
+class Omniexception( BaseException ):
     ''' Base for all exceptions in the package. '''
 
     def __init__( self, *posargs, exception_labels = None, **nomargs ):
@@ -68,11 +76,11 @@ class Exception0( BaseException ):
 #------------------------------ Object Interface -----------------------------#
 
 
-class InvalidOperation( Exception0, Exception ):
+class InvalidOperation( Omniexception, Exception ):
     ''' Complaint about invalid operation. '''
 
 
-class AbsentImplementation( Exception0, NotImplementedError ):
+class AbsentImplementation( Omniexception, NotImplementedError ):
     ''' Complaint about attempt execute nonexistent implementation. '''
 
 
@@ -103,7 +111,7 @@ class IncorrectData( InvalidOperation, TypeError, ValueError ):
 #------------------------------- Internal State ------------------------------#
 
 
-class InvalidState( Exception0, RuntimeError ):
+class InvalidState( Omniexception, RuntimeError ):
     ''' Alert about invalid internal state in the package. '''
 
 

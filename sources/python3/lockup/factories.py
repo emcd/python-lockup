@@ -137,7 +137,7 @@ def _reassign_class_factories( ):
     for aname in dir( exceptions ):
         attribute = getattr( exceptions, aname )
         if not is_class( attribute ): continue
-        if not issubclass( attribute, exceptions.Exception0 ): # pragma: no cover
+        if not issubclass( attribute, exceptions.Omniexception ): # pragma: no cover
             continue
         reassign_class_factory(
             attribute, Class, assert_implementation = False )

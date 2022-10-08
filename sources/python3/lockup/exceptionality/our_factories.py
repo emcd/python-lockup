@@ -67,7 +67,7 @@ def provide_exception_class( name ):
     from ..visibility import is_public_name
     if is_public_name( name ) and hasattr( exceptions, name ):
         exception_class = getattr( exceptions, name )
-        if issubclass( exception_class, exceptions.Exception0 ): # pragma: no branch
+        if issubclass( exception_class, exceptions.Omniexception ): # pragma: no branch
             return exception_class
     raise provide_exception_factory( 'inaccessible_entity' )(
         name, 'name of available exception class' )
