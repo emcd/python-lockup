@@ -60,7 +60,7 @@ def test_011_validate_invocable_argument( argument ):
 
 
 @mark.parametrize( 'argument', ( 123, 'ph00b4r' * 5, ) )
-def test_012_validate_noninvocable_argument( argument ):
+def test_016_validate_noninvocable_argument( argument ):
     ''' Noninvocable objects causes exceptions. '''
     def tester( argument ): return argument
     with raises( __.IncorrectData ):
@@ -74,7 +74,7 @@ def test_021_validate_attribute_existence( ):
         __.our_exception_factory_provider, 'a_method', _invocable_object )
 
 
-def test_022_validate_attribute_nonexistence( ):
+def test_026_validate_attribute_nonexistence( ):
     ''' Nonexistent attributes cause exceptions. '''
     aname = 'ph00b4r' * 5
     with raises( __.InaccessibleAttribute ):
@@ -88,7 +88,7 @@ def test_031_validate_invocable_attribute( ):
         __.our_exception_factory_provider, 'a_method', _invocable_object )
 
 
-def test_032_validate_attribute_noninvocability( ):
+def test_036_validate_attribute_noninvocability( ):
     ''' Noninvocable attributes cause exceptions. '''
     aname = '__dict__'
     with raises( __.InvalidOperation ):

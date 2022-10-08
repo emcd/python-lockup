@@ -70,7 +70,7 @@ def test_113_reclassify_module_idempotence( ):
 
 
 @mark.parametrize( 'module', ( 123, 'ph00b4r' * 5, ) )
-def test_114_reclassify_invalid_module( module ):
+def test_116_reclassify_invalid_module( module ):
     ''' Only modules may be reclassified. '''
     with raises( __.exceptions.IncorrectData ):
         __.reclassify_module( module )
