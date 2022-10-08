@@ -45,11 +45,12 @@ Module ``lockup.exceptionality``
 -------------------------------------------------------------------------------
 
 .. automodule:: lockup.exceptionality
+   :imported-members:
 
-Module ``lockup.exceptionality.ours``
+Module ``lockup.exceptionality.our_factories``
 -------------------------------------------------------------------------------
 
-.. automodule:: lockup.exceptionality.ours
+.. automodule:: lockup.exceptionality.our_factories
 
 Module ``lockup.nomenclature``
 -------------------------------------------------------------------------------
