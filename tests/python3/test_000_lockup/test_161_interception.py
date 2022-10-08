@@ -108,9 +108,9 @@ def test_027_translate_fugitive_with_interceptor( ):
     ''' Interception decorator intercepts and translates fugitives. '''
     @__.our_interceptor
     def release_fugitive( ): return 1 / 0
-    with raises( __.exceptions.FugitiveException ): release_fugitive( )
+    with raises( __.exceptions.InvalidState ): release_fugitive( )
     try: release_fugitive( )
-    except __.exceptions.FugitiveException as exc:
+    except __.exceptions.InvalidState as exc:
         assert isinstance( exc.__cause__, ZeroDivisionError )
 
 
@@ -165,9 +165,9 @@ def test_032_intercept_and_propagate_replacement( ):
         __.our_exception_factory_provider,
         apprehender = _propagate_replacement )
     def release_fugitive( ): return 1 / 0
-    with raises( __.exceptions.FugitiveException ): release_fugitive( )
+    with raises( __.exceptions.InvalidState ): release_fugitive( )
     try: release_fugitive( )
-    except __.exceptions.FugitiveException as exc:
+    except __.exceptions.InvalidState as exc:
         assert None is exc.__cause__
 
 

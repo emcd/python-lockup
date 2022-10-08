@@ -52,7 +52,6 @@ class __( metaclass = _NamespaceClass ):
         ( __.exceptions.IncorrectData, ValueError ),
         ( __.exceptions.InvalidState, __.exceptions.Exception0 ),
         ( __.exceptions.InvalidState, RuntimeError ),
-        ( __.exceptions.FugitiveException, __.exceptions.InvalidState ),
     )
 )
 def test_011_ancestry( exception_class, ancestor_class ):
