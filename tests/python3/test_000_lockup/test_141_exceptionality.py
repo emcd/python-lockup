@@ -34,7 +34,7 @@ class __( metaclass = _NamespaceClass ):
         our_exception_class_provider,
         our_exception_factory_provider,
     )
-    from lockup.exceptionality.ours import (
+    from lockup.exceptionality.our_factories import (
         ExtraData,
         create_argument_validation_exception,
         create_implementation_absence_exception,
