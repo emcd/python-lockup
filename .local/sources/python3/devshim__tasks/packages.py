@@ -71,6 +71,7 @@ def calculate_python_packages_fixtures( environment ):
 
 def record_python_packages_fixtures( identifier, fixtures ):
     ''' Records table of Python packages fixtures. '''
+    from operator import itemgetter
     from tomli import load
     from tomli_w import dump
     fixtures_path = __.paths.configuration.pypackages_fixtures
@@ -78,6 +79,9 @@ def record_python_packages_fixtures( identifier, fixtures ):
         with fixtures_path.open( 'rb' ) as file: document = load( file )
     else: document = { }
     document[ identifier ] = fixtures
+    # Minimize delta sizes for SCM commits by preserving order.
+    # I.e., a micro version bump should not reshuffle a large block of data.
+    document = dict( sorted( document.items( ), key = itemgetter( 0 ) ) )
     with fixtures_path.open( 'wb' ) as file: dump( document, file )
 
 
