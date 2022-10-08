@@ -107,13 +107,4 @@ class InvalidState( Exception0, RuntimeError ):
     ''' Alert about invalid internal state in the package. '''
 
 
-class FugitiveException( InvalidState ):
-    ''' Alert about fugitive exception intercepted at API boundary.
-
-        An fugitive exception is one which is not intended
-        to be reported across the package API boundary.
-        Fugitive exceptions include Python built-ins,
-        such as :py:exc:`IndexError`. '''
-
-
 # pylint: enable=too-many-ancestors

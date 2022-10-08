@@ -218,7 +218,7 @@ def create_fugitive_apprehension_exception(
     exception_class_label = calculate_class_label( type( fugitive ) )
     invocation_label = calculate_invocable_label( invocation )
     return _produce_exception(
-        exception_provider, sui, 'FugitiveException',
+        exception_provider, sui, 'InvalidState',
         f"Apprehension of fugitive exception of {exception_class_label} "
         f"at boundary of {invocation_label}.",
         extra_data )
