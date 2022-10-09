@@ -16,11 +16,6 @@ Testing Improvements
 * Build sdist and wheels as part of ``push`` command. Do not require to sign
   them during a test run.
 
-Add Pyright Linting
-===============================================================================
-
-* https://github.com/microsoft/pyright
-
 Prefer Prebuilt Python Executables
 ===============================================================================
 
@@ -33,7 +28,7 @@ Windows Development Support
   If viable, then recommend its installation instead of ``asdf`` if the
   development environment is not a virtualized Linux, such as WSL.
 
-* Or, create ``develop.py`` and manage Pythons on all platforms via that.
+* Or, manage Pythons on all platforms via ``develop.py``.
 
 Remove Dependency on ``bump2version``
 ===============================================================================

@@ -344,7 +344,9 @@ It likely works on others as well, but please report if it does not.
 .. TODO: https://github.com/IronLanguages/ironpython3
 .. TODO: https://github.com/RustPython/RustPython
 
+.. TODO: https://pypi.org/project/cindervm/
 .. TODO: https://pypi.org/project/Cython/
+.. TODO: https://mypyc.readthedocs.io/en/latest/
 .. TODO: https://pypi.org/project/Nuitka/
 .. TODO: https://pypi.org/project/numba/
 .. TODO: https://pypi.org/project/pyston-lite/

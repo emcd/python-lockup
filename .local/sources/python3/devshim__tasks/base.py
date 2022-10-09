@@ -74,6 +74,28 @@ def pep508_identify_python( version = None ):
         'pep508-environment', python_path = python_path )
 
 
+def test_package_executable(
+    executable_name, process_environment = None, proper_package_name = None
+):
+    ''' Checks if executable from package is in environment.
+
+        Is a proxy for determining if a package is installed. '''
+    from os import environ as current_process_environment
+    process_environment = process_environment or current_process_environment
+    venv_path = process_environment.get( 'VIRTUAL_ENV' )
+    if venv_path and is_executable_in_venv(
+        executable_name, venv_path = venv_path
+    ): return True
+    from shutil import which
+    search_path = process_environment.get( 'PATH' )
+    if search_path and which( executable_name, path = search_path ):
+        return True
+    if not proper_package_name:
+        proper_package_name = executable_name.capitalize( )
+    eprint( f"{proper_package_name} not available. Skipping." )
+    return False
+
+
 def is_executable_in_venv( name, venv_path = None, version = None ):
     ''' Checks if file is executable from virtual environment.
 

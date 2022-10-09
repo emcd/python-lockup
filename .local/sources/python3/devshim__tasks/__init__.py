@@ -50,10 +50,10 @@ class __( metaclass = _NamespaceClass ):
         detect_vmgr_python_version,
         eprint, epprint,
         indicate_python_versions_support,
-        is_executable_in_venv,
         on_tty,
         pep508_identify_python,
         render_boxed_title,
+        test_package_executable,
         unlink_recursively,
     )
     from .environments import (
@@ -343,14 +343,9 @@ def lint_mypy( context, packages, modules, files, version = None ):
     ''' Lints the source code with Mypy. '''
     __.render_boxed_title( 'Lint: Mypy', supplement = version )
     context_options = __.derive_venv_context_options( version = version )
-    if not __.is_executable_in_venv(
-        'mypy', venv_path = context_options[ 'env' ][ 'VIRTUAL_ENV' ]
-    ):
-        __.eprint( 'Mypy not available on this platform. Skipping.' )
+    if not __.test_package_executable( 'mypy', context_options[ 'env' ] ):
         return
-    configuration_str = f"--config-file {__.paths.configuration.mypy}"
     if not packages and not modules and not files:
-        #files = ( __.paths.sources.p.python3, __.paths.project / 'tasks' )
         files = ( __.paths.sources.p.python3, )
     packages_str = ' '.join( map(
         lambda package: f"--package {package}", packages ) )
@@ -358,8 +353,7 @@ def lint_mypy( context, packages, modules, files, version = None ):
         lambda module: f"--module {module}", modules ) )
     files_str = ' '.join( map( str, files ) )
     context.run(
-        f"mypy {configuration_str} "
-        f"{packages_str} {modules_str} {files_str}",
+        f"mypy {packages_str} {modules_str} {files_str}",
         pty = True, **context_options )
 
 
@@ -368,10 +362,7 @@ def lint_pylint( context, targets, checks, version = None ):
     ''' Lints the source code with Pylint. '''
     __.render_boxed_title( 'Lint: Pylint', supplement = version )
     context_options = __.derive_venv_context_options( version = version )
-    if not __.is_executable_in_venv(
-        'pylint', venv_path = context_options[ 'env' ][ 'VIRTUAL_ENV' ]
-    ):
-        __.eprint( 'Pylint not available on this platform. Skipping.' )
+    if not __.test_package_executable( 'pylint', context_options[ 'env' ] ):
         return
     reports_str = '--reports=no --score=no' if targets or checks else ''
     if not targets:
@@ -395,10 +386,7 @@ def lint_semgrep( context, version = None ):
     ''' Lints the source code with Semgrep. '''
     __.render_boxed_title( 'Lint: Semgrep', supplement = version )
     context_options = __.derive_venv_context_options( version = version )
-    if not __.is_executable_in_venv(
-        'semgrep', venv_path = context_options[ 'env' ][ 'VIRTUAL_ENV' ]
-    ):
-        __.eprint( 'Semgrep not available on this platform. Skipping.' )
+    if not __.test_package_executable( 'semgrep', context_options[ 'env' ] ):
         return
     sgconfig_path = __.paths.scm_modules / 'semgrep-rules' / 'python' / 'lang'
     context.run(

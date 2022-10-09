@@ -93,7 +93,6 @@ def _calculate_configuration_paths( paths_ ):
     return SimpleNamespace(
         asdf = paths_.project / '.tool-versions',
         bumpversion = configuration_path / 'bumpversion.cfg',
-        mypy = configuration_path / 'mypy.ini',
         pre_commit = configuration_path / 'pre-commit.yaml',
         pypackages = configuration_path / 'pypackages.toml',
         pypackages_fixtures = configuration_path / 'pypackages.fixtures.toml',
