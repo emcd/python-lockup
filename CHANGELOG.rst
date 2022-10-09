@@ -19,7 +19,7 @@
 Changelog
 ===============================================================================
 
-v2.0.0 (not released yet)
+v2.0.0
 -------------------------------------------------------------------------------
 
 API
@@ -50,7 +50,7 @@ API
 * Provide exception management utilities, including factories which can inject
   labels into instances of a single omniexception class as an alternative to
   working with a class hierarchy. This package internally uses the utilities to
-  create exceptions, which have good descriptions and helpful labels.
+  create exceptions with descriptive messages and labels.
 
 * Provide nomenclatural utilities which determine the classification of objects
   that are provided to them. These are useful for the creation of more helpful
@@ -58,8 +58,8 @@ API
   to create descritpive exception messages. A suite of exception factories,
   which use these utilities, is also exposed.
 
-* Provide validation utilities which return back the object they validation if
-  the validation is successful. Otherwise, they raise a validation error. This
+* Provide validation utilities which return back their argument if the
+  validation is successful. Otherwise, they raise a validation error. This
   allows for multiple validators to be fluently applied in succession. This
   package internally uses the validators on arguments to functions that are
   part of its public API.

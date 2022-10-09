@@ -18,7 +18,7 @@
 
 The application programming interface (API) of this library package is divided
 into two parts: Primary and Auxiliary. The primary part consists of the core
-functionality for which the packaged is being provided: concealment and
+functionality for which the package is being provided: concealment and
 immutability of attributes and interception of API invocations. The auxiliary
 part consists of various functionalities, which the package internally
 utilizes, but which provide significant value beyond the confines of the

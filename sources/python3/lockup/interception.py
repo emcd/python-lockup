@@ -36,10 +36,8 @@ def create_interception_decorator(
 ): # pylint: disable=too-complex
     ''' Creates function decorator to apprehend "fugitive" exceptions.
 
-        Takes an ``exception_factory_provider`` argument, which must behave as
-        an exception factory provider as described in the
-        :py:mod:`lockup.exceptions` module. This provider must be capable of
-        providing an exception factory, which is indexed by the name
+        Takes an ``exception_factory_provider`` argument. This provider must be
+        capable of providing an exception factory, which is indexed by the name
         ``invocation_validation`` and which has an interface that corresponds
         to
         :py:func:`lockup.exceptionality.our_factories.create_invocation_validation_exception`.
@@ -54,18 +52,23 @@ def create_interception_decorator(
         ``None``. The second return value from the apprehender is expected to
         either be an another exception or else ``None``.
 
-        If both return values from the apprehender are ``None``, then the
-        apprehended exception will be returned directly rather than propagated
-        as an exception. If the first return value from the apprehender is the
-        apprehended exception and the second return value is ``None``, then
-        propagation of the apprehended exception continues (i.e., it is
-        re-raised). If the first return value from the apprehender is the
-        apprehended exception and the second return value is another exception,
-        then the other exception is propagated with the apprehended exception
-        in its custody (i.e., its ``__cause__``). If the first return value is
-        ``None`` and the second return value is another exception, then that
-        exception is propagated instead of the originally apprehended one with
-        no reference to the originally apprehended one. ''' # pylint: disable=line-too-long
+        * If both return values from the apprehender are ``None``, then the
+          apprehended exception will be returned directly rather than
+          propagated as an exception.
+
+        * If the first return value from the apprehender is the apprehended
+          exception and the second return value is ``None``, then propagation
+          of the apprehended exception continues (i.e., it is re-raised).
+
+        * If the first return value from the apprehender is the apprehended
+          exception and the second return value is another exception, then the
+          other exception is propagated with the apprehended exception in its
+          custody (i.e., its ``__cause__``).
+
+        * If the first return value is ``None`` and the second return value is
+          another exception, then that exception is propagated instead of the
+          originally apprehended one with no reference to the originally
+          apprehended one. ''' # pylint: disable=line-too-long
     from .exceptionality import intercept_exception_factory_provider
     exception_factory_provider = intercept_exception_factory_provider(
         exception_factory_provider, create_interception_decorator )
