@@ -25,7 +25,7 @@
     an exception class among those defined in :py:mod:`lockup.exceptions` and
     provide an equivalent class. The exception class provider used internally
     within this package provides exactly those classes. However, you may define
-    your own which provides other classes referenced by the allowable names.
+    your own which provides other classes, translating the names as necessary.
     '''
 
 
@@ -45,9 +45,9 @@ from ..validators import (
 class ExtraData:
     ''' Data transfer object for extra exception data.
 
-        Carries extra positional arguments, beyond the first one which is
-        assumed to the message. Also carries extra nominative arguments to be
-        applied during exception construction.
+        Carries extra positional arguments, beyond the first one, which is
+        assumed to be the message. Also carries extra nominative arguments to
+        be applied during exception construction.
 
         Allows for specification of extra exception labels beyond what an
         exception factory would naturally provide. '''

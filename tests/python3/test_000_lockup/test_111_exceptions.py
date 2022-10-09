@@ -36,7 +36,7 @@ class __( metaclass = _NamespaceClass ):
         ( __.exceptions.Omniexception, BaseException ),
         ( __.exceptions.InvalidOperation, __.exceptions.Omniexception ),
         ( __.exceptions.InvalidOperation, Exception ),
-        ( __.exceptions.AbsentImplementation, __.exceptions.Omniexception ),
+        ( __.exceptions.AbsentImplementation, __.exceptions.InvalidOperation ),
         ( __.exceptions.AbsentImplementation, NotImplementedError ),
         ( __.exceptions.ImpermissibleOperation,
           __.exceptions.InvalidOperation ),
