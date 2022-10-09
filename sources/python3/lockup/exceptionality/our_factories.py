@@ -18,7 +18,15 @@
 #============================================================================#
 
 
-''' Factories to produce exceptions with standard message formats. '''
+''' Factories to produce exceptions with standard message formats.
+
+    Each factory takes, as its first argument, an exception class provider.
+    This provider is expected to take a single argument, which is the name of
+    an exception class among those defined in :py:mod:`lockup.exceptions` and
+    provide an equivalent class. The exception class provider used internally
+    within this package provides exactly those classes. However, you may define
+    your own which provides other classes referenced by the allowable names.
+    '''
 
 
 # Latent Dependencies:
@@ -35,7 +43,14 @@ from ..validators import (
 
 
 class ExtraData:
-    ''' Data transfer object for extra exception data. '''
+    ''' Data transfer object for extra exception data.
+
+        Carries extra positional arguments, beyond the first one which is
+        assumed to the message. Also carries extra nominative arguments to be
+        applied during exception construction.
+
+        Allows for specification of extra exception labels beyond what an
+        exception factory would naturally provide. '''
 
     def __init__(
         self,
@@ -62,7 +77,10 @@ class ExtraData:
 
 
 def provide_exception_class( name ):
-    ''' Provides package-internal exception. '''
+    ''' Provides package-internal exception class.
+
+        The exception classes are drawn from the :py:mod:`lockup.exceptions`
+        module. '''
     from .. import exceptions
     from ..visibility import is_public_name
     if is_public_name( name ) and hasattr( exceptions, name ):
@@ -74,7 +92,11 @@ def provide_exception_class( name ):
 
 
 def provide_exception_factory( name ):
-    ''' Provides package-internal exception factory. '''
+    ''' Provides package-internal exception factory.
+
+        The exception factories are drawn from this module and are functions
+        which have names that start with ``create_`` and end with
+        ``_exception``. '''
     complete_name = f"create_{name}_exception"
     if complete_name in globals( ):
         # nosemgrep: local.scm-modules.semgrep-rules.python.lang.security.dangerous-globals-use
@@ -91,7 +113,11 @@ def create_argument_validation_exception(
     exception_class_provider, name, invocation, expectation,
     extra_data = ExtraData( ),
 ):
-    ''' Creates error with context about invalid argument. '''
+    ''' Creates error with context about invalid argument.
+
+        Given an argument name, callable object, and an expectation about the
+        argument (as text), produces an exception of a class equivalent to
+        :py:exc:`lockup.exceptions.IncorrectData`. '''
     sui = create_argument_validation_exception
     _validate_argument_class( _excfp, name, str, 'name', sui )
     _validate_argument_invocability( _excfp, invocation, 'invocation', sui )
@@ -113,7 +139,12 @@ def create_attribute_immutability_exception(
     exception_class_provider, name, object_, action = 'assign',
     extra_data = ExtraData( ),
 ):
-    ''' Creates error with context about immutable attribute. '''
+    ''' Creates error with context about immutable attribute.
+
+        Given an attribute name, object which contains the attribute, and the
+        name of an action upon the attribute, produces an exception of a class
+        equivalent to
+        :py:exc:`lockup.exceptions.ImpermissibleAttributeOperation`. '''
     sui = create_attribute_immutability_exception
     _validate_argument_class( _excfp, name, str, 'name', sui )
     _validate_argument_class( _excfp, action, str, 'action', sui )
@@ -128,7 +159,11 @@ def create_attribute_immutability_exception(
 def create_attribute_indelibility_exception(
     exception_class_provider, name, object_, extra_data = ExtraData( ),
 ):
-    ''' Creates error with context about indelible attribute. '''
+    ''' Creates error with context about indelible attribute.
+
+        Given an attribute name and object which contains the attribute,
+        produces an exception of a class equivalent to
+        :py:exc:`lockup.exceptions.ImpermissibleAttributeOperation`. '''
     sui = create_attribute_indelibility_exception
     _validate_argument_class( _excfp, name, str, 'name', sui )
     from ..nomenclature import calculate_label
@@ -142,7 +177,10 @@ def create_attribute_indelibility_exception(
 def create_attribute_name_illegality_exception(
     exception_class_provider, name, extra_data = ExtraData( ),
 ):
-    ''' Creates error about illegal attribute name. '''
+    ''' Creates error about illegal attribute name.
+
+        Given an attribute name, produces an exception of a class equivalent to
+        :py:exc:`lockup.exceptions.IncorrectData`. '''
     sui = create_attribute_name_illegality_exception
     _validate_argument_class( _excfp, name, str, 'name', sui )
     return _produce_exception(
@@ -155,7 +193,12 @@ def create_attribute_nonexistence_exception(
     exception_class_provider, name, object_,
     extra_context = None, extra_data = ExtraData( ),
 ):
-    ''' Creates error with context about nonexistent attribute. '''
+    ''' Creates error with context about nonexistent attribute.
+
+        Given an attribute name, object which allegedly does not contain the
+        attribute, and, optionally, some extra context (as text), produces an
+        exception of a class equivalent to
+        :py:exc:`lockup.exceptions.InaccessibleAttribute`. '''
     sui = create_attribute_nonexistence_exception
     _validate_argument_class( _excfp, name, str, 'name', sui )
     from ..nomenclature import calculate_label
@@ -174,7 +217,11 @@ def create_attribute_noninvocability_exception(
     exception_class_provider, name, object_,
     extra_context = None, extra_data = ExtraData( ),
 ):
-    ''' Creates error with context about noninvocable attribute. '''
+    ''' Creates error with context about noninvocable attribute.
+
+        Given an attribute name, object which contains the attribute, and,
+        optionally, some extra context (as text), produces an exception of a
+        class equivalent to :py:exc:`lockup.exceptions.InvalidOperation`. '''
     sui = create_attribute_noninvocability_exception
     _validate_argument_class( _excfp, name, str, 'name', sui )
     from ..nomenclature import calculate_label
@@ -192,7 +239,11 @@ def create_attribute_noninvocability_exception(
 def create_class_attribute_rejection_exception(
     exception_class_provider, name, class_, extra_data = ExtraData( ),
 ):
-    ''' Creates error with context about class attribute rejection. '''
+    ''' Creates error with context about class attribute rejection.
+
+        Given an attribute name and the class on which it is supposed to be
+        defined, produces an exception of a class equivalent to
+        :py:exc:`lockup.exceptions.ImpermissibleOperation`. '''
     sui = create_class_attribute_rejection_exception
     _validate_argument_class( _excfp, name, str, 'name', sui )
     from ..nomenclature import calculate_class_label
@@ -206,7 +257,11 @@ def create_class_attribute_rejection_exception(
 def create_fugitive_apprehension_exception(
     exception_class_provider, fugitive, invocation, extra_data = ExtraData( ),
 ):
-    ''' Creates error with context about fugitive exception apprehension. '''
+    ''' Creates error with context about fugitive exception apprehension.
+
+        Given an apprehended fugitive exception and the callable on whose
+        boundary it was apprehended, produces an exception of a class
+        equivalent to :py:exc:`lockup.exceptions.InvalidState`. '''
     sui = create_fugitive_apprehension_exception
     _validate_argument_class(
         _excfp, fugitive, BaseException, 'fugitive', sui )
@@ -227,7 +282,10 @@ def create_fugitive_apprehension_exception(
 def create_impermissible_instantiation_exception(
     exception_class_provider, class_, extra_data = ExtraData( ),
 ):
-    ''' Creates error with context about impermissible instantiation. '''
+    ''' Creates error with context about impermissible instantiation.
+
+        Given a class, produces an exception of a class equivalent to
+        :py:exc:`lockup.exceptions.ImpermissibleOperation`. '''
     sui = create_impermissible_instantiation_exception
     from ..nomenclature import calculate_class_label
     label = calculate_class_label( class_ )
@@ -241,7 +299,11 @@ def create_implementation_absence_exception(
     exception_class_provider, invocation, variant_name,
     extra_data = ExtraData( ),
 ):
-    ''' Creates error about absent implementation of invocable. '''
+    ''' Creates error about absent implementation of invocable.
+
+        Given a callable object and the name of some platform, produces an
+        exception of a class equivalent to
+        :py:exc:`lockup.exceptions.AbsentImplementation`. '''
     sui = create_implementation_absence_exception
     _validate_argument_invocability( _excfp, invocation, 'invocation', sui )
     _validate_argument_class(
@@ -257,7 +319,11 @@ def create_implementation_absence_exception(
 def create_inaccessible_entity_exception(
     exception_class_provider, name, expectation, extra_data = ExtraData( ),
 ):
-    ''' Creates error with context about inaccessible entity. '''
+    ''' Creates error with context about inaccessible entity.
+
+        Given the name of some entity and an expectation about access (as
+        text), produces an exception of a class equivalent to
+        :py:exc:`lockup.exceptions.InvalidOperation`. '''
     sui = create_inaccessible_entity_exception
     _validate_argument_class( _excfp, name, str, 'name', sui )
     _validate_argument_class( _excfp, expectation, str, 'expectation', sui )
@@ -271,7 +337,10 @@ def create_inaccessible_entity_exception(
 def create_invalid_state_exception(
     exception_class_provider, message, package_name, extra_data = ExtraData( ),
 ):
-    ''' Creates error with context about invalid state. '''
+    ''' Creates error with context about invalid state.
+
+        Given a message and a complete package name, produces an exception of
+        a class equivalent to :py:exc:`lockup.exceptions.InvalidState`. '''
     sui = create_invalid_state_exception
     _validate_argument_class( _excfp, message, str, 'message', sui )
     _validate_argument_class( _excfp, package_name, str, 'package_name', sui )
@@ -287,7 +356,12 @@ def create_invalid_state_exception(
 def create_invocation_validation_exception(
     exception_class_provider, invocation, cause, extra_data = ExtraData( ),
 ):
-    ''' Creates error with context about invalid invocation. '''
+    ''' Creates error with context about invalid invocation.
+
+        Given a callable and a description of the discrepancy between its
+        expected parameters and the arguments used to invoke it, produces an
+        exception of a class equivalent to
+        :py:exc:`lockup.exceptions.IncorrectData`. '''
     sui = create_invocation_validation_exception
     _validate_argument_invocability( _excfp, invocation, 'invocation', sui )
     _validate_argument_class( _excfp, cause, str, 'cause', sui )
@@ -303,7 +377,11 @@ def create_return_validation_exception(
     exception_class_provider, invocation, expectation, position = None,
     extra_data = ExtraData( ),
 ):
-    ''' Creates error with context about invalid return value. '''
+    ''' Creates error with context about invalid return value.
+
+        Given a callable, an expectation about a return value from it, and,
+        optionally, the position of the return value, produces an exception of
+        a class equivalent to :py:exc:`lockup.exceptions.InvalidState`. '''
     sui = create_return_validation_exception
     _validate_argument_invocability( _excfp, invocation, 'invocation', sui )
     _validate_argument_class( _excfp, expectation, str, 'expectation', sui )

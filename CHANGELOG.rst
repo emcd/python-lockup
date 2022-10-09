@@ -35,13 +35,13 @@ API
      packages at a later point.
 
 * Provide ``create_interception_decorator`` function which creates function
-  decorators that apprehend "fugitive" exceptions before they escape across the
-  boundary of a public API. Fugitive exceptions are exceptions which are
+  decorators that can apprehend "fugitive" exceptions before they escape across
+  the boundary of a public API. Fugitive exceptions are exceptions which are
   unexpected and which should have been caught internally.
 
 * Provide ``reassign_class_factory`` function which allows for a class to be
   assigned a new factory class ("metaclass"). This can even be used on a class
-  factory class itself, similar to how `type
+  factory class itself, resulting in a factory class similar to how `type
   <https://docs.python.org/3/library/functions.html#type>`_ behaves. This
   package uses it internally, when possible, to allow class factory classes to
   enforce attribute concealment and immutability on themselves and not just
@@ -75,7 +75,7 @@ Python Support
 
 * Remove CPython 3.6 because it is past end-of-life.
 
-* Deprecate Pyston because of its new maintenance model.
+* Deprecate Pyston because of its new development direction.
 
 * Add PyPy 3.9.
 
