@@ -317,9 +317,19 @@ This package has been verified to work on the following Python implementations:
 
 * `CPython <https://github.com/python/cpython>`_
 
+  - Complete functionality.
+
+  - Support for interpreters compiled with ``Py_TRACE_REFS`` definition.
+
 * `PyPy <https://www.pypy.org/>`_
 
+  - Complete functionality except for reflection.
+
+  - Reflection is a no-op if ``assert_implementation`` is ``False``.
+
 * `Pyston <https://www.pyston.org/>`_
+
+  - Complete functionality.
 
   .. warning::
 
