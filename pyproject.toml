@@ -76,6 +76,12 @@ directory = '.local/artifacts/coverage-pytest'
 [tool.coverage.xml]
 output = '.local/artifacts/coverage-pytest/coverage.xml'
 
+[tool.mypy]
+cache_dir = '.local/caches/mypy'
+show_traceback = true
+show_error_codes = true
+disable_error_code = [ 'misc' ]
+
 [tool.pylint.MASTER]
 ignore = []
 # Warning: Parallelizing causes diagnostic output to be interleaved
