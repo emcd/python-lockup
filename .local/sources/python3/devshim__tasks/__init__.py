@@ -721,7 +721,9 @@ def _upload_pypi( context, repository_name = '' ):
     __.render_boxed_title( f"Publication: PyPI{task_name_suffix}" )
     artifacts = _get_pypi_artifacts( )
     context_options = __.derive_venv_context_options( )
-    context_options.update( _get_pypi_credentials( repository_name ) )
+    process_environment = context_options.get( 'env', { } )
+    process_environment.update( _get_pypi_credentials( repository_name ) )
+    context_options[ 'env' ] = process_environment
     context.run(
         f"twine upload --skip-existing --verbose {repository_option} "
         f"{artifacts}", pty = True, **context_options )
