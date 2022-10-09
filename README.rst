@@ -288,6 +288,28 @@ classes, i.e., fugitive exceptions. If you apprehend all fugitives at the API
 boundary, then you can guarantee to your consumers that they will only need to
 anticipate certain classes of exceptions.
 
+Here is an example with an interceptor, which includes fugitive exception
+apprehension, that this package uses internally:
+
+.. code-block:: python
+
+    >>> from lockup.exceptions import InvalidState
+    >>> from lockup.interception import our_interceptor
+    >>> @our_interceptor
+    ... def divide_by_zero( number ): return number / 0
+    ...
+    >>> try: divide_by_zero( 42 )
+    ... except InvalidState as exc:
+    ...     type( exc ), type( exc.__cause__ ), str( exc )
+    ...
+    (<class 'lockup.exceptions.InvalidState'>, <class 'ZeroDivisionError'>, "Apprehension of fugitive exception of class 'builtins.ZeroDivisionError' at boundary of function 'divide_by_zero' on module '__main__'.")
+
+As can be seen, the ``ZeroDivisionError`` is in the custody of an exception
+that is of an expected class.
+
+You can create your own interceptors with custom fugitive apprehension
+behaviors using the ``create_interception_decorator`` function.
+
 Compatibility
 ===============================================================================
 
