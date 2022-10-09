@@ -157,6 +157,12 @@ def detect_vmgr_python_version( ):
     return next( iter( indicate_python_versions_support( ) ) )
 
 
+def calculate_python_versions( version ):
+    ''' Given a Python version specifier, calculate all relevant versions. '''
+    if 'ALL' == version: return indicate_python_versions_support( )
+    return ( version, )
+
+
 def indicate_python_versions_support( ):
     ''' Returns supported Python versions. '''
     version = __.psenv.get( 'ASDF_PYTHON_VERSION' )

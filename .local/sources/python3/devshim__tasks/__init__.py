@@ -46,6 +46,7 @@ class __( metaclass = _NamespaceClass ):
 
     from .base import (
         assert_gpg_tty,
+        calculate_python_versions,
         derive_venv_context_options,
         detect_vmgr_python_version,
         eprint, epprint,
@@ -113,20 +114,28 @@ def install_git_hooks( context ):
 
 
 @__.task
-def install_pythons( context ):
-    ''' Installs each supported Python version.
+def install_python( context, version ):
+    ''' Installs requested Python version.
 
-        This task requires Internet access and may take some time. '''
-    __.render_boxed_title( 'Install: Python Releases' )
-    context.run( 'asdf install python', pty = True )
+        This task requires Internet access and may take some time.
+
+        If version is 'ALL', then all supported versions are installed. '''
+    for version_ in __.calculate_python_versions( version ):
+        _install_python( context, version_ )
 
 
-@__.task( pre = ( install_pythons, ) )
+def _install_python( context, version ):
+    __.render_boxed_title( 'Install: Python Release', supplement = version )
+    context.run( f"asdf install python {version}", pty = True )
+
+
+@__.task
 def build_python_venv( context, version, overwrite = False ):
-    ''' Creates virtual environment for requested Python version. '''
-    if 'ALL' == version: versions = __.indicate_python_versions_support( )
-    else: versions = ( version, )
-    for version_ in versions:
+    ''' Creates virtual environment for requested Python version.
+
+        If version is 'ALL', then all supported versions are targeted. '''
+    for version_ in __.calculate_python_versions( version ):
+        _install_python( context, version_ )
         __.build_python_venv( context, version_, overwrite = overwrite )
 
 
@@ -186,9 +195,7 @@ def clean_python_packages( context, version = None ):
     ''' Removes unused Python packages.
 
         If version is 'ALL', then all virtual environments are targeted. '''
-    if 'ALL' == version: versions = __.indicate_python_versions_support( )
-    else: versions = ( version, )
-    for version_ in versions:
+    for version_ in __.calculate_python_versions( version ):
         _clean_python_packages( context, version = version_ )
 
 
@@ -273,9 +280,8 @@ def freshen_python_packages( context, version = None ):
     ''' Updates declared Python packages.
 
         If version is 'ALL', then all virtual environments are targeted. '''
-    if 'ALL' == version: versions = __.indicate_python_versions_support( )
-    else: versions = ( version, )
-    for version_ in versions: _freshen_python_packages( context, version_ )
+    for version_ in __.calculate_python_versions( version ):
+        _freshen_python_packages( context, version = version_ )
 
 
 def _freshen_python_packages( context, version = None ):
@@ -331,7 +337,14 @@ def freshen( context ): # pylint: disable=unused-argument
 
 @__.task
 def lint_bandit( context, version = None ):
-    ''' Security checks the source code with Bandit. '''
+    ''' Security checks the source code with Bandit.
+
+        If version is 'ALL', then all virtual environments are targeted. '''
+    for version_ in __.calculate_python_versions( version ):
+        _lint_bandit( context, version = version_ )
+
+
+def _lint_bandit( context, version = None ):
     __.render_boxed_title( 'Lint: Bandit', supplement = version )
     context.run(
         f"bandit --recursive --verbose {__.paths.sources.p.python3}",
@@ -340,7 +353,15 @@ def lint_bandit( context, version = None ):
 
 @__.task( iterable = ( 'packages', 'modules', 'files', ) )
 def lint_mypy( context, packages, modules, files, version = None ):
-    ''' Lints the source code with Mypy. '''
+    ''' Lints the source code with Mypy.
+
+        If version is 'ALL', then all virtual environments are targeted. '''
+    for version_ in __.calculate_python_versions( version ):
+        _lint_mypy( context, packages, modules, files, version = version_ )
+
+
+def _lint_mypy( context, packages, modules, files, version = None ):
+    ''' Lints the source code with Mypy in virtual environment. '''
     __.render_boxed_title( 'Lint: Mypy', supplement = version )
     context_options = __.derive_venv_context_options( version = version )
     if not __.test_package_executable( 'mypy', context_options[ 'env' ] ):
@@ -359,7 +380,15 @@ def lint_mypy( context, packages, modules, files, version = None ):
 
 @__.task( iterable = ( 'targets', 'checks', ) )
 def lint_pylint( context, targets, checks, version = None ):
-    ''' Lints the source code with Pylint. '''
+    ''' Lints the source code with Pylint.
+
+        If version is 'ALL', then all virtual environments are targeted. '''
+    for version_ in __.calculate_python_versions( version ):
+        _lint_pylint( context, targets, checks, version = version_ )
+
+
+def _lint_pylint( context, targets, checks, version = None ):
+    ''' Lints the source code with Pylint in virtual environment. '''
     __.render_boxed_title( 'Lint: Pylint', supplement = version )
     context_options = __.derive_venv_context_options( version = version )
     if not __.test_package_executable( 'pylint', context_options[ 'env' ] ):
@@ -383,7 +412,15 @@ def lint_pylint( context, targets, checks, version = None ):
 
 @__.task
 def lint_semgrep( context, version = None ):
-    ''' Lints the source code with Semgrep. '''
+    ''' Lints the source code with Semgrep.
+
+        If version is 'ALL', then all virtual environments are targeted. '''
+    for version_ in __.calculate_python_versions( version ):
+        _lint_semgrep( context, version = version_ )
+
+
+def _lint_semgrep( context, version = None ):
+    ''' Lints the source code with Semgrep in virtual environment. '''
     __.render_boxed_title( 'Lint: Semgrep', supplement = version )
     context_options = __.derive_venv_context_options( version = version )
     if not __.test_package_executable( 'semgrep', context_options[ 'env' ] ):
@@ -398,11 +435,13 @@ def lint_semgrep( context, version = None ):
 @__.task
 def lint( context, version = None ):
     ''' Lints the source code. '''
-    lint_pylint( context, targets = ( ), checks = ( ), version = version )
-    lint_semgrep( context, version = version )
-    lint_mypy( context,
-        packages = ( ), modules = ( ), files = ( ), version = version )
-    lint_bandit( context, version = version )
+    for version_ in __.calculate_python_versions( version ):
+        lint_pylint( context, targets = ( ), checks = ( ), version = version_ )
+        lint_semgrep( context, version = version_ )
+        lint_mypy(
+            context,
+            packages = ( ), modules = ( ), files = ( ), version = version_ )
+        lint_bandit( context, version = version_ )
 
 
 @__.task
@@ -421,9 +460,8 @@ def test( context, version = None ):
     ''' Runs the test suite.
 
         If version is 'ALL', then all virtual environments are targeted. '''
-    if 'ALL' == version: versions = __.indicate_python_versions_support( )
-    else: versions = ( version, )
-    for version_ in versions: _test( context, version_ )
+    for version_ in __.calculate_python_versions( version ):
+        _test( context, version = version_ )
 
 
 def _test( context, version = None ):

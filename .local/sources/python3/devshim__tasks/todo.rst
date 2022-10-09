@@ -4,12 +4,6 @@ Package Requirements Format
 * Comments which are part of the requiremets data structure, for ease of
   machine rewriting.
 
-Tasks Interface Refinement
-===============================================================================
-
-* Remove pluralized versions of commands and use mutually-exclusive
-  ``--all`` and ``--version`` flags with singular commands.
-
 Testing Improvements
 ===============================================================================
 

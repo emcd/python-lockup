@@ -80,7 +80,7 @@ output = '.local/artifacts/coverage-pytest/coverage.xml'
 cache_dir = '.local/caches/mypy'
 show_traceback = true
 show_error_codes = true
-disable_error_code = [ 'misc' ]
+#disable_error_code = [ 'misc' ]
 
 [tool.pylint.MASTER]
 ignore = []

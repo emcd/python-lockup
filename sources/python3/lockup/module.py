@@ -42,15 +42,15 @@ from .factories import NamespaceClass as _NamespaceClass
 class __( metaclass = _NamespaceClass ):
     ''' Internal namespace. '''
 
-    from types import ModuleType as Module # type: ignore
+    from types import ModuleType as Module
 
     from .factories import Class
-    from .exceptionality import our_exception_factory_provider
-    from .validators import (
+    from .exceptionality import our_exception_factory_provider # type: ignore[misc]
+    from .validators import ( # type: ignore[misc]
         validate_attribute_existence,
         validate_attribute_name,
     )
-    from .visibility import select_public_attributes
+    from .visibility import select_public_attributes # type: ignore[misc]
 
 
 class Module( __.Module, metaclass = __.Class ):
