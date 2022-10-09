@@ -26,10 +26,11 @@
     principle, we try to avoid class hierarchies and instead use labels.
     However, sometimes the Python implementation or the test machinery expect
     exception classes which are explicitly subclassed from certain Python
-    builtin exceptions. So, variants of the omniexception class, which are
-    fused to necessary Python builtin exception classes, are also provided.
-    These exceptions can be matched by corresponding builtin exception classes
-    or by their ancestral exception classes from this module:
+    builtin exception classes. So, variants of the omniexception class, which
+    are fused to necessary Python builtin exception classes, are also provided.
+    Exceptions from the fused classes can be matched by their corresponding
+    builtin exception classes or by their ancestral exception classes from this
+    module:
 
     .. code-block:: python
 
@@ -80,8 +81,8 @@ class InvalidOperation( Omniexception, Exception ):
     ''' Complaint about invalid operation. '''
 
 
-class AbsentImplementation( Omniexception, NotImplementedError ):
-    ''' Complaint about attempt execute nonexistent implementation. '''
+class AbsentImplementation( InvalidOperation, NotImplementedError ):
+    ''' Complaint about attempt to execute nonexistent implementation. '''
 
 
 class ImpermissibleOperation( InvalidOperation, TypeError ):
