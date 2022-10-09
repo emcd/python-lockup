@@ -36,14 +36,36 @@ def create_interception_decorator(
 ): # pylint: disable=too-complex
     ''' Creates function decorator to apprehend "fugitive" exceptions.
 
-        Fugitive exceptions are exceptions which are not expected to cross the
-        boundary of an API and which should have been caught internally.
-        When the function apprehends a fugitive exception, it creates an
-        instance of a class which officially denotes fugitive exceptions and
-        chains the fugitive to its ``cause`` before propagating across the API
-        boundary. A list of permissible exceptions is consulted to determine
-        whether an exception is permissible, and thus allowed to propagate
-        freely, or if it is a fugitive. '''
+        Takes an ``exception_factory_provider`` argument, which must behave as
+        an exception factory provider as described in the
+        :py:mod:`lockup.exceptions` module. This provider must be capable of
+        providing an exception factory, which is indexed by the name
+        ``invocation_validation`` and which has an interface that corresponds
+        to
+        :py:func:`lockup.exceptionality.our_factories.create_invocation_validation_exception`.
+
+        Takes an ``apprehender`` argument, which must be a callable that
+        accepts exactly two arguments and which returns two values. The first
+        argument to the callable is expected to be an exception raised by the
+        function wrapped by the decorator produced from this factory. The
+        second argument to the callable is expected to be the function wrapped
+        by the decorator. The first return value from the apprehender is
+        expected to either be the expection that was passed to it or else
+        ``None``. The second return value from the apprehender is expected to
+        either be an another exception or else ``None``.
+
+        If both return values from the apprehender are ``None``, then the
+        apprehended exception will be returned directly rather than propagated
+        as an exception. If the first return value from the apprehender is the
+        apprehended exception and the second return value is ``None``, then
+        propagation of the apprehended exception continues (i.e., it is
+        re-raised). If the first return value from the apprehender is the
+        apprehended exception and the second return value is another exception,
+        then the other exception is propagated with the apprehended exception
+        in its custody (i.e., its ``__cause__``). If the first return value is
+        ``None`` and the second return value is another exception, then that
+        exception is propagated instead of the originally apprehended one with
+        no reference to the originally apprehended one. ''' # pylint: disable=line-too-long
     from .exceptionality import intercept_exception_factory_provider
     exception_factory_provider = intercept_exception_factory_provider(
         exception_factory_provider, create_interception_decorator )
@@ -51,7 +73,7 @@ def create_interception_decorator(
         apprehender, create_interception_decorator )
 
     def intercept( invocation ):
-        ''' Decorates function to intercept fugitive exceptions. '''
+        ''' Decorates function to apprehend fugitive exceptions. '''
         from .validators import validate_argument_invocability
         validate_argument_invocability(
             _our_exception_factory_provider,
@@ -64,6 +86,7 @@ def create_interception_decorator(
         # nosemgrep: local.scm-modules.semgrep-rules.python.lang.maintainability.useless-inner-function
         @wraps( invocation )
         def interception_invoker( *posargs, **nomargs ):
+            ''' Intercepts function invocations and apprehends fugitives. '''
             # Validate that arguments correspond to function signature.
             try: signature.bind( *posargs, **nomargs )
             except TypeError as exc:
@@ -85,7 +108,9 @@ def create_interception_decorator(
 
 
 def intercept_fugitive_exception_apprehender( apprehender, invocation ):
-    ''' Encloses fugitive apprehender with interceptor. '''
+    ''' Encloses fugitive apprehender with interceptor.
+
+        Ensures that the apprehender follows protocol. '''
     signature = _validate_fugitive_exception_apprehender(
         apprehender, invocation )
     from functools import wraps
@@ -137,7 +162,9 @@ def _validate_fugitive_exception_apprehender( apprehender, invocation ):
 
 
 def our_fugitive_exception_apprehender( exception, invocation ):
-    ''' Apprehends fugitive exceptions at API boundary. '''
+    ''' Apprehends fugitive exceptions at API boundary.
+
+        Used internally within this package. '''
     from .exceptions import Omniexception
     if isinstance( exception, Omniexception ): return exception, None
     return (
@@ -146,5 +173,6 @@ def our_fugitive_exception_apprehender( exception, invocation ):
             exception, invocation ) )
 
 
+#: Intercepts invocations within this package.
 our_interceptor = create_interception_decorator(
     _our_exception_factory_provider, our_fugitive_exception_apprehender )
