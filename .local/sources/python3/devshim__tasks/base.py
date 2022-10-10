@@ -29,7 +29,9 @@ class __( metaclass = _NamespaceClass ):
     from functools import partial as partial_function
     from os import (
         F_OK, R_OK, X_OK,
-        access as test_fs_access, environ as psenv, pathsep,
+        access as test_fs_access,
+        environ as current_process_environment,
+        pathsep,
     )
     from pathlib import Path
     from pprint import pprint
@@ -39,7 +41,7 @@ class __( metaclass = _NamespaceClass ):
     from invoke import Exit
 
     from devshim__base import (
-        collapse_multilevel_dictionary,
+        extract_python_package_requirements,
         identify_python,
         indicate_python_packages,
         paths,
@@ -51,7 +53,7 @@ class __( metaclass = _NamespaceClass ):
 
 # If running in a Github Workflow,
 # then use 'stdout' for properly interleaved output.
-if 'CI' in __.psenv:
+if 'CI' in __.current_process_environment:
     eprint = print
     epprint = __.pprint
 else:
@@ -120,11 +122,13 @@ def derive_venv_context_options(
 
 def derive_venv_path( version = None, python_path = None ):
     ''' Derives Python virtual environment path from version handle. '''
+    cpe = __.current_process_environment
+    required_keys = frozenset( { 'VIRTUAL_ENV', 'OUR_VENV_NAME' } )
     if None is python_path:
         if version: python_path = detect_vmgr_python_path( version = version )
-        elif 'VIRTUAL_ENV' in __.psenv and 'OUR_VENV_NAME' in __.psenv:
-            venv_path = __.Path( __.psenv[ 'VIRTUAL_ENV' ] )
-            if venv_path.name == __.psenv[ 'OUR_VENV_NAME' ]: return venv_path
+        elif required_keys == required_keys & cpe.keys( ):
+            venv_path = __.Path( cpe[ 'VIRTUAL_ENV' ] )
+            if venv_path.name == cpe[ 'OUR_VENV_NAME' ]: return venv_path
     if None is python_path: python_path = detect_vmgr_python_path( )
     abi_label = __.identify_python(
         'bdist-compatibility', python_path = python_path )
@@ -133,7 +137,7 @@ def derive_venv_path( version = None, python_path = None ):
 
 def derive_venv_variables( venv_path, variables = None ):
     ''' Derives environment variables from Python virtual environment path. '''
-    variables = ( variables or __.psenv ).copy( )
+    variables = ( variables or __.current_process_environment ).copy( )
     variables.pop( 'PYTHONHOME', None )
     variables[ 'PATH' ] = __.pathsep.join( (
         str( venv_path / 'bin' ), variables[ 'PATH' ] ) )
@@ -165,7 +169,7 @@ def calculate_python_versions( version ):
 
 def indicate_python_versions_support( ):
     ''' Returns supported Python versions. '''
-    version = __.psenv.get( 'ASDF_PYTHON_VERSION' )
+    version = __.current_process_environment.get( 'ASDF_PYTHON_VERSION' )
     if None is not version: return ( version, )
     regex = __.re.compile( r'''^python\s+(.*)$''', __.re.MULTILINE )
     with __.paths.configuration.asdf.open( ) as file:
@@ -176,7 +180,8 @@ def generate_pip_requirements_text( identifier = None ):
     ''' Generates Pip requirements lists from local configuration. '''
     # https://pip.pypa.io/en/stable/reference/requirements-file-format/
     # https://pip.pypa.io/en/stable/topics/repeatable-installs/
-    simples, fixtures = __.indicate_python_packages( identifier = identifier )
+    specifications, fixtures = __.indicate_python_packages(
+        identifier = identifier )
     # Pip cannot currently mix frozen and unfrozen requirements,
     # so we must split them out. (As of 2022-02-06.)
     # https://github.com/pypa/pip/issues/6469
@@ -189,7 +194,7 @@ def generate_pip_requirements_text( identifier = None ):
             options = ' \\\n    '.join(
                 f"--hash {digest}" for digest in fixture.digests )
             frozen.append( f"{name}=={fixture.version} \\\n    {options}" )
-    raw.extend( __.collapse_multilevel_dictionary( simples ) )
+    raw.extend( __.extract_python_package_requirements( specifications ) )
     return '\n'.join( raw ), '\n'.join( frozen ), '\n'.join( unpublished )
 
 
@@ -202,7 +207,7 @@ def render_boxed_title( title, supplement = None ):
 
 def format_boxed_title( title ):
     ''' Formats box around title as string. '''
-    columns_count = int( __.psenv.get( 'COLUMNS', 79 ) )
+    columns_count = int( __.current_process_environment.get( 'COLUMNS', 79 ) )
     icolumns_count = columns_count - 2
     content_template = (
         '\N{BOX DRAWINGS DOUBLE VERTICAL}{fill}'
@@ -224,7 +229,7 @@ def format_boxed_title( title ):
 # TODO: Check for cached passphrase as an alternative.
 def assert_gpg_tty( ):
     ''' Ensures the the 'GPG_TTY' environment variable is set. '''
-    if 'GPG_TTY' in __.psenv: return
+    if 'GPG_TTY' in __.current_process_environment: return
     raise __.Exit(
         "ERROR: Environment variable 'GPG_TTY' is not set. "
         "Task cannot prompt for GPG secret key passphrase." )

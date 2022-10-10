@@ -92,9 +92,12 @@ def _generate_nominative_arguments( ):
 
 def _generate_installation_requirements( ):
     ''' Generates installation requirements from local configuration. '''
-    from devshim__base import indicate_python_packages
-    simples, _ = indicate_python_packages( )
-    return simples.get( 'installation', [ ] )
+    from devshim__base import (
+        extract_python_package_requirements,
+        indicate_python_packages,
+    )
+    return extract_python_package_requirements(
+        indicate_python_packages( )[ 0 ], 'installation' )
 
 
 # https://docs.python.org/3/distutils/setupscript.html#writing-the-setup-script
