@@ -21,10 +21,8 @@
 ''' Constants and utilities for project maintenance tasks. '''
 
 
-from collections.abc import Mapping as AbstractDictionary
 from functools import partial as partial_function
-from itertools import chain
-from os import environ as psenv
+from os import environ as current_process_environment
 from pathlib import Path
 from re import match as regex_match
 from shlex import split as split_command
@@ -159,21 +157,71 @@ standard_execute_external = partial_function(
 def ensure_python_support_packages( ):
     ''' Ensures availability of support packages to active Python. '''
     # Ensure Tomli so that 'pyproject.toml' can be read.
-    # TODO: Remove this explicit dependency once Python 3.11 is baseline.
+    # TODO: Python 3.11: Remove this explicit dependency.
     _ensure_python_packages( ( 'tomli', ) )
     from tomli import load
-    base_requirements = (
-        indicate_python_packages( )[ 0 ][ 'development' ].get( 'base', [ ] ) )
+    base_requirements = extract_python_package_requirements(
+        indicate_python_packages( )[ 0 ], 'development.base' )
     with paths.configuration.pyproject.open( 'rb' ) as file:
         construction_requirements = (
             load( file )[ 'build-system' ][ 'requires' ] )
     _ensure_python_packages( frozenset(
         ( *base_requirements, *construction_requirements ) ) )
 
+
+def extract_python_package_requirements( specifications, domain = None ):
+    ''' Extracts Python packages requirements from specifications.
+
+        If the ``domain`` argument is given, then only requirements from that
+        domain are extracted. Otherwise, the requirements across all domains
+        are extracted. '''
+    # TODO: Raise error on unsupported format version.
+    if 1 != specifications.get( 'format-version', 1 ): pass
+    from itertools import chain
+    valid_apex_domains = (
+        'installation', 'optional-installation', 'development', )
+    domains = ( domain, ) if domain else valid_apex_domains
+    requirements = [ ]
+    for domain_ in domains:
+        if 'installation' == domain_:
+            requirements.extend( map(
+                _extract_python_package_requirement,
+                specifications.get( domain, [ ] ) ) )
+        else:
+            apex_domain, *subdomains = domain_.split( '.' )
+            # TODO: Raise error if apex domain is not a valid.
+            apex_specifications = specifications.get( apex_domain, { } )
+            if 0 == len( subdomains ):
+                requirements.extend( map(
+                    _extract_python_package_requirement,
+                    chain.from_iterable( apex_specifications.values( ) ) ) )
+            elif 1 == len( subdomains ):
+                subdomain = subdomains[ 0 ]
+                requirements.extend( map(
+                    _extract_python_package_requirement,
+                    apex_specifications.get( subdomain, [ ] ) ) )
+            # TODO: Raise error if more than 1 subdomain.
+    return tuple( requirements )
+
+
+def _extract_python_package_requirement( specification ):
+    ''' Extracts Python package requirement from specification. '''
+    if isinstance( specification, str ): return specification
+    from collections.abc import Mapping as Dictionary
+    if isinstance( specification, Dictionary ):
+        # TODO: Validate that requirement entry exists.
+        return specification[ 'requirement' ]
+    # TODO: Raise error about invalid state if this is reached.
+    raise RuntimeError
+
+
 def _ensure_python_packages( requirements ):
     ''' Ensures availability of packages to active Python. '''
     # Ignore if in an appropriate virtual environment.
-    if active_python_abi_label == psenv.get( 'OUR_VENV_NAME' ): return
+    if (
+        active_python_abi_label
+        == current_process_environment.get( 'OUR_VENV_NAME' )
+    ): return
     # If 'pip' module is not available, then assume PEP 517 build in progress,
     # which should have already ensured packages from 'build-requires'.
     try: import pip # pylint: disable=unused-import
@@ -200,10 +248,11 @@ def _ensure_python_packages( requirements ):
 
 
 def indicate_python_packages( identifier = None ):
-    ''' Returns lists of Python package dependencies.
+    ''' Returns Python package dependencies.
 
-        First is raw list of dependencies.
-        Second is list of dependency fixtures (fixed on digest). '''
+        First return value is contents of packages specifications file.
+        Second return value is list of dependency fixtures for the given
+        platform identifier. Will be empty if none is given. '''
     from tomli import load
     fixtures_path = paths.configuration.pypackages_fixtures
     if identifier and fixtures_path.exists( ):
@@ -211,8 +260,8 @@ def indicate_python_packages( identifier = None ):
             fixtures = load( file ).get( identifier, [ ] )
     else: fixtures = [ ]
     with paths.configuration.pypackages.open( 'rb' ) as file:
-        simples = load( file )
-    return simples, fixtures
+        specifications = load( file )
+    return specifications, fixtures
 
 
 def ensure_directory( path ):
@@ -233,16 +282,6 @@ def identify_python( mode, python_path ):
     detector_path = paths.scripts.d.python3 / 'identify-python.py'
     return standard_execute_external(
         ( python_path, detector_path, '--mode', mode ) ).stdout.strip( )
-
-
-def collapse_multilevel_dictionary( dictionary ):
-    ''' Collapses a hierarchical dictionary into a list. '''
-    # TODO: Need to handle format version number.
-    #       Probably replace this function with something more specific.
-    return tuple( chain.from_iterable(
-        (   collapse_multilevel_dictionary( value )
-            if isinstance( value, AbstractDictionary ) else value )
-        for value in dictionary.values( ) ) )
 
 
 def discover_project_version( ):

@@ -1,9 +1,3 @@
-Package Requirements Format
-===============================================================================
-
-* Comments which are part of the requiremets data structure, for ease of
-  machine rewriting.
-
 Testing Improvements
 ===============================================================================
 

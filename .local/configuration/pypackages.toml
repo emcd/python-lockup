@@ -1,13 +1,8 @@
-# TODO: Rework parser to support format version.
-#format-version = 1
+format-version = 1
 
 # References:
 #   PEP 508 ("Dependency specification for Python Software Packages"):
 #     https://peps.python.org/pep-0508/
-
-installation = [ ]
-
-[optional-installation]
 
 [development]
 base = [
@@ -16,41 +11,70 @@ base = [
   'tomli',
   'tomli-w',
 ]
-format = [
-  # YAPF 0.31 is missing full support for 'yapf-diff'.
-  'yapf >= 0.32',
-]
 documentation = [
   'furo',
   'sphinx',
   'sphinx-copybutton',
   'sphinx-inline-tabs',
 ]
-lint = [
-  'bandit',
-  # TEMP: https://github.com/PyCQA/bandit/issues/951
-  'importlib-metadata < 5',
-  # Mypy relies on 'typed_ast', which does not build under PyPy 3.7.
-  #   https://github.com/python/typed_ast/issues/111
-  'mypy; implementation_name != "pypy" or python_version >= "3.8"',
-  'pre-commit',
-  # Pylint relies on 'typed_ast', which does not build under PyPy 3.7.
-  #   https://github.com/python/typed_ast/issues/111
-  # Pylint 2.15.2 requires a patch release of Astroid 2.12, which fixes:
-  #   https://github.com/PyCQA/astroid/issues/1755
-  'pylint >= 2.15.2; implementation_name != "pypy" or python_version >= "3.8"',
-  'safety',
-  # Semgrep 0.114.0 includes fix for race with garbarge collector on PyPy.
-  #   https://github.com/returntocorp/semgrep/pull/6100
-  'semgrep >= 0.114.0',
-]
 publication = [
   'bump2version',
   'twine',
 ]
-test = [
-  # Coverage 6.1 series breaks how we handle .gitignore files.
-  'coverage[toml] >= 6.2',
-  'hypothesis',
-  'pytest',
+
+[[development.format]]
+requirement = 'yapf >= 0.32'
+comments = [
+  ''' YAPF 0.31 is missing full support for 'yapf-diff'. ''',
 ]
+
+[[development.lint]]
+requirement = 'bandit'
+
+[[development.lint]]
+requirement = 'importlib-metadata < 5'
+comments = [
+  ''' https://github.com/PyCQA/bandit/issues/951 ''',
+]
+temporary = true
+
+[[development.lint]]
+requirement = 'mypy; implementation_name != "pypy" or python_version >= "3.8"'
+comments = [
+  ''' Mypy relies on 'typed_ast', which does not build under PyPy 3.7.
+      https://github.com/python/typed_ast/issues/111 ''',
+]
+
+[[development.lint]]
+requirement = 'pre-commit'
+
+[[development.lint]]
+requirement = 'pylint >= 2.15.2; implementation_name != "pypy" or python_version >= "3.8"'
+comments = [
+  ''' Pylint relies on 'typed_ast', which does not build under PyPy 3.7.
+      https://github.com/python/typed_ast/issues/111 ''',
+  ''' Pylint 2.15.2 requires a patch release of Astroid 2.12, which fixes:
+      https://github.com/PyCQA/astroid/issues/1755 ''',
+]
+
+[[development.lint]]
+requirement = 'safety'
+
+[[development.lint]]
+requirement = 'semgrep >= 0.114.0'
+comments = [
+  ''' Semgrep 0.114.0 includes fix for race with garbarge collector on PyPy.
+      https://github.com/returntocorp/semgrep/pull/6100 '''
+]
+
+[[development.test]]
+requirement = 'coverage[toml] >= 6.2'
+comments = [
+  ''' Coverage 6.1 series breaks how we handle .gitignore files. '''
+]
+
+[[development.test]]
+requirement = 'hypothesis'
+
+[[development.test]]
+requirement = 'pytest'
