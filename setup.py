@@ -21,12 +21,20 @@
 #_current_process_environment[ 'DISTUTILS_DEBUG' ] = 'True'
 
 
+# TODO? Call setup routine from 'develop.py'.
 def _setup_python_search_paths( ):
+    from base64 import standard_b64encode as b64encode
+    from os import environ as cpe
     from pathlib import Path
+    from pickle import dumps as pickle
     from sys import path as python_search_paths
     project_path = Path( __file__ ).parent
+    # TODO: Switch to SCM modules path after refactor.
     python_search_paths.insert(
         0, str( project_path / '.local' / 'sources' / 'python3' ) )
+    cpe[ '_DEVSHIM_CONFIGURATION' ] = b64encode( pickle( dict(
+        project_path = project_path,
+    ) ) ).decode( )
 
 _setup_python_search_paths( )
 
