@@ -22,7 +22,6 @@
 
 
 from functools import partial as partial_function
-from os import environ as current_process_environment
 from pathlib import Path
 from re import match as regex_match
 from shlex import split as split_command
@@ -34,20 +33,44 @@ from types import SimpleNamespace
 
 
 def _calculate_paths( ):
-    project_path = Path( __file__ ).parent.parent.parent.parent
+    configuration = _extract_configuration( )
+    # TODO: Drop '.local' from common path after repository split.
+    common_path = configuration.common_path / '.local'
+    project_path = configuration.project_path
     local_path = project_path / '.local'
-    paths_ = SimpleNamespace( local = local_path, project = project_path )
+    paths_ = SimpleNamespace(
+        common = common_path, local = local_path, project = project_path )
     paths_.artifacts = _calculate_artifacts_paths( paths_ )
     paths_.caches = _calculate_caches_paths( paths_ )
     paths_.configuration = _calculate_configuration_paths( paths_ )
     paths_.environments = local_path / 'environments'
+    # TODO: Split SCM modules paths between common local and project local.
     paths_.scm_modules = local_path / 'scm-modules'
     paths_.state = local_path / 'state'
-    paths_.common = paths_.scm_modules / 'emcd-common'
     paths_.scripts = _calculate_scripts_paths( paths_ )
     paths_.sources = _calculate_sources_paths( paths_ )
     paths_.tests = _calculate_tests_paths( paths_ )
     return paths_
+
+
+def _extract_configuration( ):
+    common_path = Path( __file__ ).parent.parent.parent.parent
+    configuration = dict(
+        common_path = common_path,
+        project_path = common_path,
+    )
+    from os import environ as cpe
+    if '_DEVSHIM_CONFIGURATION' in cpe:
+        from base64 import standard_b64decode as b64decode
+        from binascii import Error as B64DecodeError
+        from pickle import UnpicklingError, loads as unpickle
+        try:
+            configuration.update( unpickle( b64decode(
+                cpe[ '_DEVSHIM_CONFIGURATION' ].encode( ) ) ) )
+        except ( B64DecodeError, UnpicklingError ):
+            # TODO: Emit warning.
+            pass
+    return SimpleNamespace( **configuration )
 
 
 def _calculate_artifacts_paths( paths_ ):
@@ -99,7 +122,7 @@ def _calculate_configuration_paths( paths_ ):
 
 
 def _calculate_scripts_paths( paths_ ):
-    d_scripts_path = paths_.local / 'scripts'
+    d_scripts_path = paths_.common / 'scripts'
     p_scripts_path = paths_.project / 'scripts'
     return SimpleNamespace(
         d = SimpleNamespace(
@@ -112,7 +135,7 @@ def _calculate_scripts_paths( paths_ ):
 
 
 def _calculate_sources_paths( paths_ ):
-    d_sources_path = paths_.local / 'sources'
+    d_sources_path = paths_.common / 'sources'
     p_sources_path = paths_.project / 'sources'
     return SimpleNamespace(
         d = SimpleNamespace(
@@ -126,7 +149,7 @@ def _calculate_sources_paths( paths_ ):
 
 
 def _calculate_tests_paths( paths_ ):
-    d_tests_path = paths_.local / 'tests'
+    d_tests_path = paths_.common / 'tests'
     p_tests_path = paths_.project / 'tests'
     return SimpleNamespace(
         d = SimpleNamespace(
@@ -217,11 +240,9 @@ def _extract_python_package_requirement( specification ):
 
 def _ensure_python_packages( requirements ):
     ''' Ensures availability of packages to active Python. '''
+    from os import environ as cpe
     # Ignore if in an appropriate virtual environment.
-    if (
-        active_python_abi_label
-        == current_process_environment.get( 'OUR_VENV_NAME' )
-    ): return
+    if active_python_abi_label == cpe.get( 'OUR_VENV_NAME' ): return
     # If 'pip' module is not available, then assume PEP 517 build in progress,
     # which should have already ensured packages from 'build-requires'.
     try: import pip # pylint: disable=unused-import
