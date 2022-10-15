@@ -7,21 +7,18 @@
         https://jareddillard.com/blog/common-ways-to-customize-sphinx-themes.html
 """
 
-def _setup_python_search_paths( ):
-    from base64 import standard_b64encode as b64encode
-    from os import environ as cpe
-    from pathlib import Path
-    from pickle import dumps as pickle
-    from sys import path as python_search_paths
-    project_path = Path( __file__ ).parent.parent.parent
-    # TODO: Switch to SCM modules path after refactor.
-    python_search_paths.insert(
-        0, str( project_path / '.local' / 'sources' / 'python3' ) )
-    cpe[ '_DEVSHIM_CONFIGURATION' ] = b64encode( pickle( dict(
-        project_path = project_path,
-    ) ) ).decode( )
 
-_setup_python_search_paths( )
+def _configure( ):
+    from pathlib import Path
+    project_path = Path( __file__ ).parent.parent.parent
+    from importlib.util import module_from_spec, spec_from_file_location
+    module_spec = spec_from_file_location(
+        '_develop', project_path / 'develop.py' )
+    module = module_from_spec( module_spec )
+    module_spec.loader.exec_module( module )
+    module.configure_auxiliary( project_path )
+
+_configure( )
 
 
 def _install_prerequisite_packages( ):

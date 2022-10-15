@@ -17,26 +17,23 @@
 ###############################################################################
 
 
-#from os import environ as _current_process_environment
-#_current_process_environment[ 'DISTUTILS_DEBUG' ] = 'True'
+''' Setuptools configuration and support. '''
 
 
-# TODO? Call setup routine from 'develop.py'.
-def _setup_python_search_paths( ):
-    from base64 import standard_b64encode as b64encode
-    from os import environ as cpe
+def _configure( ):
     from pathlib import Path
-    from pickle import dumps as pickle
-    from sys import path as python_search_paths
     project_path = Path( __file__ ).parent
-    # TODO: Switch to SCM modules path after refactor.
-    python_search_paths.insert(
-        0, str( project_path / '.local' / 'sources' / 'python3' ) )
-    cpe[ '_DEVSHIM_CONFIGURATION' ] = b64encode( pickle( dict(
-        project_path = project_path,
-    ) ) ).decode( )
+    from importlib.util import module_from_spec, spec_from_file_location
+    module_spec = spec_from_file_location(
+        '_develop', project_path / 'develop.py' )
+    module = module_from_spec( module_spec )
+    module_spec.loader.exec_module( module )
+    module.configure_auxiliary( project_path )
+    if False: # pylint: disable=using-constant-test
+        from os import environ as _current_process_environment
+        _current_process_environment[ 'DISTUTILS_DEBUG' ] = 'True'
 
-_setup_python_search_paths( )
+_configure( )
 
 
 # Overridden Setuptools Command Attributes
@@ -45,7 +42,7 @@ _setup_python_search_paths( )
 
 
 from setuptools.command.build import build as _BuildCommand
-class BuildCommand( _BuildCommand ):
+class BuildCommand( _BuildCommand ): # pylint: disable=too-many-ancestors
     ''' With overridden 'build_base' attribute. '''
     # https://github.com/pypa/wheel/issues/306#issuecomment-522529825
 
@@ -66,11 +63,11 @@ class EggInfoCommand( _EggInfoCommand ):
         ''' Override 'egg_base' attribute. '''
         _EggInfoCommand.initialize_options( self )
         from devshim__base import paths
-        self.egg_base = str( paths.caches.setuptools )
+        self.egg_base = str( paths.caches.setuptools ) # pylint: disable=attribute-defined-outside-init
 
 
 from setuptools.command.sdist import sdist as _SdistCommand
-class SdistCommand( _SdistCommand ):
+class SdistCommand( _SdistCommand ): # pylint: disable=too-many-ancestors
     ''' With overridden 'dist_dir' attribute. '''
 
     def initialize_options( self ):
