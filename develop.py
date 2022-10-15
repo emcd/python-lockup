@@ -22,6 +22,9 @@
     Bootstraps basic development environment as necessary. '''
 
 
+_EX_UNAVAILABLE = 69
+
+
 def assert_minimum_python_version( ):
     ''' Asserts minimum Python version in a version-agnostic manner.
 
@@ -35,46 +38,85 @@ def assert_minimum_python_version( ):
     version = version_info[ 0 ], version_info[ 1 ]
     if required_version > version:
         stderr.write( error_message ); stderr.flush( )
-        raise SystemExit( 69 ) # EX_UNAVAILABLE
+        raise SystemExit( _EX_UNAVAILABLE )
 
 assert_minimum_python_version( )
 
 
-# TODO: Ensure that Git submodules are cloned.
-
-
-def setup_python_search_paths( ):
-    ''' Allows Python to locate modules for development support. '''
-    from base64 import standard_b64encode as b64encode
-    from os import environ as cpe
+def configure( ):
+    ''' Configures development support executor. '''
+    from logging import (
+        basicConfig as simple_setup_logging,
+        captureWarnings as capture_admonitions,
+    )
+    simple_setup_logging( )
+    capture_admonitions( True )
     from pathlib import Path
-    from pickle import dumps as pickle
-    from sys import path as python_search_paths
     project_path = Path( __file__ ).parent
+    ensure_scm_modules( project_path )
+    configure_auxiliary( project_path )
+
+
+def ensure_scm_modules( project_path ):
+    ''' Ensures SCM modules have been cloned. '''
+    for modules_path in (
+        project_path / '.local' / 'scm-modules',
+        project_path / 'scm-modules',
+    ):
+        if not modules_path.is_dir( ): continue
+        for module_path in modules_path.iterdir( ):
+            if not module_path.is_dir( ): continue
+            if not len( tuple( module_path.iterdir( ) ) ):
+                _attempt_clone_scm_modules( project_path )
+                return
+        else: return
+
+
+def _attempt_clone_scm_modules( project_path ):
+    ''' Attempts to clone SCM modules. '''
+    from shutil import which
+    # TODO: Handle alternative Git implementations.
+    git_path = which( 'git' )
+    if None is git_path:
+        _die(
+            _EX_UNAVAILABLE,
+            'Git must be installed to use development support tools.' )
+    from logging import info
+    info( 'Cloning SCM modules to get development support tools.' )
+    from subprocess import run
+    run(
+        ( git_path, *'submodule update --init --recursive'.split( ' ' ) ),
+        capture_output = True, check = True, cwd = project_path, text = True )
+
+
+def configure_auxiliary( project_path ):
+    ''' Locates and configures development support modules. '''
     # TODO: Switch to SCM modules path after refactor.
+    from sys import path as python_search_paths
     python_search_paths.insert(
         0, str( project_path / '.local' / 'sources' / 'python3' ) )
-    cpe[ '_DEVSHIM_CONFIGURATION' ] = b64encode( pickle( dict(
-        project_path = project_path,
-    ) ) ).decode( )
+    from os import environ as current_process_environment
+    current_process_environment.update( dict(
+        _DEVSHIM_PROJECT_PATH = str( project_path )
+    ) )
+    from devshim__base import assert_sanity
+    assert_sanity( )
 
-setup_python_search_paths( )
 
-
-from devshim__base import assert_sanity as _assert_sanity
-_assert_sanity( )
+def _die( exit_code, message ):
+    ''' Logs message and exits with given code. '''
+    from logging import critical
+    critical( message )
+    raise SystemExit( exit_code )
 
 
 def main( ):
     ''' Entrypoint for development activity. '''
+    configure( )
     from invoke import Collection, Program
     import devshim__tasks
     program = Program( namespace = Collection.from_module( devshim__tasks ) )
     program.run( )
-
-
-from lockup import reclassify_module as _reclassify_module
-_reclassify_module( __name__ )
 
 
 if '__main__' == __name__: main( )

@@ -184,8 +184,6 @@ def clean_tool_caches( context, include_development_support = False ): # pylint:
             continue
         path.unlink( )
     while dirs_stack: dirs_stack.pop( ).rmdir( )
-    # Setuptools hardcodes the eggs path to different location.
-    __.unlink_recursively( __.paths.caches.eggs )
     # Regnerate development support packages cache, if necessary.
     if include_development_support: __.ensure_python_support_packages( )
 
@@ -400,7 +398,8 @@ def _lint_pylint( context, targets, checks, version = None ):
             *__.paths.tests.p.python3.rglob( '*.py' ),
             *__.paths.sources.d.python3.rglob( '*.py' ),
             __.paths.sources.p.sphinx / 'conf.py',
-            __package__, )
+            __.paths.project / 'setup.py',
+        )
     targets_str = ' '.join( map( str, targets ) )
     checks_str = (
         "--disable=all --enable={}".format( ','.join( checks ) )

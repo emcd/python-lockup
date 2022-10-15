@@ -22,55 +22,49 @@
 
 
 from functools import partial as partial_function
-from pathlib import Path
-from re import match as regex_match
 from shlex import split as split_command
 from subprocess import run
-from sys import (
-    path as python_search_paths,
-)
 from types import SimpleNamespace
 
 
+standard_execute_external = partial_function(
+    run, check = True, capture_output = True, text = True )
+
+
+def _configure( ):
+    ''' Configure development support. '''
+    from pathlib import Path
+    # TODO: Correct auxiliary path derivation after repository split.
+    auxiliary_path = Path( __file__ ).parent.parent.parent.parent
+    from os import environ as current_process_environment
+    from types import MappingProxyType as DictionaryProxy
+    configuration_ = DictionaryProxy( dict(
+        auxiliary_path = auxiliary_path,
+        project_path = Path( current_process_environment.get(
+            '_DEVSHIM_PROJECT_PATH', auxiliary_path ) )
+    ) )
+    return configuration_
+
+configuration = _configure( )
+
+
 def _calculate_paths( ):
-    configuration = _extract_configuration( )
-    # TODO: Drop '.local' from common path after repository split.
-    common_path = configuration.common_path / '.local'
-    project_path = configuration.project_path
-    local_path = project_path / '.local'
     paths_ = SimpleNamespace(
-        common = common_path, local = local_path, project = project_path )
+        # TODO: Drop '.local' from auxiliary path after repository split.
+        auxiliary = configuration[ 'auxiliary_path' ] / '.local',
+        project = configuration[ 'project_path' ] )
+    paths_.local = paths_.project / '.local'
     paths_.artifacts = _calculate_artifacts_paths( paths_ )
     paths_.caches = _calculate_caches_paths( paths_ )
     paths_.configuration = _calculate_configuration_paths( paths_ )
-    paths_.environments = local_path / 'environments'
-    # TODO: Split SCM modules paths between common local and project local.
-    paths_.scm_modules = local_path / 'scm-modules'
-    paths_.state = local_path / 'state'
+    paths_.environments = paths_.local / 'environments'
+    # TODO: Split SCM modules paths between auxiliary and project local.
+    paths_.scm_modules = paths_.local / 'scm-modules'
+    paths_.state = paths_.local / 'state'
     paths_.scripts = _calculate_scripts_paths( paths_ )
     paths_.sources = _calculate_sources_paths( paths_ )
     paths_.tests = _calculate_tests_paths( paths_ )
     return paths_
-
-
-def _extract_configuration( ):
-    common_path = Path( __file__ ).parent.parent.parent.parent
-    configuration = dict(
-        common_path = common_path,
-        project_path = common_path,
-    )
-    from os import environ as cpe
-    if '_DEVSHIM_CONFIGURATION' in cpe:
-        from base64 import standard_b64decode as b64decode
-        from binascii import Error as B64DecodeError
-        from pickle import UnpicklingError, loads as unpickle
-        try:
-            configuration.update( unpickle( b64decode(
-                cpe[ '_DEVSHIM_CONFIGURATION' ].encode( ) ) ) )
-        except ( B64DecodeError, UnpicklingError ):
-            # TODO: Emit warning.
-            pass
-    return SimpleNamespace( **configuration )
 
 
 def _calculate_artifacts_paths( paths_ ):
@@ -92,8 +86,6 @@ def _calculate_caches_paths( paths_ ):
     utilities_path = caches_path / 'utilities'
     return SimpleNamespace(
         SELF = caches_path,
-        # Note: 'setuptools' hardcodes the eggs path.
-        eggs = paths_.project / 'eggs',
         hypothesis = caches_path / 'hypothesis',
         packages = SimpleNamespace(
             python3 = packages_path / 'python3',
@@ -122,41 +114,41 @@ def _calculate_configuration_paths( paths_ ):
 
 
 def _calculate_scripts_paths( paths_ ):
-    d_scripts_path = paths_.common / 'scripts'
-    p_scripts_path = paths_.project / 'scripts'
+    auxiliary_path = paths_.auxiliary / 'scripts'
+    project_path = paths_.project / 'scripts'
     return SimpleNamespace(
         d = SimpleNamespace(
-            python3 = d_scripts_path / 'python3',
+            python3 = auxiliary_path / 'python3',
         ),
         p = SimpleNamespace(
-            python3 = p_scripts_path / 'python3',
+            python3 = project_path / 'python3',
         ),
     )
 
 
 def _calculate_sources_paths( paths_ ):
-    d_sources_path = paths_.common / 'sources'
-    p_sources_path = paths_.project / 'sources'
+    auxiliary_path = paths_.auxiliary / 'sources'
+    project_path = paths_.project / 'sources'
     return SimpleNamespace(
         d = SimpleNamespace(
-            python3 = d_sources_path / 'python3',
+            python3 = auxiliary_path / 'python3',
         ),
         p = SimpleNamespace(
-            python3 = p_sources_path / 'python3',
-            sphinx = p_sources_path / 'sphinx',
+            python3 = project_path / 'python3',
+            sphinx = project_path / 'sphinx',
         ),
     )
 
 
 def _calculate_tests_paths( paths_ ):
-    d_tests_path = paths_.common / 'tests'
-    p_tests_path = paths_.project / 'tests'
+    auxiliary_path = paths_.auxiliary / 'tests'
+    project_path = paths_.project / 'tests'
     return SimpleNamespace(
         d = SimpleNamespace(
-            python3 = d_tests_path / 'python3',
+            python3 = auxiliary_path / 'python3',
         ),
         p = SimpleNamespace(
-            python3 = p_tests_path / 'python3',
+            python3 = project_path / 'python3',
         ),
     )
 
@@ -171,10 +163,6 @@ def identify_active_python( mode ):
 
 
 active_python_abi_label = identify_active_python( 'bdist-compatibility' )
-
-
-standard_execute_external = partial_function(
-    run, check = True, capture_output = True, text = True )
 
 
 def ensure_python_support_packages( ):
@@ -223,7 +211,8 @@ def extract_python_package_requirements( specifications, domain = None ):
                 requirements.extend( map(
                     _extract_python_package_requirement,
                     apex_specifications.get( subdomain, [ ] ) ) )
-            # TODO: Raise error if more than 1 subdomain.
+            # TODO: Raise more appropriate error.
+            else: raise RuntimeError( f"Invalid domain: {domain}" )
     return tuple( requirements )
 
 
@@ -250,12 +239,14 @@ def _ensure_python_packages( requirements ):
     cache_path = ensure_directory(
         paths.caches.packages.python3 / active_python_abi_label )
     cache_path_ = str( cache_path )
+    from sys import path as python_search_paths
     if cache_path_ not in python_search_paths:
         python_search_paths.insert( 0, cache_path_ )
     # Ignore packages which are already cached.
     in_cache_packages = frozenset(
         path.name for path in cache_path.glob( '*' )
         if path.suffix not in ( '.dist-info', ) )
+    from re import match as regex_match
     def requirement_to_name( requirement ):
         return regex_match(
             r'^([\w\-]+)(.*)$', requirement ).group( 1 ).replace( '-', '_' )

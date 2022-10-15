@@ -47,7 +47,8 @@ Provide In-Tree PEP 517 Build Backend
 ===============================================================================
 
 * Proxy to Setuptools 'build_meta' backend, once it supports the 'build_base'
-  and 'egg_base' options.
+  and 'egg_base' options. Can use the command options overrides now baked in
+  'setup.py'.
 
 * Or proxy to `Enscons <https://pypi.org/project/enscons/>`_.
 
