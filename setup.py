@@ -30,8 +30,8 @@ def _configure( ):
     module_spec.loader.exec_module( module )
     module.configure_auxiliary( project_path )
     if False: # pylint: disable=using-constant-test
-        from os import environ as _current_process_environment
-        _current_process_environment[ 'DISTUTILS_DEBUG' ] = 'True'
+        from os import environ as current_process_environment
+        current_process_environment[ 'DISTUTILS_DEBUG' ] = 'True'
 
 _configure( )
 
