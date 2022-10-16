@@ -57,7 +57,7 @@ def install_python_builder_posix( ):
         PREFIX = __.paths.caches.utilities.python_build,
     ) )
     __.standard_execute_external(
-        str( __.paths.scm_modules.joinpath(
+        str( __.paths.scm_modules.aux.joinpath(
             'pyenv', 'plugins', 'python-build', 'install.sh' ) ),
         env = environment )
 

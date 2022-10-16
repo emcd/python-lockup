@@ -154,9 +154,10 @@ def clean_pycaches( context ): # pylint: disable=unused-argument
     ''' Removes all caches of compiled CPython bytecode. '''
     __.render_boxed_title( 'Clean: Python Caches' )
     anchors = (
-        __.paths.sources.d.python3, __.paths.sources.p.python3,
-        __.paths.sources.p.sphinx,
-        __.paths.tests.p.python3,
+        __.paths.sources.aux.python3,
+        __.paths.sources.prj.python3,
+        __.paths.sources.prj.sphinx,
+        __.paths.tests.prj.python3,
     )
     for path in __.chain.from_iterable( map(
         lambda anchor: anchor.rglob( '__pycache__' ), anchors
@@ -345,7 +346,7 @@ def lint_bandit( context, version = None ):
 def _lint_bandit( context, version = None ):
     __.render_boxed_title( 'Lint: Bandit', supplement = version )
     context.run(
-        f"bandit --recursive --verbose {__.paths.sources.p.python3}",
+        f"bandit --recursive --verbose {__.paths.sources.prj.python3}",
         pty = True, **__.derive_venv_context_options( version = version ) )
 
 
@@ -365,7 +366,7 @@ def _lint_mypy( context, packages, modules, files, version = None ):
     if not __.test_package_executable( 'mypy', context_options[ 'env' ] ):
         return
     if not packages and not modules and not files:
-        files = ( __.paths.sources.p.python3, )
+        files = ( __.paths.sources.prj.python3, )
     packages_str = ' '.join( map(
         lambda package: f"--package {package}", packages ) )
     modules_str = ' '.join( map(
@@ -395,9 +396,10 @@ def _lint_pylint( context, targets, checks, version = None ):
     if not targets:
         targets = (
             __.project_name,
-            *__.paths.tests.p.python3.rglob( '*.py' ),
-            *__.paths.sources.d.python3.rglob( '*.py' ),
-            __.paths.sources.p.sphinx / 'conf.py',
+            *__.paths.tests.prj.python3.rglob( '*.py' ),
+            # TODO: Remove this path after repository split.
+            *__.paths.sources.aux.python3.rglob( '*.py' ),
+            __.paths.sources.prj.sphinx / 'conf.py',
             __.paths.project / 'setup.py',
         )
     targets_str = ' '.join( map( str, targets ) )
@@ -424,11 +426,12 @@ def _lint_semgrep( context, version = None ):
     context_options = __.derive_venv_context_options( version = version )
     if not __.test_package_executable( 'semgrep', context_options[ 'env' ] ):
         return
-    sgconfig_path = __.paths.scm_modules / 'semgrep-rules' / 'python' / 'lang'
+    sgconfig_path = __.paths.scm_modules.aux.joinpath(
+        'semgrep-rules', 'python', 'lang' )
     context.run(
         #f"strace -ff -tt --string-limit=120 --output=strace/semgrep "
         f"semgrep --config {sgconfig_path} --error --use-git-ignore "
-        f"{__.paths.sources.p.python3}", pty = __.on_tty, **context_options )
+        f"{__.paths.sources.prj.python3}", pty = __.on_tty, **context_options )
 
 
 @__.task
@@ -484,7 +487,7 @@ def check_urls( context ):
     __.render_boxed_title( 'Test: Documentation URLs' )
     context.run(
         f"sphinx-build -b linkcheck {__.sphinx_options} "
-        f"{__.paths.sources.p.sphinx} {__.paths.artifacts.sphinx_linkcheck}",
+        f"{__.paths.sources.prj.sphinx} {__.paths.artifacts.sphinx_linkcheck}",
         pty = __.on_tty, **__.derive_venv_context_options( ) )
 
 
@@ -541,7 +544,7 @@ def make_html( context ):
     __.unlink_recursively( __.paths.artifacts.sphinx_html )
     context.run(
         f"sphinx-build -b html {__.sphinx_options} "
-        f"{__.paths.sources.p.sphinx} {__.paths.artifacts.sphinx_html}",
+        f"{__.paths.sources.prj.sphinx} {__.paths.artifacts.sphinx_html}",
         pty = __.on_tty, **__.derive_venv_context_options( ) )
 
 
@@ -616,7 +619,7 @@ def check_code_style( context, write_changes = False ):
     if write_changes: yapf_options.append( '--in-place --verbose' )
     yapf_options_string = ' '.join( yapf_options )
     context.run(
-        f"git diff --unified=0 --no-color -- {__.paths.sources.p.python3} "
+        f"git diff --unified=0 --no-color -- {__.paths.sources.prj.python3} "
         f"| yapf-diff {yapf_options_string}",
         pty = __.on_tty, **__.derive_venv_context_options( ) )
 

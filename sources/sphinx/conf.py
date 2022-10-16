@@ -43,7 +43,7 @@ def _install_prerequisite_packages( ):
     standard_execute_external(
         ( *split_command( 'pip install --upgrade' ), *manifest ) )
     from sys import path as python_search_paths
-    python_search_paths.insert( 0, str( paths.sources.p.python3 ) )
+    python_search_paths.insert( 0, str( paths.sources.prj.python3 ) )
 _install_prerequisite_packages( )
 
 

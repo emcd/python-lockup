@@ -58,8 +58,7 @@ def _calculate_paths( ):
     paths_.caches = _calculate_caches_paths( paths_ )
     paths_.configuration = _calculate_configuration_paths( paths_ )
     paths_.environments = paths_.local / 'environments'
-    # TODO: Split SCM modules paths between auxiliary and project local.
-    paths_.scm_modules = paths_.local / 'scm-modules'
+    paths_.scm_modules = _calculate_scm_modules_paths( paths_ )
     paths_.state = paths_.local / 'state'
     paths_.scripts = _calculate_scripts_paths( paths_ )
     paths_.sources = _calculate_sources_paths( paths_ )
@@ -113,14 +112,21 @@ def _calculate_configuration_paths( paths_ ):
     )
 
 
+def _calculate_scm_modules_paths( paths_ ):
+    return SimpleNamespace(
+        aux = paths_.auxiliary / 'scm-modules',
+        prj = paths_.local / 'scm-modules',
+    )
+
+
 def _calculate_scripts_paths( paths_ ):
     auxiliary_path = paths_.auxiliary / 'scripts'
     project_path = paths_.project / 'scripts'
     return SimpleNamespace(
-        d = SimpleNamespace(
+        aux = SimpleNamespace(
             python3 = auxiliary_path / 'python3',
         ),
-        p = SimpleNamespace(
+        prj = SimpleNamespace(
             python3 = project_path / 'python3',
         ),
     )
@@ -130,10 +136,10 @@ def _calculate_sources_paths( paths_ ):
     auxiliary_path = paths_.auxiliary / 'sources'
     project_path = paths_.project / 'sources'
     return SimpleNamespace(
-        d = SimpleNamespace(
+        aux = SimpleNamespace(
             python3 = auxiliary_path / 'python3',
         ),
-        p = SimpleNamespace(
+        prj = SimpleNamespace(
             python3 = project_path / 'python3',
             sphinx = project_path / 'sphinx',
         ),
@@ -144,10 +150,10 @@ def _calculate_tests_paths( paths_ ):
     auxiliary_path = paths_.auxiliary / 'tests'
     project_path = paths_.project / 'tests'
     return SimpleNamespace(
-        d = SimpleNamespace(
+        aux = SimpleNamespace(
             python3 = auxiliary_path / 'python3',
         ),
-        p = SimpleNamespace(
+        prj = SimpleNamespace(
             python3 = project_path / 'python3',
         ),
     )
@@ -291,7 +297,7 @@ def assert_sanity( ):
 
 def identify_python( mode, python_path ):
     ''' Reports compatibility identifier for Python at given path. '''
-    detector_path = paths.scripts.d.python3 / 'identify-python.py'
+    detector_path = paths.scripts.aux.python3 / 'identify-python.py'
     return standard_execute_external(
         ( python_path, detector_path, '--mode', mode ) ).stdout.strip( )
 
