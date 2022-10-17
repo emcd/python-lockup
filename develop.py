@@ -91,10 +91,13 @@ def _attempt_clone_scm_modules( project_path ):
 
 def configure_auxiliary( project_path ):
     ''' Locates and configures development support modules. '''
-    # TODO: Switch to SCM modules path after refactor.
+    auxiliary_path = project_path.joinpath(
+        '.local', 'scm-modules', 'python-devshim' )
+    packages_path = (
+        auxiliary_path if auxiliary_path.is_dir( )
+        else project_path ) / 'sources' / 'python3'
     from sys import path as python_search_paths
-    python_search_paths.insert(
-        0, str( project_path / '.local' / 'sources' / 'python3' ) )
+    python_search_paths.insert( 0, str( packages_path ) )
     from os import environ as current_process_environment
     current_process_environment.update( dict(
         _DEVSHIM_PROJECT_PATH = str( project_path )
