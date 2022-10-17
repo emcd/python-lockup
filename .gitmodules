@@ -1,7 +1,3 @@
-[submodule ".local/scm-modules/pyenv"]
-	path = .local/scm-modules/pyenv
-	url = https://github.com/pyenv/pyenv.git
-[submodule ".local/scm-modules/semgrep-rules"]
-	path = .local/scm-modules/semgrep-rules
-	url = https://github.com/returntocorp/semgrep-rules.git
-	branch = develop
+[submodule ".local/scm-modules/python-devshim"]
+	path = .local/scm-modules/python-devshim
+	url = git@github.com:emcd/python-devshim.git

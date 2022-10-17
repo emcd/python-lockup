@@ -99,7 +99,7 @@ def provide_exception_factory( name ):
         ``_exception``. '''
     complete_name = f"create_{name}_exception"
     if complete_name in globals( ):
-        # nosemgrep: local.scm-modules.semgrep-rules.python.lang.security.dangerous-globals-use
+        # nosemgrep: local.scm-modules.python-devshim.scm-modules.semgrep-rules.python.lang.security.dangerous-globals-use
         exception_factory = globals( )[ complete_name ]
         from functools import partial as partial_function
         return partial_function( exception_factory, provide_exception_class )
