@@ -8,13 +8,13 @@ jobs:
         python-version: ['3.7', '3.8', '3.9', '3.10', 'pypy3.7', 'pypy3.8', 'pypy3.9', 'pyston-2.3']
     steps:
       - name: Prepare
-        uses: emcd/python-lockup/.github/actions/python-venv@master
+        uses: emcd/python-devshim/.github/actions/python-venv@v1.0a202210200017
         with:
           python-version: '${{ matrix.python-version }}'
       - name: Test
         run: python3 develop.py test
       - name: Preserve Coverage Results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: coverage-results-${{ matrix.python-version }}
           path: .local/caches/pytest/coverage.sqlite3.*
@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Prepare
-        uses: emcd/python-lockup/.github/actions/python-venv@master
+        uses: emcd/python-devshim/.github/actions/python-venv@v1.0a202210200017
         with:
           python-version: '3.8'
           python-configure-flags: '--with-trace-refs'
