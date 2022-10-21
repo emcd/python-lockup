@@ -10,9 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Prepare
-        uses: emcd/python-lockup/.github/actions/python-venv@master
+        uses: emcd/python-devshim/.github/actions/python-venv@v1.0a202210200017
       - name: Restore Coverage Results
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           path: .local/caches/pytest
       - name: Relocate Coverage Results
@@ -20,6 +20,6 @@ jobs:
       - name: Report Coverage
         run: python3 develop.py report-coverage
       - name: Upload Coverage Report
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           files: artifacts/coverage-pytest/coverage.xml
