@@ -1,0 +1,24 @@
+name: reusable--initializer
+on:
+  workflow_call:
+    outputs:
+      python-versions-json:
+        description: 'List of Python versions in JSON format.'
+        value: '${{ jobs.define-constants.outputs.python-versions-json }}'
+      python-versions-words:
+        description: 'List of Python versions as POSIX shell split and quoted words.'
+        value: '${{ jobs.define-constants.outputs.python-versions-words }}'
+jobs:
+  define-constants:
+    runs-on: ubuntu-latest
+    outputs:
+      python-versions-json: '${{ steps.python-versions.outputs.json }}'
+      python-versions-words: '${{ steps.python-versions.outputs.words }}'
+    steps:
+      - name: Enumerate Python Versions
+        id: python-versions
+        run: |
+          python_versions=( '3.7' '3.8' '3.9' '3.10' 'pypy3.7' 'pypy3.8' 'pypy3.9' 'pyston-2.3' )
+          echo "json=$(jq --null-input --compact-output '[$ARGS.positional[]]' --args ${python_versions[@]})" >> ${GITHUB_OUTPUT}
+          echo "words=${python_versions[@]}" >> ${GITHUB_OUTPUT}
+        shell: bash
