@@ -3,5 +3,15 @@ on:
   pull_request:
     branches: ['*']
 jobs:
-  test:
-    uses: ./.github/workflows/reusable--test.yaml
+  initialize:
+    uses: ./.github/workflows/reusable--initializer.yaml
+  test-standard-suite:
+    needs: initialize
+    strategy:
+      matrix:
+        python-version: ${{ fromJSON(needs.initialize.outputs.python-versions-json) }}
+    uses: emcd/python-devshim/.github/workflows/reusable--tester.yaml@master
+    with:
+      python-version: '${{ matrix.python-version }}'
+  test-specials:
+    uses: ./.github/workflows/reusable--special-tester.yaml

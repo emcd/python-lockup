@@ -1,24 +1,6 @@
-name: reusable--tests
+name: reusable--special-tester
 on: ['workflow_call']
 jobs:
-  test-standard-suite:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ['3.7', '3.8', '3.9', '3.10', 'pypy3.7', 'pypy3.8', 'pypy3.9', 'pyston-2.3']
-    steps:
-      - name: Prepare
-        uses: emcd/python-devshim/.github/actions/python-venv@master
-        with:
-          python-version: '${{ matrix.python-version }}'
-      - name: Test
-        run: python3 develop.py test
-        shell: bash
-      - name: Preserve Coverage Results
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage-results-${{ matrix.python-version }}
-          path: .local/caches/pytest/coverage.sqlite3.*
   test-cpython-trace-refs:
     runs-on: ubuntu-latest
     steps:
