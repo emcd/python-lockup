@@ -1,35 +1,10 @@
+# OBSOLETE. Serves as an anchor for tests status badge on older versions of the documentation.
+#           Ran an actual test suite against the 'master' branch at one point.
 name: tests
 on:
-  push:
-    branches: ['master', 'release-*']
+  workflow_dispatch: {}
 jobs:
-  initialize:
-    uses: ./.github/workflows/reusable--initializer.yaml
-  test-standard-suite:
-    needs: initialize
-    strategy:
-      matrix:
-        python-version: ${{ fromJSON(needs.initialize.outputs.python-versions-json) }}
-    uses: emcd/python-devshim/.github/workflows/reusable--tester.yaml@master
-    with:
-      python-version: '${{ matrix.python-version }}'
-  test-specials:
-    uses: ./.github/workflows/reusable--special-tester.yaml
-  report-coverage:
-    needs: test-standard-suite
-    runs-on: ubuntu-latest
+  fabricate-truth:
     steps:
-      - name: Prepare
-        uses: emcd/python-devshim/.github/actions/python-venv@master
-      - name: Restore Coverage Results
-        uses: actions/download-artifact@v3
-        with:
-          path: .local/caches/pytest
-      - name: Relocate Coverage Results
-        run: mv .local/caches/pytest/coverage-results-*/coverage.sqlite3.* .local/caches/pytest
-      - name: Report Coverage
-        run: python3 develop.py report-coverage
-      - name: Upload Coverage Report
-        uses: codecov/codecov-action@v3
-        with:
-          files: artifacts/coverage-pytest/coverage.xml
+      - name: 'Not Volkswagen, Really...'
+        run: true

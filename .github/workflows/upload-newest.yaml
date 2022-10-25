@@ -1,7 +1,7 @@
 name: upload-newest
 on:
   workflow_run:
-    workflows: ['tests']
+    workflows: ['tester']
     branches: ['master']
     types: ['completed']
 jobs:
