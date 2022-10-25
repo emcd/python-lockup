@@ -1,11 +1,13 @@
-name: pr-tests
+name: tester
 on:
   pull_request:
     branches: ['*']
+  push:
+    branches: ['master', 'release-*']
 jobs:
   initialize:
     uses: ./.github/workflows/reusable--initializer.yaml
-  test-standard-suite:
+  test:
     needs: initialize
     strategy:
       matrix:
@@ -15,3 +17,8 @@ jobs:
       python-version: '${{ matrix.python-version }}'
   test-specials:
     uses: ./.github/workflows/reusable--special-tester.yaml
+  report:
+    needs: test
+    uses: emcd/python-devshim/.github/workflows/reusable--reporter.yaml@master
+    with:
+      publish: "${{ 'master' == github.ref_name }}"

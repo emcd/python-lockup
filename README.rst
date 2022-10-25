@@ -28,9 +28,9 @@
    :alt: PyPI - Status
    :target: https://pypi.org/project/lockup/
 
-.. image:: https://github.com/emcd/python-lockup/actions/workflows/test.yaml/badge.svg?branch=master&event=push
+.. image:: https://github.com/emcd/python-lockup/actions/workflows/tester.yaml/badge.svg?branch=master&event=push
    :alt: Tests Status
-   :target: https://github.com/emcd/python-lockup/actions/workflows/test.yaml
+   :target: https://github.com/emcd/python-lockup/actions/workflows/tester.yaml
 
 .. image:: https://codecov.io/gh/emcd/python-lockup/branch/master/graph/badge.svg?token=PA9QI9RL63
    :alt: Code Coverage
