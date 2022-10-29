@@ -1,4 +1,4 @@
 [submodule ".local/scm-modules/python-devshim"]
 	path = .local/scm-modules/python-devshim
-	url = git@github.com:emcd/python-devshim.git
+	url = https://github.com/emcd/python-devshim.git
 	branch = stable
