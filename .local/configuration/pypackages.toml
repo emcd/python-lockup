@@ -5,12 +5,6 @@ format-version = 1
 #     https://peps.python.org/pep-0508/
 
 [development]
-base = [
-  'invoke',
-  'shellingham',
-  'tomli',
-  'tomli-w',
-]
 documentation = [
   'furo',
   'sphinx',
@@ -21,6 +15,26 @@ publication = [
   'bump2version',
   'twine',
 ]
+
+[[development.base]]
+requirement = 'invoke @ git+https://github.com/emcd/invoke.git@fb40a3c79b3fa59cb589a642d0c4b8fa87ca082e'
+comments = [
+  ''' Invoke is broken on Python 3.11 because of removal of 'inspect.getargspec'.
+      https://github.com/pyinvoke/invoke/issues/833
+      Fork of repository is used as workaround for now. ''',
+]
+
+[[development.base]]
+requirement = 'lockup'
+
+[[development.base]]
+requirement = 'shellingham'
+
+[[development.base]]
+requirement = 'tomli'
+
+[[development.base]]
+requirement = 'tomli-w'
 
 [[development.format]]
 requirement = 'yapf >= 0.32'
