@@ -11,7 +11,7 @@ jobs:
     uses: ./.github/workflows/reusable--initializer.yaml
   update:
     needs: initialize
-    uses: emcd/python-devshim/.github/workflows/reusable--updater.yaml@v1.0a202210291425
+    uses: emcd/python-devshim/.github/workflows/reusable--updater.yaml@stable
     secrets:
       GHA_COMMIT_SIGNING_KEY: '${{ secrets.GHA_COMMIT_SIGNING_KEY }}'
     with:

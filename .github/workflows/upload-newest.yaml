@@ -10,7 +10,7 @@ jobs:
     if: "${{ github.event.workflow_run.conclusion == 'success' }}"
     steps:
       - name: Prepare
-        uses: emcd/python-devshim/.github/actions/python-venv@v1.0a202210291425
+        uses: emcd/python-devshim/.github/actions/python-venv@stable
       - name: Load PGP Key
         uses: crazy-max/ghaction-import-gpg@v5
         with:
