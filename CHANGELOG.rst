@@ -19,6 +19,18 @@
 Changelog
 ===============================================================================
 
+v2.1.0
+-------------------------------------------------------------------------------
+
+Python Support
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Remove Pyston because its maintainers have decided upon another direction.
+  The ``reflection`` module still recognizes Pyston, but there is no support
+  for this Python implementation, going forward.
+
+* Add CPython 3.11.
+
 v2.0.0
 -------------------------------------------------------------------------------
 
