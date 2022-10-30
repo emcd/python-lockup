@@ -1,4 +1,4 @@
-name: fresheners
+name: updater
 on:
   schedule:
     - cron: '0 0 * * *'
