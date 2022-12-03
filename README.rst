@@ -342,6 +342,7 @@ It likely works on others as well, but please report if it does not.
 .. TODO: https://github.com/facebookincubator/cinder
 .. TODO: https://github.com/oracle/graalpython
 .. TODO: https://github.com/IronLanguages/ironpython3
+.. TODO: https://pyodide.org/en/stable
 .. TODO: https://github.com/RustPython/RustPython
 
 .. TODO: https://pypi.org/project/cindervm/
@@ -359,6 +360,10 @@ It likely works on others as well, but please report if it does not.
 .. image:: https://img.shields.io/github/last-commit/emcd/python-lockup
    :alt: GitHub last commit
    :target: https://github.com/emcd/python-lockup
+
+.. image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit
+   :alt: pre-commit
+   :target: https://github.com/pre-commit/pre-commit
 
 .. image:: https://img.shields.io/badge/security-bandit-yellow.svg
    :alt: Security Status
