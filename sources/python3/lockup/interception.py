@@ -86,7 +86,7 @@ def create_interception_decorator(
         from functools import wraps
 
         # https://github.com/returntocorp/semgrep-rules/issues/2367
-        # nosemgrep: local.scm-modules.python-devshim.scm-modules.semgrep-rules.python.lang.maintainability.useless-inner-function
+        # nosemgrep: python.lang.maintainability.useless-inner-function
         @wraps( invocation )
         def interception_invoker( *posargs, **nomargs ):
             ''' Intercepts function invocations and apprehends fugitives. '''

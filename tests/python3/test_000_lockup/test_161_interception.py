@@ -129,6 +129,7 @@ def test_033_relay_permissible_with_interceptor( exception_class ):
 
 def test_034_intercept_invalid_invocation( ):
     ''' Special report on invalid invocation arguments. '''
+    # nosemgrep: python.lang.best-practice.pass-body-fn
     @__.our_interceptor
     def a_function( ): pass
     with raises( __.exceptions.IncorrectData ):

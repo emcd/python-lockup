@@ -20,20 +20,30 @@
 ''' Setuptools configuration and support. '''
 
 
-def _configure( ):
-    from pathlib import Path
-    project_path = Path( __file__ ).parent
-    from importlib.util import module_from_spec, spec_from_file_location
-    module_spec = spec_from_file_location(
-        '_develop', project_path / 'develop.py' )
-    module = module_from_spec( module_spec )
-    module_spec.loader.exec_module( module )
-    module.configure_auxiliary( project_path )
+def _prepare( ):
     if False: # pylint: disable=using-constant-test
         from os import environ as current_process_environment
         current_process_environment[ 'DISTUTILS_DEBUG' ] = 'True'
+    from pathlib import Path
+    project_location = Path( __file__ ).parent
+    from importlib.util import module_from_spec, spec_from_file_location
+    module_spec = spec_from_file_location(
+        '_develop', project_location / 'develop.py' )
+    module = module_from_spec( module_spec )
+    module_spec.loader.exec_module( module )
+    module.prepare( project_location )
+    # Only want our main cache on the modules search path long enough to ensure
+    # successful import of our own sources to assist in build preparation. Do
+    # not want to see build helper or its dependencies during actual build of
+    # package or anytime afterwards (such as virtual environment construction)
+    # as this can lead to conflicts.
+    with module.imports_from_cache(
+        module.ensure_packages_cache( 'main' )
+    ):
+        from devshim.data import paths # pylint: disable=import-error
+    return paths
 
-_configure( )
+_paths = _prepare( )
 
 
 # Overridden Setuptools Command Attributes
@@ -49,8 +59,7 @@ class BuildCommand( _BuildCommand ): # pylint: disable=too-many-ancestors
     def initialize_options( self ):
         ''' Override 'build_base' attribute. '''
         _BuildCommand.initialize_options( self )
-        from devshim__base import paths
-        self.build_base = str( paths.caches.setuptools )
+        self.build_base = str( _paths.caches.setuptools )
 
 
 from setuptools.command.egg_info import egg_info as _EggInfoCommand
@@ -62,8 +71,7 @@ class EggInfoCommand( _EggInfoCommand ):
     def initialize_options( self ):
         ''' Override 'egg_base' attribute. '''
         _EggInfoCommand.initialize_options( self )
-        from devshim__base import paths
-        self.egg_base = str( paths.caches.setuptools ) # pylint: disable=attribute-defined-outside-init
+        self.egg_base = str( _paths.caches.setuptools ) # pylint: disable=attribute-defined-outside-init
 
 
 from setuptools.command.sdist import sdist as _SdistCommand
@@ -73,8 +81,7 @@ class SdistCommand( _SdistCommand ): # pylint: disable=too-many-ancestors
     def initialize_options( self ):
         ''' Override 'dist_dir' attribute. '''
         _SdistCommand.initialize_options( self )
-        from devshim__base import paths
-        self.dist_dir = str( paths.artifacts.sdists )
+        self.dist_dir = str( _paths.artifacts.sdists )
 
 
 from wheel.bdist_wheel import bdist_wheel as _BdistWheelCommand
@@ -84,25 +91,7 @@ class BdistWheelCommand( _BdistWheelCommand ):
     def initialize_options( self ):
         ''' Override 'dist_dir' attribute. '''
         _BdistWheelCommand.initialize_options( self )
-        from devshim__base import paths
-        self.dist_dir = str( paths.artifacts.wheels ) # pylint: disable=attribute-defined-outside-init
-
-
-def _generate_nominative_arguments( ):
-    ''' Generates nominative arguments to 'setuptools.setup'. '''
-    return dict(
-        install_requires = _generate_installation_requirements( ),
-    )
-
-
-def _generate_installation_requirements( ):
-    ''' Generates installation requirements from local configuration. '''
-    from devshim__base import (
-        extract_python_package_requirements,
-        indicate_python_packages,
-    )
-    return extract_python_package_requirements(
-        indicate_python_packages( )[ 0 ], 'installation' )
+        self.dist_dir = str( _paths.artifacts.wheels ) # pylint: disable=attribute-defined-outside-init
 
 
 # https://docs.python.org/3/distutils/setupscript.html#writing-the-setup-script
@@ -114,5 +103,4 @@ setup(
         'egg_info': EggInfoCommand,
         'sdist': SdistCommand,
     },
-    **_generate_nominative_arguments( )
 )
