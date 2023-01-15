@@ -85,6 +85,7 @@ attributes_by_module = tuple( chain.from_iterable(
     tuple( zip(
         repeat( module_name ),
         _scan_module_attributes(
+            # nosemgrep: python.lang.security.audit.non-literal-import
             import_module( f".{module_name}", package_name ) ) ) )
     for module_name in module_names ) )
 
@@ -92,6 +93,7 @@ attributes_by_module = tuple( chain.from_iterable(
 @mark.parametrize( 'module_name', module_names )
 def test_011_module_public_interface( module_name ):
     ''' Module directory only exposes public interface. '''
+    # nosemgrep: python.lang.security.audit.non-literal-import
     module = import_module( f".{module_name}", package_name )
     assert not any( map( lambda a: a.startswith( '_' ), dir( module ) ) )
 

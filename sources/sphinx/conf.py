@@ -8,7 +8,10 @@
 """
 
 
-def _configure( ):
+def _prepare( ):
+    #from os import environ as current_process_environment
+    #if 'True' != current_process_environment.get( 'READTHEDOCS', 'False' ):
+    #    return
     from pathlib import Path
     project_path = Path( __file__ ).parent.parent.parent
     from importlib.util import module_from_spec, spec_from_file_location
@@ -16,35 +19,19 @@ def _configure( ):
         '_develop', project_path / 'develop.py' )
     module = module_from_spec( module_spec )
     module_spec.loader.exec_module( module )
-    module.configure_auxiliary( project_path )
-
-_configure( )
-
-
-def _install_prerequisite_packages( ):
+    module.prepare( project_path )
+    with module.imports_from_cache(
+        module.ensure_packages_cache( 'main' )
+    ):
+        from devshim.packages import ensure_python_packages # pylint: disable=import-error
+        from devshim.project import discover_information # pylint: disable=import-error
     # Hack to install documentation requirements for ReadTheDocs builder.
     # (Better than maintaining a separate 'requirements.txt'.)
-    from os import environ as current_process_environment
-    from shlex import split as split_command
-    from devshim__base import (
-        extract_python_package_requirements,
-        indicate_python_packages,
-        paths,
-        standard_execute_external,
-    )
-    if 'True' != current_process_environment.get( 'READTHEDOCS', 'False' ):
-        return
-    requirements = extract_python_package_requirements(
-        indicate_python_packages( )[ 0 ], 'development.documentation' )
-    # TODO: Handle constraints on package names in requirements.
-    manifest = tuple(
-        package_name for package_name in requirements
-        if 'sphinx' != package_name )
-    standard_execute_external(
-        ( *split_command( 'pip install --upgrade' ), *manifest ) )
-    from sys import path as python_search_paths
-    python_search_paths.insert( 0, str( paths.sources.prj.python3 ) )
-_install_prerequisite_packages( )
+    ensure_python_packages(
+        domain = 'development.documentation', excludes = ( 'sphinx', ) )
+    return discover_information( )
+
+_information = _prepare( )
 
 
 # -- Project information -----------------------------------------------------
@@ -57,8 +44,6 @@ def _calculate_copyright_notice( information, author_ ):
     else: year_range = str( first_year )
     return f"{year_range}, {author_}"
 
-from devshim__base import discover_project_information
-_information = discover_project_information( )
 project = _information[ 'name' ]
 release = _information[ 'version' ]
 author = _information[ 'authors' ][ 0 ][ 'name' ]

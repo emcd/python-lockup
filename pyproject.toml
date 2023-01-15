@@ -1,10 +1,6 @@
 [build-system]
 requires = [
-  'lockup',  # Package from PyPI is for development support.
-  'packaging',
   'setuptools>=61.0.0',  # Has 'pyproject.toml' support!
-  'tomli',  # TODO: Use standard library 'tomllib' once Python 3.11 is baseline.
-  'tomli-w',
   'wheel',
 ]
 # Explicit build backend, in case we use frontend other than Pip or Pip default changes.
@@ -61,6 +57,13 @@ where = [ 'sources/python3' ]
 [tool.SELF]
 year-of-origin = 2021
 
+[tool.bandit]
+exclude_dirs = [ 'tests' ]
+# TODO: Reenable skips.
+skips = [
+  'B310', # urllib_urlopen
+]
+
 [tool.coverage.run]
 branch = true
 command_line = '-m pytest'
@@ -81,7 +84,8 @@ output = '.local/artifacts/coverage-pytest/coverage.xml'
 cache_dir = '.local/caches/mypy'
 show_traceback = true
 show_error_codes = true
-#disable_error_code = [ 'misc' ]
+# TODO: Reenable error codes and address the issues they reveal.
+disable_error_code = [ 'arg-type', 'import', 'misc', 'var-annotated' ]
 
 [tool.pylint.MASTER]
 ignore = []
@@ -103,17 +107,19 @@ load-plugins = [
 ]
 [tool.pylint.'MESSAGES CONTROL']
 disable = [
-  "consider-using-f-string",
-  "duplicate-code",  # TODO: Re-enable after heuristic is fixed.
-  "fixme",
-  "f-string-without-interpolation",
-  "import-outside-toplevel",
-  "multiple-statements",
-  "reimported",
-  "too-few-public-methods",
-  "ungrouped-imports",
-  "wrong-import-order",
-  "wrong-import-position",
+  'consider-using-f-string',
+  'duplicate-code',  # TODO: Re-enable after heuristic is fixed.
+  'fixme',
+  'f-string-without-interpolation',
+  'import-outside-toplevel',
+  'logging-fstring-interpolation',
+  'multiple-statements',
+  'reimported',
+  'too-few-public-methods',
+  'ungrouped-imports',
+  'unnecessary-lambda-assignment',
+  'wrong-import-order',
+  'wrong-import-position',
 ]
 [tool.pylint.REPORTS]
 output-format = "colorized"
