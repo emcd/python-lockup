@@ -47,7 +47,7 @@ email = 'python-lockup@googlegroups.com'
 # https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
 # https://setuptools.pypa.io/en/latest/references/keywords.html
 [tool.setuptools.dynamic.readme]
-file = [ 'README.rst', 'CHANGELOG.rst' ]
+file = [ 'README.rst', 'sources/sphinx/changelog.rst' ]
 content-type = 'text/x-rst'
 # https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
 [tool.setuptools.packages.find]

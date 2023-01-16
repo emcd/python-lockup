@@ -11,6 +11,9 @@ documentation = [
   'sphinx-copybutton',
   'sphinx-inline-tabs',
 ]
+packaging = [
+  'build',
+]
 publication = [
   'bump2version',
   'twine',
@@ -67,6 +70,9 @@ comments = [
 
 [[development.test]]
 requirement = 'hypothesis'
+
+[[development.test]]
+requirement = 'pre-commit'
 
 [[development.test]]
 requirement = 'pytest'

@@ -39,12 +39,6 @@ title = 'Python 3.11'
 #providers = [ 'python-build', ]
 #title = 'Python 3.8 +TRACEREFS'
 
-[versions.'pypy-3.7']
-base-version = '3.7'
-implementation = 'pypy'
-providers = [ 'python-build', ]
-title = 'PyPy 3.7'
-
 [versions.'pypy-3.8']
 base-version = '3.8'
 implementation = 'pypy'

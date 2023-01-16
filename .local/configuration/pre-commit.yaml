@@ -5,12 +5,79 @@ repos:
   rev: v4.4.0
   hooks:
   - id: check-added-large-files
+  - id: check-ast
+    fail_fast: true
   - id: check-case-conflict
   - id: check-docstring-first
+  - id: check-json
   - id: check-merge-conflict
   - id: check-symlinks
   - id: check-toml
   - id: check-yaml
+  - id: check-vcs-permalinks
   - id: debug-statements
   - id: destroyed-symlinks
   - id: detect-private-key
+  - id: mixed-line-ending
+    args: [ '--fix', 'no' ]
+# TODO? yapf
+# TODO: Apply linting steps with passed files.
+#       Cannot do this with Invoke's argument parsing.
+- repo: local
+  hooks:
+  - id: devshim-pylint
+    name: Devshim Lint Pylint
+    stages: [ 'push' ]
+    fail_fast: true
+    language: system
+    always_run: true
+    pass_filenames: false
+    entry: 'python3 develop.py lint.pylint'
+  - id: devshim-semgrep
+    name: Devshim Lint Semgrep
+    stages: [ 'push' ]
+    fail_fast: true
+    language: system
+    always_run: true
+    pass_filenames: false
+    entry: 'python3 develop.py lint.semgrep'
+  - id: devshim-mypy
+    name: Devshim Lint Mypy
+    stages: [ 'push' ]
+    fail_fast: true
+    language: system
+    always_run: true
+    pass_filenames: false
+    entry: 'python3 develop.py lint.mypy'
+  - id: devshim-bandit
+    name: Devshim Lint Bandit
+    stages: [ 'push' ]
+    fail_fast: true
+    language: system
+    always_run: true
+    pass_filenames: false
+    entry: 'python3 develop.py lint.bandit'
+  - id: devshim-test
+    name: Devshim Test Suite
+    stages: [ 'push' ]
+    fail_fast: true
+    language: system
+    always_run: true
+    pass_filenames: false
+    entry: 'python3 develop.py test --no-ensure-sanity'
+  - id: devshim-html
+    name: Devshim Documentation
+    stages: [ 'push' ]
+    fail_fast: true
+    language: system
+    always_run: true
+    pass_filenames: false
+    entry: 'python3 develop.py make.html'
+  - id: devshim-wheel
+    name: Devshim Packages
+    stages: [ 'push' ]
+    fail_fast: true
+    language: system
+    always_run: true
+    pass_filenames: false
+    entry: 'python3 develop.py make.wheel --no-ensure-sanity --no-signature'
