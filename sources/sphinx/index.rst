@@ -17,7 +17,7 @@
    +--------------------------------------------------------------------------+
 
 
-.. include:: README.rst
+.. include:: ../../README.rst
 
 
 Table of Contents
@@ -29,7 +29,7 @@ Table of Contents
    api
    contribution
    license
-   CHANGELOG
+   changelog
 
 
 Indices
