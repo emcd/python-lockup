@@ -222,7 +222,7 @@ def discover_repository_apex_directory( ):
                 current_process_environment
                 .get( 'GIT_CEILING_DIRECTORIES', '' ).split( pathsep ) ) ) ) )
     while location not in ceilings:
-        if ( location / '.git' ).is_dir( ): return location
+        if ( location / '.git' ).exists( ): return location
         location = location.parent
     raise FileNotFoundError
 
@@ -230,11 +230,21 @@ def discover_repository_apex_directory( ):
 def discover_repository_records_directory( ):
     ''' Discovers records directory of repository. '''
     # Note: 'FileNotFoundError' exceptions are allowed to propagate by design.
+    apex_location = _data.locations.repository_apex
     records_location = (
         Path(
             current_process_environment.get( 'GIT_DIR' )
-            or ( _data.locations.repository_apex / '.git' ) )
+            or ( apex_location / '.git' ) )
         .resolve( strict = True ) )
+    # Account for indirection file in submodules.
+    if records_location.is_file( ):
+        with records_location.open( encoding = 'utf-8' ) as file:
+            for line in file:
+                if not line.startswith( 'gitdir: ' ): continue
+                records_location = (
+                    ( apex_location / line.split( ': ' )[ -1 ].strip( ) )
+                    .resolve( strict = True ) )
+                break
     if not records_location.is_dir( ): raise FileNotFoundError
     return records_location
 
