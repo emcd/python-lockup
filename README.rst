@@ -50,9 +50,9 @@
 `API Documentation (current) <https://emcd.github.io/python-lockup/api.html>`_
 |
 `Code of Conduct
-<https://emcd.github.io/python-lockup/contribution.html#code-of-conduct>`_
+<https://emcd.github.io/python-devshim/contribution.html#code-of-conduct>`_
 |
-`Contribution Guide <https://emcd.github.io/python-lockup/contribution.html>`_
+`Contribution Guide <https://emcd.github.io/python-devshim/contribution.html>`_
 
 Overview
 ===============================================================================
