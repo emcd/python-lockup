@@ -12,7 +12,7 @@ build-backend = 'setuptools.build_meta'
 # https://packaging.python.org/en/latest/specifications/declaring-project-metadata
 dynamic = [ 'readme' ]
 name = 'lockup'
-version = '2.2a202301160305' # TODO: should be dynamic
+version = '2.2a202303191802' # TODO: should be dynamic
 description = 'Immutable and concealed attributes for classes, modules, and namespaces.'
 license = { text = 'Apache-2.0' }
 keywords = [ 'api', 'attribute', 'concealment', 'immutability', 'namespace' ]
