@@ -31,16 +31,16 @@ def _prepare( ):
         '_develop', project_location / 'develop.py' )
     module = module_from_spec( module_spec )
     module_spec.loader.exec_module( module )
-    module.prepare( project_location )
-    # Only want our main cache on the modules search path long enough to ensure
-    # successful import of our own sources to assist in build preparation. Do
-    # not want to see build helper or its dependencies during actual build of
-    # package or anytime afterwards (such as virtual environment construction)
-    # as this can lead to conflicts.
-    with module.imports_from_cache(
-        module.ensure_packages_cache( 'main' )
-    ):
-        from devshim.data import paths # pylint: disable=import-error
+    package_discovery_manager, packages_cache_manager = (
+        module.ensure_sanity( ) )
+    # Only want our main cache and our sources on the modules search path long
+    # enough to ensure successful import of our own sources to assist in build
+    # preparation. Do not want to see ourself or our dependencies during actual
+    # build of package or anytime afterwards (such as virtual environment
+    # construction) as this can lead to conflicts.
+    with packages_cache_manager:
+        with package_discovery_manager:
+            from devshim.data import paths # pylint: disable=import-error
     return paths
 
 _paths = _prepare( )
