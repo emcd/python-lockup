@@ -52,7 +52,7 @@
 `Code of Conduct
 <https://emcd.github.io/python-devshim/contribution.html#code-of-conduct>`_
 |
-`Contribution Guide <https://emcd.github.io/python-devshim/contribution.html>`_
+`Contribution Guide <https://emcd.github.io/python-lockup/contribution.html>`_
 
 Overview
 ===============================================================================
