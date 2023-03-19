@@ -12,11 +12,11 @@ jobs:
     strategy:
       matrix:
         python-version: ${{ fromJSON(needs.initialize.outputs.python-versions-json) }}
-    uses: emcd/python-devshim/.github/workflows/reusable--tester.yaml@prerelease-1.0a20230114
+    uses: emcd/python-devshim/.github/workflows/reusable--tester.yaml@prerelease-1.0a20230319
     with:
       python-version: '${{ matrix.python-version }}'
   report:
     needs: test
-    uses: emcd/python-devshim/.github/workflows/reusable--reporter.yaml@prerelease-1.0a20230114
+    uses: emcd/python-devshim/.github/workflows/reusable--reporter.yaml@prerelease-1.0a20230319
     with:
       publish: "${{ 'master' == github.ref_name }}"

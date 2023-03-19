@@ -9,27 +9,29 @@
 
 
 def _prepare( ):
-    #from os import environ as current_process_environment
-    #if 'True' != current_process_environment.get( 'READTHEDOCS', 'False' ):
-    #    return
     from pathlib import Path
-    project_path = Path( __file__ ).parent.parent.parent
+    project_location = Path( __file__ ).parent.parent.parent
     from importlib.util import module_from_spec, spec_from_file_location
     module_spec = spec_from_file_location(
-        '_develop', project_path / 'develop.py' )
+        '_develop', project_location / 'develop.py' )
     module = module_from_spec( module_spec )
     module_spec.loader.exec_module( module )
-    module.prepare( project_path )
-    with module.imports_from_cache(
-        module.ensure_packages_cache( 'main' )
-    ):
-        from devshim.packages import ensure_python_packages # pylint: disable=import-error
+    package_discovery_manager, packages_cache_manager = (
+        module.ensure_sanity( ) )
+    from os import environ as current_process_environment
+    from contextlib import ExitStack as CMStack
+    with CMStack( ) as contexts:
+        contexts.enter_context( packages_cache_manager )
+        contexts.enter_context( package_discovery_manager )
+        if 'True' == current_process_environment.get( 'READTHEDOCS', 'False' ):
+            # Hack to install requirements for ReadTheDocs builder.
+            # (Better than maintaining a separate 'requirements.txt'.)
+            from devshim.packages import ensure_python_packages # pylint: disable=import-error
+            ensure_python_packages(
+                domain = 'development.documentation',
+                excludes = ( 'sphinx', ) )
         from devshim.project import discover_information # pylint: disable=import-error
-    # Hack to install documentation requirements for ReadTheDocs builder.
-    # (Better than maintaining a separate 'requirements.txt'.)
-    ensure_python_packages(
-        domain = 'development.documentation', excludes = ( 'sphinx', ) )
-    return discover_information( )
+        return discover_information( )
 
 _information = _prepare( )
 

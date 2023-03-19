@@ -1,0 +1,29 @@
+format-version = 1
+
+[descriptors.'cpython-3.7']
+language-descriptors = { python = 'cpython-3.7' }
+title = 'Python 3.7'
+
+[descriptors.'cpython-3.8']
+language-descriptors = { python = 'cpython-3.8' }
+title = 'Python 3.8'
+
+[descriptors.'cpython-3.9']
+language-descriptors = { python = 'cpython-3.9' }
+title = 'Python 3.9'
+
+[descriptors.'cpython-3.10']
+language-descriptors = { python = 'cpython-3.10' }
+title = 'Python 3.10'
+
+[descriptors.'cpython-3.11']
+language-descriptors = { python = 'cpython-3.11' }
+title = 'Python 3.11'
+
+[descriptors.'pypy-3.8']
+language-descriptors = { python = 'pypy-3.8' }
+title = 'PyPy 3.8'
+
+[descriptors.'pypy-3.9']
+language-descriptors = { python = 'pypy-3.9' }
+title = 'PyPy 3.9'
