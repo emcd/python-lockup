@@ -1,11 +1,5 @@
 format-version = 1
 
-[descriptors.'cpython-3.7']
-base-version = '3.7'
-implementation = 'cpython'
-providers = [ 'windows-embeddable', 'python-build', ]
-title = 'Python 3.7'
-
 [descriptors.'cpython-3.8']
 base-version = '3.8'
 implementation = 'cpython'
