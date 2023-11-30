@@ -19,7 +19,7 @@ jobs:
         id: python-versions
         run: |
           python_versions=(
-            'cpython-3.7' 'cpython-3.8' 'cpython-3.9' 'cpython-3.10' 'cpython-3.11'
+            'cpython-3.8' 'cpython-3.9' 'cpython-3.10' 'cpython-3.11'
             'pypy-3.8' 'pypy-3.9'
           )
           # TODO: 'cpython-3.8--tracerefs'
