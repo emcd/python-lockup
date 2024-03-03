@@ -60,7 +60,7 @@ def assert_minimum_python_version( ):
         Checking the Python version must be done in a backwards-compatible
         manner, so as to not trigger syntax exceptions in the checking logic.
         (Compatibility of this logic has been tested back to Python 2.6.) '''
-    required_version = 3, 7
+    required_version = 3, 8
     error_message = '\nERROR: Python {0}.{1} or higher required.\n'.format(
         required_version[ 0 ], required_version[ 1 ] )
     from sys import stderr, version_info
