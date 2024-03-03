@@ -11,5 +11,3 @@ jobs:
   publish:
     needs: initialize
     uses: emcd/python-devshim/.github/workflows/reusable--publisher.yaml@prerelease-1.0a20240303
-    secrets:
-      GHA_COMMIT_SIGNING_KEY: '${{ secrets.GHA_COMMIT_SIGNING_KEY }}'
