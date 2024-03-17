@@ -63,7 +63,7 @@ class BuildCommand( _BuildCommand ): # pylint: disable=too-many-ancestors
 
 
 from setuptools.command.egg_info import egg_info as _EggInfoCommand
-class EggInfoCommand( _EggInfoCommand ):
+class EggInfoCommand( _EggInfoCommand ): # pylint: disable=too-many-ancestors
     ''' With overridden 'egg_base' attribute. '''
     # https://github.com/pypa/setuptools/issues/1347#issuecomment-707979218
     # https://github.com/pypa/setuptools/milestone/3

@@ -148,7 +148,7 @@ valid-classmethod-first-arg = ["kind", "class_"]
 valid-metaclass-classmethod-first-arg = ["maker", "factory"]
 exclude-protected = []
 [tool.pylint.EXCEPTIONS]
-overgeneral-exceptions = ["BaseException", "Exception"]
+overgeneral-exceptions = ["builtins.BaseException", "builtins.Exception"]
 [tool.pylint.SIMILARITIES]
 min-similarity-lines = 5
 ignore-imports = true
