@@ -470,10 +470,10 @@ digests = [
 
 [["cpython-3.10.13--linux-64bit--x86_64"]]
 name = "hypothesis"
-version = "6.99.6"
+version = "6.99.8"
 digests = [
-    "sha256:f5287e0ca8be94b2129483e1268639f8675c8c041d1b1756561a374575659940",
-    "sha256:397e362c8d7e3a5f4654644db964759f6a7f26a8c8a46d2a9e909595d9769ed1",
+    "sha256:8b5175a906c0a11967c3a04eeb17c42b4b395cacd02a246ce926613189a14279",
+    "sha256:1274abcc12137645a1bcb8453063060cf38f949a90b31d08bea45e1818e05b8b",
 ]
 
 [["cpython-3.10.13--linux-64bit--x86_64"]]
@@ -1867,10 +1867,10 @@ digests = [
 
 [["cpython-3.11.8--linux-64bit--x86_64"]]
 name = "hypothesis"
-version = "6.99.6"
+version = "6.99.8"
 digests = [
-    "sha256:f5287e0ca8be94b2129483e1268639f8675c8c041d1b1756561a374575659940",
-    "sha256:397e362c8d7e3a5f4654644db964759f6a7f26a8c8a46d2a9e909595d9769ed1",
+    "sha256:8b5175a906c0a11967c3a04eeb17c42b4b395cacd02a246ce926613189a14279",
+    "sha256:1274abcc12137645a1bcb8453063060cf38f949a90b31d08bea45e1818e05b8b",
 ]
 
 [["cpython-3.11.8--linux-64bit--x86_64"]]
@@ -3264,10 +3264,10 @@ digests = [
 
 [["cpython-3.8.18--linux-64bit--x86_64"]]
 name = "hypothesis"
-version = "6.99.6"
+version = "6.99.8"
 digests = [
-    "sha256:f5287e0ca8be94b2129483e1268639f8675c8c041d1b1756561a374575659940",
-    "sha256:397e362c8d7e3a5f4654644db964759f6a7f26a8c8a46d2a9e909595d9769ed1",
+    "sha256:8b5175a906c0a11967c3a04eeb17c42b4b395cacd02a246ce926613189a14279",
+    "sha256:1274abcc12137645a1bcb8453063060cf38f949a90b31d08bea45e1818e05b8b",
 ]
 
 [["cpython-3.8.18--linux-64bit--x86_64"]]
@@ -4685,10 +4685,10 @@ digests = [
 
 [["cpython-3.9.18--linux-64bit--x86_64"]]
 name = "hypothesis"
-version = "6.99.6"
+version = "6.99.8"
 digests = [
-    "sha256:f5287e0ca8be94b2129483e1268639f8675c8c041d1b1756561a374575659940",
-    "sha256:397e362c8d7e3a5f4654644db964759f6a7f26a8c8a46d2a9e909595d9769ed1",
+    "sha256:8b5175a906c0a11967c3a04eeb17c42b4b395cacd02a246ce926613189a14279",
+    "sha256:1274abcc12137645a1bcb8453063060cf38f949a90b31d08bea45e1818e05b8b",
 ]
 
 [["cpython-3.9.18--linux-64bit--x86_64"]]
@@ -6125,10 +6125,10 @@ digests = [
 
 [["pypy-3.10.13-7.3.15--linux-64bit--x86_64"]]
 name = "hypothesis"
-version = "6.99.6"
+version = "6.99.8"
 digests = [
-    "sha256:f5287e0ca8be94b2129483e1268639f8675c8c041d1b1756561a374575659940",
-    "sha256:397e362c8d7e3a5f4654644db964759f6a7f26a8c8a46d2a9e909595d9769ed1",
+    "sha256:8b5175a906c0a11967c3a04eeb17c42b4b395cacd02a246ce926613189a14279",
+    "sha256:1274abcc12137645a1bcb8453063060cf38f949a90b31d08bea45e1818e05b8b",
 ]
 
 [["pypy-3.10.13-7.3.15--linux-64bit--x86_64"]]
@@ -7511,10 +7511,10 @@ digests = [
 
 [["pypy-3.9.18-7.3.15--linux-64bit--x86_64"]]
 name = "hypothesis"
-version = "6.99.6"
+version = "6.99.8"
 digests = [
-    "sha256:f5287e0ca8be94b2129483e1268639f8675c8c041d1b1756561a374575659940",
-    "sha256:397e362c8d7e3a5f4654644db964759f6a7f26a8c8a46d2a9e909595d9769ed1",
+    "sha256:8b5175a906c0a11967c3a04eeb17c42b4b395cacd02a246ce926613189a14279",
+    "sha256:1274abcc12137645a1bcb8453063060cf38f949a90b31d08bea45e1818e05b8b",
 ]
 
 [["pypy-3.9.18-7.3.15--linux-64bit--x86_64"]]
