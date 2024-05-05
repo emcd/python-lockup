@@ -1,5 +1,5 @@
 format-version = 1
 
 [platforms.linux-64bit--x86_64]
-implementation-version = "3.11.8"
+implementation-version = "3.11.9"
 provider = "python-build"
