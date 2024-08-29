@@ -85,7 +85,7 @@ class SdistCommand( _SdistCommand ): # pylint: disable=too-many-ancestors
 
 
 from wheel.bdist_wheel import bdist_wheel as _BdistWheelCommand
-class BdistWheelCommand( _BdistWheelCommand ):
+class BdistWheelCommand( _BdistWheelCommand ): # pylint: disable=too-many-ancestors
     ''' With overridden 'dist_dir' attribute. '''
 
     def initialize_options( self ):
