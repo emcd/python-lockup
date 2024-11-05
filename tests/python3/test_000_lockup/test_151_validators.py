@@ -46,6 +46,7 @@ class __( metaclass = _NamespaceClass ):
 from .invocables import InvocableObject as _InvocableObject
 _invocable_object = _InvocableObject( )
 _invocables = (
+    # nosemgrep: python.lang.maintainability.return-not-in-function
     lambda: None, __.our_interceptor, _InvocableObject,
     _invocable_object, _invocable_object.a_method,
 )
