@@ -27,7 +27,7 @@ repos:
   hooks:
   - id: devshim-pylint
     name: Devshim Lint Pylint
-    stages: [ 'push' ]
+    stages: [ 'pre-push' ]
     fail_fast: true
     language: system
     always_run: true
@@ -35,7 +35,7 @@ repos:
     entry: 'python3 develop.py lint.pylint'
   - id: devshim-semgrep
     name: Devshim Lint Semgrep
-    stages: [ 'push' ]
+    stages: [ 'pre-push' ]
     fail_fast: true
     language: system
     always_run: true
@@ -43,7 +43,7 @@ repos:
     entry: 'python3 develop.py lint.semgrep'
   - id: devshim-mypy
     name: Devshim Lint Mypy
-    stages: [ 'push' ]
+    stages: [ 'pre-push' ]
     fail_fast: true
     language: system
     always_run: true
@@ -51,7 +51,7 @@ repos:
     entry: 'python3 develop.py lint.mypy'
   - id: devshim-bandit
     name: Devshim Lint Bandit
-    stages: [ 'push' ]
+    stages: [ 'pre-push' ]
     fail_fast: true
     language: system
     always_run: true
@@ -59,7 +59,7 @@ repos:
     entry: 'python3 develop.py lint.bandit'
   - id: devshim-test
     name: Devshim Test Suite
-    stages: [ 'push' ]
+    stages: [ 'pre-push' ]
     fail_fast: true
     language: system
     always_run: true
@@ -67,7 +67,7 @@ repos:
     entry: 'python3 develop.py test --no-ensure-sanity'
   - id: devshim-html
     name: Devshim Documentation
-    stages: [ 'push' ]
+    stages: [ 'pre-push' ]
     fail_fast: true
     language: system
     always_run: true
@@ -75,7 +75,7 @@ repos:
     entry: 'python3 develop.py make.html'
   - id: devshim-wheel
     name: Devshim Packages
-    stages: [ 'push' ]
+    stages: [ 'pre-push' ]
     fail_fast: true
     language: system
     always_run: true
