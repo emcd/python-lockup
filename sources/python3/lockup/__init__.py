@@ -25,7 +25,7 @@
 
 
 # https://www.python.org/dev/peps/pep-0396/
-__version__ = '2.2rc1'
+__version__ = '2.2.0'
 
 
 # Public API
