@@ -20,6 +20,18 @@
                                     lockup
 *******************************************************************************
 
+
+
+⚠️ **Project Status: Unmaintained**
+
+    This project is no longer actively maintained. The replacement is `frigid
+    <https://pypi.org/project/frigid/>`_ which provides similar functionality
+    and is actively maintained.
+
+    No further updates will be provided for this package.
+
+
+
 .. image:: https://img.shields.io/pypi/v/lockup
    :alt: Project Version
    :target: https://pypi.org/project/lockup/
